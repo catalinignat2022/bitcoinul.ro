@@ -501,6 +501,18 @@ function bitcoinul_ro_customize_register($wp_customize) {
         'section'  => 'bitcoinul_ro_general',
         'type'     => 'text',
     ));
+
+    // Setare pentru CryptoPanic API Token (știri)
+    $wp_customize->add_setting('bitcoinul_ro_news_api_token', array(
+        'default'           => '',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('bitcoinul_ro_news_api_token', array(
+        'label'    => 'CryptoPanic API Token (știri)',
+        'section'  => 'bitcoinul_ro_general',
+        'type'     => 'text',
+        'description' => 'Cheie gratuită de pe cryptopanic.com (Free API). Folosită pentru pagina Știri.'
+    ));
 }
 add_action('customize_register', 'bitcoinul_ro_customize_register');
 
@@ -623,6 +635,10 @@ function bitcoinul_ro_create_pages() {
         'stiri' => array(
             'title' => 'Știri Bitcoin & Crypto',
             'template' => 'page-stiri.php'
+        ),
+        'calculatoare-bitcoin' => array(
+            'title' => 'Calculatoare Crypto',
+            'template' => 'page-calculatoare-bitcoin.php'
         )
     );
     
@@ -646,7 +662,14 @@ function bitcoinul_ro_create_pages() {
                 update_post_meta($page_id, '_wp_page_template', $page_data['template']);
             }
         } else {
-            // Dacă pagina există, actualizează template-ul
+            // Dacă pagina există, restaurează/publică și setează template-ul corect
+            if ($existing_page->post_status === 'trash') {
+                wp_untrash_post($existing_page->ID);
+                $existing_page->post_status = 'draft';
+            }
+            if ($existing_page->post_status !== 'publish') {
+                wp_update_post(array('ID' => $existing_page->ID, 'post_status' => 'publish'));
+            }
             if (isset($page_data['template'])) {
                 update_post_meta($existing_page->ID, '_wp_page_template', $page_data['template']);
             }
@@ -883,7 +906,7 @@ add_action('init', 'bitcoinul_ro_autoseed_guides_once', 40);
  */
 function bitcoinul_ro_force_recreate_pages() {
     // Șterge paginile existente
-    $pages_to_delete = array('exchange-uri', 'ghiduri', 'stiri');
+    $pages_to_delete = array('exchange-uri', 'ghiduri', 'stiri', 'calculatoare-bitcoin');
     
     foreach ($pages_to_delete as $slug) {
         $page = get_page_by_path($slug);
@@ -1023,7 +1046,9 @@ function bitcoinul_ro_autofix_important_pages() {
     if (is_admin()) return; // avoid overhead in admin
 
     // Avoid repeated work in a short window
-    if (get_transient('bitcoinul_ro_pages_autofix_done')) return;
+    // Bump the transient key to force one more pass after adding /stiri/ și /calculatoare-bitcoin/
+    $autofix_key = 'bitcoinul_ro_pages_autofix_done_v3';
+    if (get_transient($autofix_key)) return;
 
     $pages = array(
         'exchange-uri' => array(
@@ -1033,6 +1058,14 @@ function bitcoinul_ro_autofix_important_pages() {
         'ghiduri' => array(
             'title' => 'Ghiduri Bitcoin & Crypto',
             'template' => 'page-ghiduri.php',
+        ),
+        'stiri' => array(
+            'title' => 'Știri Bitcoin & Crypto',
+            'template' => 'page-stiri.php',
+        ),
+        'calculatoare-bitcoin' => array(
+            'title' => 'Calculatoare Crypto',
+            'template' => 'page-calculatoare-bitcoin.php',
         ),
     );
 
@@ -1053,6 +1086,15 @@ function bitcoinul_ro_autofix_important_pages() {
                 $need_flush = true;
             }
         } else {
+            // Restaurează din coș și publică dacă e nevoie
+            if ($page->post_status === 'trash') {
+                wp_untrash_post($page->ID);
+                $page->post_status = 'draft';
+            }
+            if ($page->post_status !== 'publish') {
+                wp_update_post(array('ID' => $page->ID, 'post_status' => 'publish'));
+                $need_flush = true;
+            }
             $current_tpl = get_post_meta($page->ID, '_wp_page_template', true);
             if ($current_tpl !== $info['template']) {
                 update_post_meta($page->ID, '_wp_page_template', $info['template']);
@@ -1064,7 +1106,7 @@ function bitcoinul_ro_autofix_important_pages() {
     // 2) Validate rewrite rules route to pages
     $rules = get_option('rewrite_rules');
     if (is_array($rules)) {
-        foreach (array('exchange-uri', 'ghiduri') as $slug) {
+        foreach (array('exchange-uri', 'ghiduri', 'stiri', 'calculatoare-bitcoin') as $slug) {
             $pattern = '^' . preg_quote($slug, '#') . '/?$';
             foreach ($rules as $rule => $target) {
                 if ($rule === $pattern) {
@@ -1082,7 +1124,7 @@ function bitcoinul_ro_autofix_important_pages() {
         // Make sure CPTs are registered before flushing
         bitcoinul_ro_custom_post_types();
         flush_rewrite_rules(false);
-        set_transient('bitcoinul_ro_pages_autofix_done', 1, HOUR_IN_SECONDS);
+        set_transient($autofix_key, 1, HOUR_IN_SECONDS);
     }
 }
 add_action('init', 'bitcoinul_ro_autofix_important_pages', 60);
@@ -1095,6 +1137,8 @@ function bitcoinul_ro_add_core_page_rewrites() {
     bitcoinul_ro_custom_post_types();
     add_rewrite_rule('^exchange-uri/?$', 'index.php?pagename=exchange-uri', 'top');
     add_rewrite_rule('^ghiduri/?$', 'index.php?pagename=ghiduri', 'top');
+    add_rewrite_rule('^stiri/?$', 'index.php?pagename=stiri', 'top');
+    add_rewrite_rule('^calculatoare-bitcoin/?$', 'index.php?pagename=calculatoare-bitcoin', 'top');
 }
 add_action('init', 'bitcoinul_ro_add_core_page_rewrites', 20);
 
@@ -1112,7 +1156,7 @@ function bitcoinul_ro_fix_pages_admin() {
     flush_rewrite_rules();
 
     add_action('admin_notices', function() {
-        echo '<div class="notice notice-success is-dismissible"><p>Paginile importante au fost verificate/creat și permalinks au fost reîmprospătate. Verifică /exchange-uri/ și /ghiduri/ pe frontend și golește cache-ul (plugin/CDN) dacă e cazul.</p></div>';
+        echo '<div class="notice notice-success is-dismissible"><p>Paginile importante au fost verificate/creat și permalinks au fost reîmprospătate. Verifică /exchange-uri/, /ghiduri/, /stiri/ și /calculatoare-bitcoin/ pe frontend și golește cache-ul (plugin/CDN) dacă e cazul.</p></div>';
     });
 }
 add_action('admin_init', 'bitcoinul_ro_fix_pages_admin');
@@ -1126,11 +1170,103 @@ function bitcoinul_ro_rescue_core_pages_on_404() {
 
     global $wp;
     $request = isset($wp->request) ? trim($wp->request, '/') : '';
-    $core_slugs = array('exchange-uri', 'ghiduri');
+    $core_slugs = array('exchange-uri', 'ghiduri', 'stiri', 'calculatoare-bitcoin');
 
+    // Acceptăm atât pretty URLs cât și /?pagename=...
+    $pagename_qv = get_query_var('pagename');
+    $target = '';
     if (in_array($request, $core_slugs, true)) {
-        wp_redirect(home_url('/index.php?pagename=' . $request), 302);
+        $target = $request;
+    } elseif (!empty($pagename_qv) && in_array($pagename_qv, $core_slugs, true)) {
+        $target = $pagename_qv;
+    }
+
+    if ($target) {
+        // Creează/publică pagina dacă lipsește
+        $page = get_page_by_path($target);
+        if (!$page) {
+            // Titluri implicite per slug
+            $titles = array(
+                'exchange-uri' => 'Exchange-uri Bitcoin România',
+                'ghiduri'      => 'Ghiduri Bitcoin & Crypto',
+                'stiri'        => 'Știri Bitcoin & Crypto',
+                'calculatoare-bitcoin' => 'Calculatoare Crypto',
+            );
+            $templates = array(
+                'exchange-uri' => 'page-exchange-uri.php',
+                'ghiduri'      => 'page-ghiduri.php',
+                'stiri'        => 'page-stiri.php',
+                'calculatoare-bitcoin' => 'page-calculatoare-bitcoin.php',
+            );
+            $page_id = wp_insert_post(array(
+                'post_title'  => isset($titles[$target]) ? $titles[$target] : ucfirst($target),
+                'post_name'   => $target,
+                'post_status' => 'publish',
+                'post_type'   => 'page',
+            ));
+            if ($page_id && !is_wp_error($page_id)) {
+                if (isset($templates[$target])) {
+                    update_post_meta($page_id, '_wp_page_template', $templates[$target]);
+                }
+            }
+        } else {
+            if ($page->post_status === 'trash') {
+                wp_untrash_post($page->ID);
+                $page->post_status = 'draft';
+            }
+            if ($page->post_status !== 'publish') {
+                wp_update_post(array('ID' => $page->ID, 'post_status' => 'publish'));
+            }
+        }
+
+        // Asigură regulile și redirecționează către URL-ul frumos
+        bitcoinul_ro_custom_post_types();
+        flush_rewrite_rules(false);
+        wp_redirect(home_url('/' . $target . '/'), 302);
         exit;
     }
 }
 add_action('template_redirect', 'bitcoinul_ro_rescue_core_pages_on_404', 0);
+
+/**
+ * AJAX proxy pentru CryptoPanic (știri) – evită CORS în browser și ascunde tokenul.
+ * Endpoint: /wp-admin/admin-ajax.php?action=bitcoinul_ro_fetch_news&page=1&kind=news&currencies=BTC,ETH
+ */
+function bitcoinul_ro_fetch_news_ajax() {
+    // Permite acces public (nu doar logat)
+    $token = trim(get_theme_mod('bitcoinul_ro_news_api_token', ''));
+    if (empty($token)) {
+        wp_send_json_error(array('message' => 'Lipsește token-ul API (Customizer > Setări Bitcoinul.ro).'));
+    }
+
+    $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+    $kind = isset($_GET['kind']) ? sanitize_text_field($_GET['kind']) : 'news';
+    $curr = isset($_GET['currencies']) ? preg_replace('/[^A-Z,]/', '', $_GET['currencies']) : 'BTC,ETH';
+
+    $url = add_query_arg(array(
+        'auth_token' => $token,
+        'page'       => max(1, $page),
+        'kind'       => $kind,
+        'currencies' => $curr,
+    ), 'https://cryptopanic.com/api/free/v1/posts/');
+
+    $resp = wp_remote_get($url, array('timeout' => 12, 'headers' => array('Accept' => 'application/json')));
+    if (is_wp_error($resp)) {
+        wp_send_json_error(array('message' => $resp->get_error_message()));
+    }
+
+    $code = wp_remote_retrieve_response_code($resp);
+    $body = wp_remote_retrieve_body($resp);
+    if ($code !== 200) {
+        wp_send_json_error(array('message' => 'API error', 'status' => $code, 'body' => $body));
+    }
+
+    $data = json_decode($body, true);
+    if (!is_array($data)) {
+        wp_send_json_error(array('message' => 'Invalid API response'));
+    }
+
+    wp_send_json_success($data);
+}
+add_action('wp_ajax_bitcoinul_ro_fetch_news', 'bitcoinul_ro_fetch_news_ajax');
+add_action('wp_ajax_nopriv_bitcoinul_ro_fetch_news', 'bitcoinul_ro_fetch_news_ajax');

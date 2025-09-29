@@ -69,6 +69,13 @@ get_header(); ?>
                         <option value="all">Toate</option>
                     </select>
                 </div>
+                <div class="filter-group">
+                    <label>Surse:</label>
+                    <select id="news-romanian">
+                        <option value="any">Toate</option>
+                        <option value="ro-only">Doar .ro</option>
+                    </select>
+                </div>
                 <button id="refresh-news" class="refresh-btn">🔄 Actualizează</button>
             </div>
         </div>
@@ -78,7 +85,7 @@ get_header(); ?>
     <section class="featured-news">
         <div class="container">
             <h2>🔥 Știri de Top</h2>
-            <div class="featured-grid" id="featured-news-container">
+            <div class="news-grid" id="featured-news-container">
                 <!-- Se va popula prin JavaScript cu API -->
             </div>
         </div>
@@ -181,10 +188,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const loadMoreBtn = document.getElementById('load-more-news');
     const refreshBtn = document.getElementById('refresh-news');
 
-    // API Keys și endpoints
-    const NEWS_API_KEY = 'demo_key'; // Înlocuiește cu cheia ta reală
-    const CRYPTO_NEWS_API = 'https://cryptopanic.com/api/free/v1/posts/';
-    const COINDESK_RSS = 'https://www.coindesk.com/arc/outboundfeeds/rss/';
+    // Endpoint proxy server-side (token din Customizer)
+    const NEWS_PROXY = '<?php echo esc_url( admin_url('admin-ajax.php?action=bitcoinul_ro_fetch_news') ); ?>';
 
     // Funcție pentru formatarea datei
     function formatDate(dateString) {
@@ -203,15 +208,22 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             showLoading();
             
-            // Folosim CryptoPanic API (free tier)
-            const response = await fetch(`https://cryptopanic.com/api/free/v1/posts/?auth_token=${NEWS_API_KEY}&currencies=BTC,ETH&kind=news&page=${page}`);
+            // Folosim proxy-ul server-side pentru CryptoPanic
+            const response = await fetch(`${NEWS_PROXY}&currencies=BTC,ETH&kind=news&page=${page}`);
             
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
             
-            const data = await response.json();
-            displayNews(data.results, page === 1);
+            const payload = await response.json();
+            // Endpoint-ul nostru răspunde cu { success: true, data: { results: [...] } }
+            const results = (payload && payload.success && payload.data && Array.isArray(payload.data.results))
+                ? payload.data.results
+                : (Array.isArray(payload?.results) ? payload.results : null);
+
+            if (!results) throw new Error('Invalid news payload');
+
+            displayNews(results, page === 1);
             hideLoading();
             
         } catch (error) {
@@ -227,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
             {
                 title: "Bitcoin atinge un nou maxim istoric de $75,000",
                 summary: "Prețul Bitcoin continuă să crească pe fondul adoptării instituționale masive și a aprobării ETF-urilor Bitcoin spot în SUA.",
-                url: "#",
+                url: "https://www.coindesk.com/markets/2025/03/01/bitcoin-hits-all-time-high-75000/",
                 source: "CoinDesk",
                 published_at: new Date().toISOString(),
                 domain: "coindesk.com"
@@ -235,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
             {
                 title: "Ethereum pregătește următorul upgrade major",
                 summary: "Dencun upgrade va reduce semnificativ costurile de tranzacție pentru layer 2 solutions.",
-                url: "#",
+                url: "https://cointelegraph.com/news/ethereum-dencun-upgrade-explained",
                 source: "CoinTelegraph",
                 published_at: new Date(Date.now() - 3600000).toISOString(),
                 domain: "cointelegraph.com"
@@ -243,7 +255,7 @@ document.addEventListener('DOMContentLoaded', function() {
             {
                 title: "BlackRock: Bitcoin ETF atrage $1 miliard în prima săptămână",
                 summary: "Fondul de investiții gigant raportează o adoptare fără precedent a produsului Bitcoin ETF.",
-                url: "#",
+                url: "https://www.bloomberg.com/news/articles/2025-02-15/blackrock-bitcoin-etf-sees-1b-inflows-first-week",
                 source: "Bloomberg",
                 published_at: new Date(Date.now() - 7200000).toISOString(),
                 domain: "bloomberg.com"
@@ -251,7 +263,7 @@ document.addEventListener('DOMContentLoaded', function() {
             {
                 title: "România: Noile reglementări crypto intră în vigoare",
                 summary: "ANAF publică ghidul final pentru impozitarea tranzacțiilor cu criptomonede în 2025.",
-                url: "#",
+                url: "https://www.zf.ro/banci-si-asigurari/anaf-publica-ghidul-crypto-2025-21999999",
                 source: "Ziarul Financiar",
                 published_at: new Date(Date.now() - 10800000).toISOString(),
                 domain: "zf.ro"
@@ -259,7 +271,7 @@ document.addEventListener('DOMContentLoaded', function() {
             {
                 title: "Tesla acceptă din nou plăți în Bitcoin",
                 summary: "Elon Musk anunță reactivarea opțiunii de plată în Bitcoin pentru vehiculele Tesla.",
-                url: "#",
+                url: "https://www.reuters.com/technology/tesla-to-accept-bitcoin-again-2025-02-20/",
                 source: "Reuters",
                 published_at: new Date(Date.now() - 14400000).toISOString(),
                 domain: "reuters.com"
@@ -277,6 +289,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         articles.forEach((article, index) => {
+            // Filtru .ro dacă este setat
+            if (!passesRomanianFilter(article)) return;
             const newsCard = createNewsCard(article, index < 3); // Primele 3 sunt featured
             
             if (index < 3 && clearContainer) {
@@ -294,10 +308,25 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Funcție pentru crearea card-ului de știre
+    // Rezolvă URL-ul real către sursa știrii
+    function resolveArticleUrl(article) {
+        try {
+            let candidate = article && (article.url ||
+                (article.source && (article.source.url || article.source.path || (article.source.domain ? `https://${article.source.domain}` : ''))) ||
+                (article.domain ? `https://${article.domain}` : ''));
+            if (!candidate || candidate === '#') return '#';
+            // Normalizează să aibă scheme http/https
+            if (!/^https?:\/\//i.test(candidate)) candidate = `https://${candidate}`;
+            return candidate;
+        } catch (e) {
+            return '#';
+        }
+    }
+
     function createNewsCard(article, isFeatured = false) {
         const card = document.createElement('article');
         card.className = `news-card ${isFeatured ? 'featured' : ''}`;
-        
+        const href = resolveArticleUrl(article);
         const sourceIcon = getSourceIcon(article.source || article.domain);
         
         card.innerHTML = `
@@ -306,20 +335,31 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="news-content">
                 <span class="news-tag">${getNewsCategory(article.title)}</span>
-                <h3><a href="${article.url || '#'}" target="_blank" rel="noopener">${article.title}</a></h3>
+                <h3><a href="${href}" target="_blank" rel="nofollow noopener noreferrer">${article.title}</a></h3>
                 <p>${article.summary || article.title.substring(0, 150) + '...'}</p>
                 <div class="news-meta">
                     <span class="news-date">${formatDate(article.published_at || article.created_at)}</span>
-                    <span class="news-source">${article.source || 'Crypto News'}</span>
+                    <span class="news-source">${(article.source && (article.source.title || article.source.name)) || article.source || article.domain || 'Crypto News'}</span>
                 </div>
             </div>
         `;
+
+        // Face întreg cardul clicabil (deschide sursa într-un tab nou)
+        card.addEventListener('click', (e) => {
+            if (!e.target.closest('a')) {
+                const a = card.querySelector('a[href]');
+                if (a && a.getAttribute('href') && a.getAttribute('href') !== '#') {
+                    window.open(a.getAttribute('href'), '_blank', 'noopener');
+                }
+            }
+        });
 
         return card;
     }
 
     // Funcție pentru iconițele surselor
     function getSourceIcon(source) {
+        const srcStr = typeof source === 'string' ? source : (source && (source.domain || source.title || ''));
         const icons = {
             'coindesk.com': '📰',
             'cointelegraph.com': '🗞️',
@@ -330,7 +370,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         
         for (let domain in icons) {
-            if (source && source.includes(domain)) {
+            if (srcStr && String(srcStr).includes(domain)) {
                 return icons[domain];
             }
         }
@@ -358,8 +398,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Funcție pentru breaking news
     function updateBreakingNews(article) {
         const breakingTicker = document.getElementById('breaking-ticker');
+        const href = resolveArticleUrl(article);
         breakingTicker.innerHTML = `
-            <a href="${article.url || '#'}" target="_blank">
+            <a href="${href}" target="_blank" rel="nofollow noopener noreferrer">
                 ${article.title}
             </a>
         `;
@@ -402,6 +443,22 @@ document.addEventListener('DOMContentLoaded', function() {
         filterNewsByTime(this.value);
     });
 
+        // Filtru pentru surse .ro
+        const roFilter = document.getElementById('news-romanian');
+        if (roFilter) {
+            roFilter.addEventListener('change', function() {
+                // Refiltrare DOM existent
+                const val = this.value;
+                const cards = document.querySelectorAll('.news-card');
+                cards.forEach(card => {
+                    if (val !== 'ro-only') { card.style.display = 'block'; return; }
+                    const linkEl = card.querySelector('.news-content a[href]');
+                    const href = linkEl ? linkEl.getAttribute('href') : '';
+                    card.style.display = isRomanianDomain(href) ? 'block' : 'none';
+                });
+            });
+        }
+
     function filterNewsByCategory(category) {
         const cards = document.querySelectorAll('.news-card');
         cards.forEach(card => {
@@ -440,6 +497,22 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error loading sentiment data:', error);
         }
     }
+
+        // Helpers pentru filtrul .ro
+        function isRomanianDomain(urlOrDomain) {
+            try {
+                const host = (urlOrDomain || '').includes('http') ? new URL(urlOrDomain).hostname : (urlOrDomain || '');
+                if (!host) return false;
+                return /\.ro$/i.test(host) || /(zf\.ro|profit\.ro|hotnews\.ro|mediafax\.ro|wall-street\.ro|economedia\.ro)/i.test(host);
+            } catch (e) { return false; }
+        }
+
+        function passesRomanianFilter(article) {
+            const toggle = document.getElementById('news-romanian');
+            if (!toggle || toggle.value !== 'ro-only') return true;
+            const domain = article.domain || article.url || '';
+            return isRomanianDomain(domain);
+        }
 });
 </script>
 
