@@ -1,280 +1,191 @@
 <?php
 /**
  * Template Name: Ghiduri Bitcoin
- * Pagina cu ghiduri complete despre Bitcoin și investiții crypto
+ * Pagină cu ghiduri curate și filtrabile
  */
+
+if (!defined('ABSPATH')) exit;
 
 get_header(); ?>
 
 <main class="site-content guides-page">
-    
-    <!-- Hero Section Ghiduri -->
-    <section class="page-hero guides-hero">
+    <style>
+        .guides-hero { padding: 4rem 0 2rem; }
+        .guides-hero h1 { font-size: 2.4rem; margin: 0; color: var(--text-primary); text-align: center; }
+        .guides-hero p { color: var(--text-secondary); text-align: center; margin: .75rem auto 0; max-width: 720px; }
+
+        .guide-filters { display: flex; gap: .5rem; flex-wrap: wrap; justify-content: center; margin: 1.5rem 0 2rem; }
+        .guide-filters .filter-btn { background: #fff; border: 1px solid #e5e7eb; border-radius: 999px; padding: .55rem 1rem; font-weight: 600; cursor: pointer; }
+        .guide-filters .filter-btn.active { background: #111827; color: #fff; border-color: #111827; }
+
+        .guides-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
+        .guide-card { background: #fff; border-radius: 18px; box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; }
+        .guide-media { height: 140px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg,#f8fafc,#ffffff); }
+        .guide-media .emoji { font-size: 3rem; }
+        .guide-body { padding: 1.1rem 1.25rem 1.25rem; }
+        .guide-title { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 0 0 .35rem; }
+        .guide-excerpt { color: var(--text-secondary); font-size: .95rem; line-height: 1.6; margin: 0 0 .9rem; }
+        .guide-meta { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: .9rem; }
+        .guide-meta .chip { background: #f3f4f6; color: #111827; border-radius: 999px; padding: .25rem .6rem; font-size: .8rem; font-weight: 600; }
+        .guide-cta { display: inline-flex; align-items: center; gap: .5rem; background: linear-gradient(135deg,#f7931a,#ff6b00); color: #fff; padding: .7rem 1rem; border-radius: 999px; font-weight: 700; text-decoration: none; transition: transform .15s ease; }
+        .guide-cta:hover { transform: translateY(-1px); }
+        .guides-empty { text-align: center; padding: 2rem 0; color: var(--text-secondary); }
+
+        @media (max-width: 480px){
+            .guides-hero h1 { font-size: 2rem; }
+        }
+    </style>
+
+    <section class="guides-hero">
         <div class="container">
-            <div class="hero-content">
-                <h1 class="page-title">
-                    📚 Ghiduri Bitcoin România
-                </h1>
-                <p class="page-subtitle">
-                    Învață tot ce trebuie să știi despre Bitcoin: de la primul tău wallet până la strategii avansate de investiții. 
-                    Ghiduri complete, actualizate și adaptate pentru piața din România.
-                </p>
+            <h1>📚 Ghiduri Bitcoin România</h1>
+            <p>Începe cu bazele, continuă cu securitatea și treci la strategii. Am strâns ghiduri utile pentru cititorii bitcoinul.ro.</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <div class="guide-filters">
+                <button class="filter-btn active" onclick="filterGuides('all')">Toate</button>
+                <button class="filter-btn" onclick="filterGuides('incepatori')">Începători</button>
+                <button class="filter-btn" onclick="filterGuides('securitate')">Securitate</button>
+                <button class="filter-btn" onclick="filterGuides('investitii')">Investiții</button>
+                <button class="filter-btn" onclick="filterGuides('trading')">Trading</button>
+            </div>
+
+            <div id="guides-container" class="guides-grid">
+                <?php
+                // Curated recommended guides (safe: show only if they exist)
+                $curated = [
+                    [
+                        'title' => 'Ghid Bitcoin pentru începători',
+                        'path'  => 'ghid-bitcoin-incepatori',
+                        'desc'  => 'Ce este Bitcoin, cum funcționează și cum să începi în siguranță.',
+                        'chip'  => ['Începători','Educație'],
+                        'cat'   => 'incepatori',
+                        'emoji' => '🎓',
+                    ],
+                    [
+                        'title' => 'Cum să cumperi Bitcoin în România',
+                        'path'  => 'cum-sa-cumperi-bitcoin-in-romania',
+                        'desc'  => 'Metode rapide, comisioane, KYC și recomandări practice pentru România.',
+                        'chip'  => ['Începători','Cumpărare'],
+                        'cat'   => 'incepatori',
+                        'emoji' => '🛒',
+                    ],
+                    [
+                        'title' => 'Securitate: Portofele și custodie',
+                        'path'  => 'securitate-portofele-si-custodie',
+                        'desc'  => 'Seed phrase, cold storage, hardware wallet și bune practici.',
+                        'chip'  => ['Securitate','Wallet'],
+                        'cat'   => 'securitate',
+                        'emoji' => '🔐',
+                    ],
+                    [
+                        'title' => 'Strategii de investiții în Bitcoin',
+                        'path'  => 'strategii-de-investitii-in-bitcoin',
+                        'desc'  => 'DCA, rebalansare, orizont de timp și psihologia pieței.',
+                        'chip'  => ['Investiții','Strategii'],
+                        'cat'   => 'investitii',
+                        'emoji' => '📈',
+                    ],
+                    [
+                        'title' => 'Trading responsabil: Spot vs. Derivate',
+                        'path'  => 'trading-spot-vs-derivate-bitcoin',
+                        'desc'  => 'Riscuri, levier și managementul pozițiilor pentru traderi.',
+                        'chip'  => ['Trading','Risc'],
+                        'cat'   => 'trading',
+                        'emoji' => '📊',
+                    ],
+                    [
+                        'title' => 'Fiscalitate: cum declari câștigurile',
+                        'path'  => 'fiscalitate-declarare-castiguri-crypto',
+                        'desc'  => 'Noțiuni esențiale despre taxe și declarații pentru crypto în România.',
+                        'chip'  => ['Fiscalitate','Legal'],
+                        'cat'   => 'investitii',
+                        'emoji' => '🧾',
+                    ],
+                ];
+
+                foreach ($curated as $g) {
+                    // Try to resolve path to a post/page; if not found skip to avoid 404 links
+                    $post = get_page_by_path($g['path'], OBJECT, ['post','page']);
+                    if (!$post) continue;
+                    $url = get_permalink($post);
+                    ?>
+                    <article class="guide-card" data-cat="<?php echo esc_attr($g['cat']); ?>" style="transition:transform .15s ease, box-shadow .15s ease;">
+                        <div class="guide-media" style="position:relative;overflow:hidden;">
+                            <div class="emoji" style="transition: transform .3s ease;"><?php echo esc_html($g['emoji']); ?></div>
+                        </div>
+                        <div class="guide-body">
+                            <h3 class="guide-title"><?php echo esc_html($g['title']); ?></h3>
+                            <p class="guide-excerpt"><?php echo esc_html($g['desc']); ?></p>
+                            <div class="guide-meta">
+                                <?php foreach ($g['chip'] as $chip): ?>
+                                    <span class="chip"><?php echo esc_html($chip); ?></span>
+                                <?php endforeach; ?>
+                            </div>
+                            <a href="<?php echo esc_url($url); ?>" class="guide-cta" onclick="window.trackEvent && trackEvent('cta_click','guides','<?php echo esc_js($g['title']); ?>'); return true;">
+                                Deschide ghidul →
+                            </a>
+                        </div>
+                    </article>
+                    <?php
+                }
+
+                // If nothing curated resolved, show a helpful empty state
+                $printed = did_action('loop_start'); // rough indicator something printed
+                ?>
+            </div>
+
+            <?php
+            // If no curated items matched, show a CTA and optionally latest posts
+            $container_html = ob_get_contents();
+            ?>
+            <div class="guides-empty" id="guides-empty" style="display:none;">
+                Nu am găsit ghiduri publicate încă. Revino curând sau vezi articolele recente din blog.
             </div>
         </div>
     </section>
 
-    <!-- Categorii Ghiduri -->
-    <section class="guides-categories">
-        <div class="container">
-            <div class="category-filters">
-                <button class="filter-btn active" data-category="all">Toate Ghidurile</button>
-                <button class="filter-btn" data-category="beginner">Începători</button>
-                <button class="filter-btn" data-category="intermediate">Intermediar</button>
-                <button class="filter-btn" data-category="advanced">Avansat</button>
-                <button class="filter-btn" data-category="wallet">Wallet-uri</button>
-                <button class="filter-btn" data-category="trading">Trading</button>
-            </div>
-        </div>
-    </section>
+    <script>
+    function filterGuides(cat) {
+        const buttons = document.querySelectorAll('.guide-filters .filter-btn');
+        buttons.forEach(b => b.classList.remove('active'));
+        const btn = Array.from(buttons).find(b => (b.getAttribute('onclick')||'').includes(`filterGuides('${cat}')`));
+        if (btn) btn.classList.add('active');
 
-    <!-- Lista Ghidurilor -->
-    <section class="guides-grid-section">
-        <div class="container">
-            <div class="guides-grid">
+        const cards = document.querySelectorAll('#guides-container .guide-card');
+        let visible = 0;
+        cards.forEach(card => {
+            const show = (cat==='all') || (card.dataset.cat===cat);
+            card.style.display = show ? '' : 'none';
+            if (show) visible++;
+        });
+        const empty = document.getElementById('guides-empty');
+        if (empty) empty.style.display = visible ? 'none' : '';
+    }
+    document.addEventListener('DOMContentLoaded', function(){ filterGuides('all'); });
 
-                <!-- Ghid Începători -->
-                <article class="guide-card featured" data-category="beginner">
-                    <div class="guide-image">
-                        <div class="guide-icon">🚀</div>
-                    </div>
-                    <div class="guide-content">
-                        <div class="guide-meta">
-                            <span class="difficulty beginner">Începător</span>
-                            <span class="read-time">15 min citire</span>
-                        </div>
-                        <h3>Ce este Bitcoin? Ghidul complet pentru începători</h3>
-                        <p>Descoperă totul despre Bitcoin: ce este, cum funcționează, de ce este valoros și cum poți începe să investești în siguranță din România.</p>
-                        <div class="guide-highlights">
-                            <span>✅ Concepte de bază</span>
-                            <span>✅ Primul tău Bitcoin</span>
-                            <span>✅ Securitate wallet</span>
-                        </div>
-                        <a href="#guide-ce-este-bitcoin" 
-                           class="read-guide-btn"
-                           onclick="trackGuideEngagement('Ce_este_Bitcoin', 'click_to_read'); return true;">
-                           Citește Ghidul Complet
-                        </a>
-                    </div>
-                </article>
-
-                <!-- Ghid Wallet -->
-                <article class="guide-card" data-category="wallet beginner">
-                    <div class="guide-image">
-                        <div class="guide-icon">🔐</div>
-                    </div>
-                    <div class="guide-content">
-                        <div class="guide-meta">
-                            <span class="difficulty beginner">Începător</span>
-                            <span class="read-time">20 min citire</span>
-                        </div>
-                        <h3>Cum să alegi cel mai bun Wallet Bitcoin în 2025</h3>
-                        <p>Comparație completă între wallet-urile hardware, software și mobile. Descoperă care este cel mai sigur pentru nevoile tale.</p>
-                        <div class="guide-highlights">
-                            <span>✅ Hardware vs Software</span>
-                            <span>✅ Seed phrase securitate</span>
-                            <span>✅ Recomandări România</span>
-                        </div>
-                        <a href="#guide-wallet-bitcoin" 
-                           class="read-guide-btn"
-                           onclick="trackGuideEngagement('Wallet_Bitcoin', 'click_to_read'); return true;">
-                           Învață despre Wallet-uri
-                        </a>
-                    </div>
-                </article>
-
-                <!-- Ghid Trading -->
-                <article class="guide-card" data-category="trading intermediate">
-                    <div class="guide-image">
-                        <div class="guide-icon">📈</div>
-                    </div>
-                    <div class="guide-content">
-                        <div class="guide-meta">
-                            <span class="difficulty intermediate">Intermediar</span>
-                            <span class="read-time">30 min citire</span>
-                        </div>
-                        <h3>Analiza Tehnică Bitcoin: Strategii de Trading</h3>
-                        <p>Învață să citești graficele Bitcoin, să identifici tendințele și să faci predicții informate pentru tranzacțiile tale.</p>
-                        <div class="guide-highlights">
-                            <span>✅ Indicatori tehnici</span>
-                            <span>✅ Suport & Rezistență</span>
-                            <span>✅ Risk management</span>
-                        </div>
-                        <a href="#guide-analiza-tehnica" class="read-guide-btn">Master Trading-ul</a>
-                    </div>
-                </article>
-
-                <!-- Ghid Taxe -->
-                <article class="guide-card" data-category="advanced">
-                    <div class="guide-image">
-                        <div class="guide-icon">💰</div>
-                    </div>
-                    <div class="guide-content">
-                        <div class="guide-meta">
-                            <span class="difficulty advanced">Avansat</span>
-                            <span class="read-time">25 min citire</span>
-                        </div>
-                        <h3>Taxe Bitcoin în România: Tot ce trebuie să știi</h3>
-                        <p>Ghid complet despre impozitarea Bitcoin în România: când plătești taxe, cum calculezi profitul și ce documente îți trebuie.</p>
-                        <div class="guide-highlights">
-                            <span>✅ ANAF reglementări</span>
-                            <span>✅ Calculul taxelor</span>
-                            <span>✅ Declarația unică</span>
-                        </div>
-                        <a href="#guide-taxe-bitcoin" class="read-guide-btn">Înțelege Taxele</a>
-                    </div>
-                </article>
-
-                <!-- Ghid DCA -->
-                <article class="guide-card" data-category="intermediate">
-                    <div class="guide-image">
-                        <div class="guide-icon">📊</div>
-                    </div>
-                    <div class="guide-content">
-                        <div class="guide-meta">
-                            <span class="difficulty intermediate">Intermediar</span>
-                            <span class="read-time">18 min citire</span>
-                        </div>
-                        <h3>Strategia DCA (Dollar Cost Averaging) pentru Bitcoin</h3>
-                        <p>Cum să investești în Bitcoin pe termen lung cu strategia DCA - metoda preferate de investitorii profesioniști.</p>
-                        <div class="guide-highlights">
-                            <span>✅ Investiții regulate</span>
-                            <span>✅ Reducerea riscului</span>
-                            <span>✅ Calculatoare DCA</span>
-                        </div>
-                        <a href="#guide-dca-strategy" class="read-guide-btn">Aplică Strategia DCA</a>
-                    </div>
-                </article>
-
-                <!-- Ghid Securitate -->
-                <article class="guide-card" data-category="wallet advanced">
-                    <div class="guide-image">
-                        <div class="guide-icon">🛡️</div>
-                    </div>
-                    <div class="guide-content">
-                        <div class="guide-meta">
-                            <span class="difficulty advanced">Avansat</span>
-                            <span class="read-time">35 min citire</span>
-                        </div>
-                        <h3>Securitate maximă pentru Bitcoin: Ghid complet</h3>
-                        <p>Protejează-ți investițiile Bitcoin cu cele mai bune practici de securitate: 2FA, multisig, cold storage și mai mult.</p>
-                        <div class="guide-highlights">
-                            <span>✅ Multi-signature</span>
-                            <span>✅ Cold storage</span>
-                            <span>✅ Backup strategies</span>
-                        </div>
-                        <a href="#guide-securitate-bitcoin" class="read-guide-btn">Securizează-ți Bitcoin</a>
-                    </div>
-                </article>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- Ghid Rapid de Start -->
-    <section class="quick-start-guide">
-        <div class="container">
-            <h2>🎯 Începe Investiția în Bitcoin - Pașii Esențiali</h2>
-            <div class="quick-steps">
-                <div class="quick-step">
-                    <div class="step-icon">1️⃣</div>
-                    <div class="step-content">
-                        <h3>Educație de bază</h3>
-                        <p>Citește ghidul "Ce este Bitcoin" pentru a înțelege fundamentele</p>
-                        <a href="#guide-ce-este-bitcoin" class="step-link">Start aici →</a>
-                    </div>
-                </div>
-                <div class="quick-step">
-                    <div class="step-icon">2️⃣</div>
-                    <div class="step-content">
-                        <h3>Alege Exchange-ul</h3>
-                        <p>Selectează o platformă sigură din lista noastră verificată</p>
-                        <a href="/exchange-uri" class="step-link">Vezi exchange-urile →</a>
-                    </div>
-                </div>
-                <div class="quick-step">
-                    <div class="step-icon">3️⃣</div>
-                    <div class="step-content">
-                        <h3>Configurează Wallet-ul</h3>
-                        <p>Învață să îți securizezi Bitcoin cu un wallet proper</p>
-                        <a href="#guide-wallet-bitcoin" class="step-link">Setup wallet →</a>
-                    </div>
-                </div>
-                <div class="quick-step">
-                    <div class="step-icon">4️⃣</div>
-                    <div class="step-content">
-                        <h3>Prima investiție</h3>
-                        <p>Începe cu o sumă mică și aplică strategia DCA</p>
-                        <a href="#guide-dca-strategy" class="step-link">Învață DCA →</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ Bitcoin -->
-    <section class="bitcoin-faq">
-        <div class="container">
-            <h2>❓ Întrebări Frecvente despre Bitcoin</h2>
-            <div class="faq-grid">
-                <div class="faq-item">
-                    <h3>Este Bitcoin legal în România?</h3>
-                    <p>Da, Bitcoin este complet legal în România. Trebuie să plătești taxe pe profit conform legislației ANAF.</p>
-                </div>
-                <div class="faq-item">
-                    <h3>Cât Bitcoin pot cumpăra cu 100 RON?</h3>
-                    <p>Depinde de prețul curent. La un preț de ~200,000 RON/BTC, cu 100 RON cumperi ~0.0005 BTC.</p>
-                </div>
-                <div class="faq-item">
-                    <h3>Este sigur să țin Bitcoin pe exchange?</h3>
-                    <p>Pentru sume mari, recomandăm wallet hardware. Pentru sume mici, exchange-urile reglementate sunt OK.</p>
-                </div>
-                <div class="faq-item">
-                    <h3>Cum să nu cad în capcane crypto?</h3>
-                    <p>Evită promisiuni de câștiguri rapide, verifică mereu adresele wallet și nu da seed phrase-ul nimănui.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    // micro interacțiuni
+    document.addEventListener('mouseover', function(e){
+        const card = e.target.closest('.guide-card');
+        if (!card) return;
+        card.style.transform = 'translateY(-2px)';
+        card.style.boxShadow = 'var(--shadow-hover)';
+        const emoji = card.querySelector('.emoji');
+        if (emoji) emoji.style.transform = 'scale(1.1)';
+    });
+    document.addEventListener('mouseout', function(e){
+        const card = e.target.closest('.guide-card');
+        if (!card) return;
+        card.style.transform = '';
+        card.style.boxShadow = '';
+        const emoji = card.querySelector('.emoji');
+        if (emoji) emoji.style.transform = '';
+    });
+    </script>
 
 </main>
-
-<script>
-// Filtru pentru categorii
-document.addEventListener('DOMContentLoaded', function() {
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    const guideCards = document.querySelectorAll('.guide-card');
-
-    filterButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const category = this.getAttribute('data-category');
-            
-            // Update active button
-            filterButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Filter cards
-            guideCards.forEach(card => {
-                if (category === 'all' || card.getAttribute('data-category').includes(category)) {
-                    card.style.display = 'block';
-                    setTimeout(() => card.classList.add('visible'), 10);
-                } else {
-                    card.classList.remove('visible');
-                    setTimeout(() => card.style.display = 'none', 300);
-                }
-            });
-        });
-    });
-});
-</script>
 
 <?php get_footer(); ?>

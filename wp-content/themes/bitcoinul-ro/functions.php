@@ -652,6 +652,9 @@ function bitcoinul_ro_create_pages() {
             }
         }
     }
+
+    // Creează și ghidurile curate (dacă lipsesc)
+    bitcoinul_ro_create_guide_pages();
 }
 
 /**
@@ -698,6 +701,181 @@ function bitcoinul_ro_theme_activation() {
     bitcoinul_ro_flush_rewrite_rules();
 }
 add_action('after_switch_theme', 'bitcoinul_ro_theme_activation');
+
+/**
+ * Creează ghiduri editoriale de bază (pagini) pentru filtrele: Începători, Securitate, Investiții, Trading.
+ * Conținut în limba română, structurat pe secțiuni. Rulează idempotent: nu rescrie dacă există.
+ */
+function bitcoinul_ro_create_guide_pages() {
+    if (!function_exists('wp_insert_post')) return;
+
+    $guides = array(
+        'ghid-bitcoin-incepatori' => array(
+            'title' => 'Ghid Bitcoin pentru Începători (2025)',
+            'content' => bitcoinul_ro_render_guide_content('incepatori'),
+        ),
+        'cum-sa-cumperi-bitcoin-in-romania' => array(
+            'title' => 'Cum să cumperi Bitcoin în România: metode, comisioane, pași',
+            'content' => bitcoinul_ro_render_guide_content('cumparare'),
+        ),
+        'securitate-portofele-si-custodie' => array(
+            'title' => 'Securitate Bitcoin: Portofele, Custodie și Bune Practici',
+            'content' => bitcoinul_ro_render_guide_content('securitate'),
+        ),
+        'strategii-de-investitii-in-bitcoin' => array(
+            'title' => 'Strategii de investiții în Bitcoin: DCA, orizont, risc',
+            'content' => bitcoinul_ro_render_guide_content('investitii'),
+        ),
+        'trading-spot-vs-derivate-bitcoin' => array(
+            'title' => 'Trading Bitcoin: Spot vs. Derivate, riscuri și disciplină',
+            'content' => bitcoinul_ro_render_guide_content('trading'),
+        ),
+        'fiscalitate-declarare-castiguri-crypto' => array(
+            'title' => 'Fiscalitate Crypto în România: cum declari câștigurile',
+            'content' => bitcoinul_ro_render_guide_content('fiscalitate'),
+        ),
+    );
+
+    foreach ($guides as $slug => $data) {
+        $existing = get_page_by_path($slug, OBJECT, array('page'));
+        if ($existing) continue; // nu rescrie
+
+        $page_id = wp_insert_post(array(
+            'post_title'   => $data['title'],
+            'post_name'    => $slug,
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+            'post_content' => $data['content'],
+            'post_author'  => 1,
+            'comment_status' => 'closed',
+        ));
+
+        if (!is_wp_error($page_id)) {
+            // opțional: șablon implicit de pagină
+            update_post_meta($page_id, '_wp_page_template', 'page.php');
+        }
+    }
+}
+
+/**
+ * Generează conținut HTML pentru ghiduri în funcție de tip.
+ */
+function bitcoinul_ro_render_guide_content($type) {
+    ob_start();
+    ?>
+    <div class="guide-body-pro" style="max-width:920px;margin:0 auto;">
+        <div class="guide-hero" style="padding:1.5rem 0 1rem;margin-bottom:1rem;border-bottom:1px solid var(--border-light);">
+            <div style="display:flex;gap:1rem;align-items:center;">
+                <div style="font-size:2rem;">🎓</div>
+                <div>
+                    <p style="color:var(--text-secondary);margin:.25rem 0 0;">Ghid editorial bitcoinul.ro • Actualizat <?php echo date('M Y'); ?></p>
+                </div>
+            </div>
+        </div>
+        <?php if ($type==='incepatori'): ?>
+            <h2>Ce este Bitcoin și de ce contează</h2>
+            <p>Bitcoin este o rețea monetaryă descentralizată care permite transferul de valoare pe internet fără intermediar. Unitatea sa de cont, BTC, are ofertă limitată la 21 de milioane. Pentru începători, cel mai important este să înțeleagă principiile de bază: auto‑custodia, cheile private și tranzacțiile ireversibile.</p>
+            <h3>Pașii esențiali pentru a începe</h3>
+            <ol>
+                <li>Înțelege riscurile și volatilitatea.</li>
+                <li>Deschide un cont pe un exchange reglementat și verificat (KYC).</li>
+                <li>Cumpără sume mici la început, preferabil prin <strong>DCA</strong>.</li>
+                <li>Mută BTC într-un <em>wallet</em> pe care îl controlezi tu.</li>
+                <li>Respectă igiena de securitate: seed phrase offline, 2FA, niciodată să nu o trimiți cuiva.</li>
+            </ol>
+            <blockquote>Amintește‑ți: „Nu cheile tale, nu monedele tale”.</blockquote>
+            <h3>Resurse utile</h3>
+            <ul>
+                <li><a href="/exchange-uri" rel="nofollow">Comparația exchange‑urilor recomandate</a></li>
+                <li><a href="/securitate-portofele-si-custodie/">Securitate și portofele</a></li>
+                <li><a href="/strategii-de-investitii-in-bitcoin/">Strategii de investiții</a></li>
+            </ul>
+        <?php elseif ($type==='cumparare'): ?>
+            <h2>Cum cumperi Bitcoin în România</h2>
+            <p>Ai trei opțiuni populare: exchange‑uri centralizate (cel mai simplu), brokeri fintech (ex. super‑app), sau ATM‑uri BTC (comisioane mai mari). Recomandăm platforme cu lichiditate și costuri reduse.</p>
+            <h3>Comparație pe scurt</h3>
+            <table style="width:100%;border-collapse:separate;border-spacing:0 8px;">
+                <tr><th>Metodă</th><th>Avantaje</th><th>Dezavantaje</th></tr>
+                <tr><td>Exchange CEX</td><td>Comisioane mici, lichiditate</td><td>KYC, custodie la terț</td></tr>
+                <tr><td>Fintech</td><td>UX simplu, cumpărare rapidă</td><td>Spread mai mare</td></tr>
+                <tr><td>ATM BTC</td><td>Anonim parțial, cash</td><td>Comisioane ridicate</td></tr>
+            </table>
+            <h3>Pași practici</h3>
+            <ol>
+                <li>Crează cont și finalizează KYC.</li>
+                <li>Depune RON prin card/transfer.</li>
+                <li>Cumpără BTC pe spot.</li>
+                <li>Transferă în wallet-ul tău.</li>
+            </ol>
+        <?php elseif ($type==='securitate'): ?>
+            <h2>Portofele și custodie</h2>
+            <p>Cheia privată îți conferă controlul absolut. Păstreaz-o offline, în siguranță. Hardware wallet-urile oferă un echilibru excelent între uzabilitate și securitate.</p>
+            <h3>Bune practici</h3>
+            <ul>
+                <li>Scrie <em>seed phrase</em>-ul pe hârtie/placă, nu în cloud.</li>
+                <li>Activează 2FA pe conturile de exchange.</li>
+                <li>Verifică adresele cu atenție (clipboard malware există!).</li>
+                <li>Ia în calcul <strong>multisig</strong> pentru sume mari.</li>
+            </ul>
+            <h3>Tipuri de wallet</h3>
+            <p><strong>Hardware</strong> (ledger/trezor), <strong>software</strong> (mobile/desktop), <strong>paper</strong> (avansat). Pentru majoritatea, hardware + verificare adresă pe ecran este ideal.</p>
+        <?php elseif ($type==='investitii'): ?>
+            <h2>Strategii de investiții</h2>
+            <p>Strategia populară este DCA: cumpărare periodică a aceleiași sume, indiferent de preț. Adaugă o regulă clară de <em>risk management</em> și un orizont minim de 4 ani.</p>
+            <h3>Reguli cheie</h3>
+            <ul>
+                <li>Nu investi bani de care ai nevoie pe termen scurt.</li>
+                <li>Automatizează achizițiile (DCA) pentru disciplină.</li>
+                <li>Rebalansează portofoliul anual.</li>
+                <li>Ține evidența costului mediu și a taxelor.</li>
+            </ul>
+            <h3>Greșeli frecvente</h3>
+            <ul>
+                <li>Levier fără experiență.</li>
+                <li>Vânzare emoțională la scăderi temporare.</li>
+                <li>Nesecurizarea seed phrase-ului.</li>
+            </ul>
+        <?php elseif ($type==='trading'): ?>
+            <h2>Trading responsabil: spot vs. derivate</h2>
+            <p>Derivatele sunt pentru traderi avansați. Levierul amplifică atât câștigurile, cât și pierderile. Dacă ești la început, rămâi pe spot și învață bazele analizei tehnice.</p>
+            <h3>Checklist trader</h3>
+            <ul>
+                <li>Plan de tranzacționare clar: intrare, ieșire, invalidare.</li>
+                <li>Risk per tranzacție ≤ 1–2% din capital.</li>
+                <li>Fără overtrading; jurnal de tranzacționare.</li>
+            </ul>
+            <h3>Indicatori de bază</h3>
+            <p>MA/EMA, RSI, nivele S/R, volum. Evită „magia” indicatorilor combinați fără testare.</p>
+        <?php elseif ($type==='fiscalitate'): ?>
+            <h2>Fiscalitate: cum declari câștigurile</h2>
+            <p>În România, câștigurile din tranzacții crypto se declară în Declarația Unică. Ține evidența tranzacțiilor și a costului de achiziție. Informează-te periodic, reglementările se pot actualiza.</p>
+            <h3>Pași practici</h3>
+            <ol>
+                <li>Exportă istoricul tranzacțiilor din exchange.</li>
+                <li>Calculează câștigul/pierderea (FIFO cel mai uzual).</li>
+                <li>Completează Declarația Unică în termen.</li>
+            </ol>
+            <p><em>Acest material are caracter informativ și nu reprezintă consultanță fiscală.</em></p>
+        <?php endif; ?>
+        <div class="guide-cta-bar" style="margin:2rem 0 0;display:flex;gap:.75rem;flex-wrap:wrap;">
+            <a class="btn" href="/exchange-uri" style="background:linear-gradient(135deg,#f7931a,#ff6b00);color:#fff;padding:.9rem 1.2rem;border-radius:12px;text-decoration:none;font-weight:700;">Vezi Exchange-uri recomandate →</a>
+            <a class="btn" href="/securitate-portofele-si-custodie/" style="background:#111827;color:#fff;padding:.9rem 1.2rem;border-radius:12px;text-decoration:none;font-weight:700;">Învață Securitatea →</a>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+/**
+ * Auto-seed: creează ghidurile o singură dată după deploy, fără intervenție manuală.
+ */
+function bitcoinul_ro_autoseed_guides_once() {
+    if (get_transient('bitcoinul_ro_guides_seeded')) return;
+    // Creează ghidurile (idempotent)
+    bitcoinul_ro_create_guide_pages();
+    set_transient('bitcoinul_ro_guides_seeded', 1, 12 * HOUR_IN_SECONDS);
+}
+add_action('init', 'bitcoinul_ro_autoseed_guides_once', 40);
 
 /**
  * Funcție pentru debug - forțează recrearea paginilor
@@ -835,3 +1013,124 @@ function bitcoinul_ro_autofix_exchange_page_routing() {
 }
 // Run late in init to ensure CPT registration already happened
 add_action('init', 'bitcoinul_ro_autofix_exchange_page_routing', 50);
+
+/**
+ * Generic auto-fix for important pages (exchange-uri, ghiduri).
+ * Ensures the pages exist with the right templates and that rewrite rules route
+ * to the page, not to conflicting archives. Runs once per hour on frontend.
+ */
+function bitcoinul_ro_autofix_important_pages() {
+    if (is_admin()) return; // avoid overhead in admin
+
+    // Avoid repeated work in a short window
+    if (get_transient('bitcoinul_ro_pages_autofix_done')) return;
+
+    $pages = array(
+        'exchange-uri' => array(
+            'title' => 'Exchange-uri Bitcoin România',
+            'template' => 'page-exchange-uri.php',
+        ),
+        'ghiduri' => array(
+            'title' => 'Ghiduri Bitcoin & Crypto',
+            'template' => 'page-ghiduri.php',
+        ),
+    );
+
+    $need_flush = false;
+
+    // 1) Ensure pages exist and templates are set
+    foreach ($pages as $slug => $info) {
+        $page = get_page_by_path($slug);
+        if (!$page) {
+            $page_id = wp_insert_post(array(
+                'post_title'  => $info['title'],
+                'post_name'   => $slug,
+                'post_status' => 'publish',
+                'post_type'   => 'page',
+            ));
+            if ($page_id && !is_wp_error($page_id)) {
+                update_post_meta($page_id, '_wp_page_template', $info['template']);
+                $need_flush = true;
+            }
+        } else {
+            $current_tpl = get_post_meta($page->ID, '_wp_page_template', true);
+            if ($current_tpl !== $info['template']) {
+                update_post_meta($page->ID, '_wp_page_template', $info['template']);
+                $need_flush = true;
+            }
+        }
+    }
+
+    // 2) Validate rewrite rules route to pages
+    $rules = get_option('rewrite_rules');
+    if (is_array($rules)) {
+        foreach (array('exchange-uri', 'ghiduri') as $slug) {
+            $pattern = '^' . preg_quote($slug, '#') . '/?$';
+            foreach ($rules as $rule => $target) {
+                if ($rule === $pattern) {
+                    if (strpos($target, 'pagename=' . $slug) === false) {
+                        // Not pointing at the page; schedule a flush
+                        $need_flush = true;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    if ($need_flush) {
+        // Make sure CPTs are registered before flushing
+        bitcoinul_ro_custom_post_types();
+        flush_rewrite_rules(false);
+        set_transient('bitcoinul_ro_pages_autofix_done', 1, HOUR_IN_SECONDS);
+    }
+}
+add_action('init', 'bitcoinul_ro_autofix_important_pages', 60);
+
+/**
+ * Add explicit rewrite rules for key pages to avoid CPT/archive conflicts.
+ */
+function bitcoinul_ro_add_core_page_rewrites() {
+    // Ensure CPTs are registered first so WordPress knows all routes
+    bitcoinul_ro_custom_post_types();
+    add_rewrite_rule('^exchange-uri/?$', 'index.php?pagename=exchange-uri', 'top');
+    add_rewrite_rule('^ghiduri/?$', 'index.php?pagename=ghiduri', 'top');
+}
+add_action('init', 'bitcoinul_ro_add_core_page_rewrites', 20);
+
+/**
+ * Admin one-click fix: /wp-admin/?fix_pages=1
+ * Ensures important pages exist with the right templates and flushes permalinks.
+ */
+function bitcoinul_ro_fix_pages_admin() {
+    if (!is_admin() || !current_user_can('manage_options')) return;
+    if (!isset($_GET['fix_pages'])) return;
+
+    // Create/update pages using existing helper (includes guides)
+    bitcoinul_ro_create_pages();
+    bitcoinul_ro_custom_post_types();
+    flush_rewrite_rules();
+
+    add_action('admin_notices', function() {
+        echo '<div class="notice notice-success is-dismissible"><p>Paginile importante au fost verificate/creat și permalinks au fost reîmprospătate. Verifică /exchange-uri/ și /ghiduri/ pe frontend și golește cache-ul (plugin/CDN) dacă e cazul.</p></div>';
+    });
+}
+add_action('admin_init', 'bitcoinul_ro_fix_pages_admin');
+
+/**
+ * 404 rescue: if key slugs hit a 404 because of stale rewrites, redirect to the
+ * non-pretty permalink that forces WordPress to load the correct page.
+ */
+function bitcoinul_ro_rescue_core_pages_on_404() {
+    if (!is_404()) return;
+
+    global $wp;
+    $request = isset($wp->request) ? trim($wp->request, '/') : '';
+    $core_slugs = array('exchange-uri', 'ghiduri');
+
+    if (in_array($request, $core_slugs, true)) {
+        wp_redirect(home_url('/index.php?pagename=' . $request), 302);
+        exit;
+    }
+}
+add_action('template_redirect', 'bitcoinul_ro_rescue_core_pages_on_404', 0);

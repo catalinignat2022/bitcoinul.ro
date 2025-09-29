@@ -134,10 +134,6 @@ get_header(); ?>
                 <!-- Call-to-Action pentru conversion (doar pe anumite pagini) -->
                 <?php if (!in_array($page_slug, ['termeni-conditii', 'politica-confidentialitate', 'contact'])) : ?>
                     <div class="page-cta" style="margin-top: 3rem; background: linear-gradient(135deg, var(--bitcoin-orange), var(--bitcoin-dark)); color: white; padding: 3rem 2rem; border-radius: 15px; text-align: center; position: relative; overflow: hidden;">
-                        
-                        <!-- Pattern de fundal -->
-                        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><circle cx=\"50\" cy=\"50\" r=\"2\" fill=\"rgba(255,255,255,0.1)\"/></svg>') repeat; opacity: 0.3;"></div>
-                        
                         <div style="position: relative; z-index: 2;">
                             <h3 style="font-size: 2rem; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
                                 🚀 Gata să începi cu Bitcoin?
@@ -234,7 +230,7 @@ get_header(); ?>
                                     </p>
                                 <?php endif; ?>
                                 
-                                <a href="<?php echo esc_url(get_permalink($page)); ?>" 
+                                <a class="read-more" href="<?php echo esc_url(get_permalink($page)); ?>" 
                                    style="color: var(--bitcoin-orange); text-decoration: none; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.5rem;">
                                     Citește mai mult <span style="transition: transform 0.3s ease;">→</span>
                                 </a>
