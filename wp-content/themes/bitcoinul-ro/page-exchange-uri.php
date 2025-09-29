@@ -2,521 +2,648 @@
 /**
  * Template Name: Exchange-uri Bitcoin
  * Pagina cu lista completă de exchange-uri Bitcoin din România
+ * Optimizată pentru afilierea și conversiile
  */
 
 get_header(); ?>
+<!-- using template: page-exchange-uri.php -->
 
 <main class="site-content exchange-page">
     
     <!-- Hero Section Exchange-uri -->
-    <section class="page-hero exchanges-hero">
+    <style>
+        /* Lightweight page-scoped styles for consistent logos and grid */
+        .site-content.exchange-page { padding-top: 3.5rem; }
+        .exchanges { padding-top: 4rem; }
+        .exchange-filters { display: flex; gap: .5rem; flex-wrap: wrap; margin: 1rem 0 1.5rem; }
+        .exchange-filters .filter-btn { background: var(--white); border: 1px solid #e5e7eb; border-radius: 999px; padding: .5rem 1rem; font-weight: 600; cursor: pointer; }
+        .exchange-filters .filter-btn.active { background: #111827; color: #fff; border-color: #111827; }
+        .exchanges-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+        .exchange-card { overflow: visible; }
+    /* Keep logos square, icon-only sizing to prevent visual overlap with titles */
+    .exchange-card .logo { width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; flex: 0 0 56px; overflow: hidden; }
+    .exchange-card .logo img { width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+        .badge-container { z-index: 2; }
+        /* Ensure badges aren't clipped */
+        .exchanges-grid { overflow: visible; }
+        /* Normalize header layout inside cards (override any global styles) */
+        .exchanges .exchange-header { padding: 0 !important; text-align: left !important; background: none !important; }
+    </style>
+
+    <section class="exchanges">
         <div class="container">
-            <div class="hero-content">
-                <h1 class="page-title">
-                    <span class="btc-icon">₿</span>
-                    Exchange-uri Bitcoin România 2025
-                </h1>
-                <p class="page-subtitle">
-                    Cele mai sigure și de încredere platforme pentru cumpărarea și vânzarea Bitcoin în România. 
-                    Comparăm comisioane, securitate, metode de plată și ușurința de utilizare.
-                </p>
+            <header style="margin: 0 0 1rem;">
+                <h1 style="margin: 0; font-size: 2rem;">₿ Top exchange-uri Bitcoin 2025</h1>
+                <p style="margin: .25rem 0 0; color: var(--text-secondary);">Alege un exchange și apasă „Cumpără Bitcoin”.</p>
+            </header>
+            <div class="exchange-filters">
+                <button class="filter-btn active" onclick="filterExchanges('all')">Toate</button>
+                <button class="filter-btn" onclick="filterExchanges('recommended')">Recomandate</button>
+                <button class="filter-btn" onclick="filterExchanges('low-fees')">Comisioane mici</button>
+                <button class="filter-btn" onclick="filterExchanges('beginners')">Pentru începători</button>
             </div>
+            <div id="exchanges-container" class="exchanges-grid">
+
+                <!-- Binance - Recomandat #1 (moved first) -->
+                <div class="exchange-card low-fees recommended" data-name="binance" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); position: relative;">
+                    <div class="badge-container" style="position:absolute;top:-10px;left:20px;background:#f59e0b;color:#fff;padding:.5rem 1.5rem;border-radius:20px;font-size:.8rem;font-weight:700;">⭐ Recomandat</div>
+                    <div class="exchange-header" style="display:flex;align-items:center;gap:1rem;margin:1rem 0 1.5rem;">
+                        <div class="logo"><img src="https://cdn.simpleicons.org/binance/f59e0b" alt="Binance logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';"></div>
+                        <div>
+                            <h3 style="font-size:1.5rem;font-weight:700;color:var(--text-primary);">Binance</h3>
+                            <div class="rating" style="color:#ffd700;font-size:1.1rem;">★★★★★ <span style="color:var(--text-secondary);font-size:.9rem;">(4.8/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom:1.5rem;color:var(--text-secondary);">Comisioane 0.1%, lichiditate maximă.</div>
+                    <div class="action-container" style="text-align:center;">
+                        <a href="https://accounts.binance.com/en/register?ref=21315882" target="_blank" rel="sponsored nofollow noopener noreferrer" style="display:inline-block;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;padding:1rem 2rem;border-radius:30px;font-weight:700" onclick="trackAffiliateClick('Binance','cta_click')">Cumpără Bitcoin →</a>
+                    </div>
+                </div>
+
+                <!-- Bybit - Derivate (moved second) -->
+                <div class="exchange-card low-fees" data-name="bybit" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); position: relative;">
+                    <div class="badge-container" style="position: absolute; top: -10px; left: 20px; background: #f59e0b; color: white; padding: 0.5rem 1.5rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">📈 DERIVATE</div>
+                    <div class="exchange-header" style="display: flex; align-items: center; gap: 1rem; margin: 1rem 0 1.5rem;">
+                        <div class="logo"><img src="<?= get_stylesheet_directory_uri(); ?>/assets/img/bybit-logo.svg" alt="Bybit logo" loading="lazy" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';"></div>
+                        <div>
+                            <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Bybit</h3>
+                            <div class="rating" style="color: #ffd700; font-size: 1.1rem;">★★★★☆ <span style="color: var(--text-secondary); font-size: 0.9rem;">(4.3/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom: 1.5rem; color: var(--text-secondary);">Specialist în derivate, execuție rapidă.</div>
+                    <div class="action-container" style="text-align: center;">
+                        <a href="https://www.bybit.com/en/invite/?ref=ZW6OLQ" target="_blank" rel="sponsored nofollow noopener noreferrer" style="display:inline-block;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;padding:1rem 2rem;border-radius:30px;font-weight:700" onclick="trackAffiliateClick('Bybit','cta_click')">Cumpără Bitcoin →</a>
+                    </div>
+                </div>
+
+                <div class="exchange-card low-fees" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); transition: all 0.3s ease; position: relative;">
+                    <div class="badge-container" style="position: absolute; top: -10px; left: 20px; background: #24d0ff; color: white; padding: 0.5rem 1.5rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">
+                        🎯 ALTCOINS
+                    </div>
+                    <div class="exchange-header" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; margin-top: 1rem;">
+                        <div class="logo">
+                            <img src="https://cryptologos.cc/logos/kucoin-token-kcs-logo.png" alt="KuCoin logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';">
+                        </div>
+                        <div>
+                            <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem;">KuCoin</h3>
+                            <div class="rating" style="color: #ffd700; font-size: 1.1rem;">★★★★☆ <span style="color: var(--text-secondary); font-size: 0.9rem;">(4.1/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom: 1.5rem;">
+                        <div style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem; line-height: 1.6;">
+                            Exchange cu cea mai mare selecție de altcoins și gem-uri noi.
+                        </div>
+                        <div class="feature-list" style="display: grid; gap: 0.5rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--success-green); font-size: 0.9rem;">✓ 700+ criptomonede</div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--success-green); font-size: 0.9rem;">✓ Comisioane 0.1%</div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--success-green); font-size: 0.9rem;">✓ Spot și futures trading</div>
+                        </div>
+                    </div>
+                    <div class="action-container" style="text-align: center;">
+                        <a href="https://kucoin.com/ucenter/signup?rcode=BITCOIN_RO" target="_blank" rel="sponsored nofollow" 
+                           style="display: inline-block; background: linear-gradient(135deg, #24d0ff, #0ea5e9); color: white; padding: 1rem 2rem; border-radius: 30px; text-decoration: none; font-weight: 700; font-size: 1rem; text-transform: uppercase; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(36, 208, 255, 0.3);"
+                           onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(36, 208, 255, 0.4)'"
+                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(36, 208, 255, 0.3)'"
+                           onclick="trackAffiliateClick('KuCoin', 'cta_click')">
+                            Cumpără Bitcoin →
+                        </a>
+                        <div style="margin-top: 0.8rem; font-size: 0.8rem; color: var(--text-secondary);">
+                            💎 Descoperă următorul 1000x coin
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 13. OKX - Ecosistem complet -->
+                <div class="exchange-card low-fees" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); position: relative;">
+                    <div class="badge-container" style="position: absolute; top: -10px; left: 20px; background: #111827; color: white; padding: 0.5rem 1.5rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">🌐 ECOSISTEM</div>
+                    <div class="exchange-header" style="display: flex; align-items: center; gap: 1rem; margin: 1rem 0 1.5rem;">
+                        <div class="logo"><img src="https://cryptologos.cc/logos/okb-okb-logo.png" alt="OKX logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';"></div>
+                        <div>
+                            <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">OKX</h3>
+                            <div class="rating" style="color: #ffd700; font-size: 1.1rem;">★★★★☆ <span style="color: var(--text-secondary); font-size: 0.9rem;">(4.2/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom: 1.5rem; color: var(--text-secondary);">
+                        Exchange complet cu Web3 wallet și DeFi integrate.
+                    </div>
+                    <div class="action-container" style="text-align: center;">
+                        <a href="https://okx.com/register?ref=BITCOIN_RO" target="_blank" rel="sponsored nofollow" style="display:inline-block;background:linear-gradient(135deg,#111827,#1f2937);color:#fff;padding:1rem 2rem;border-radius:30px;font-weight:700" onclick="trackAffiliateClick('OKX','cta_click')">Cumpără Bitcoin →</a>
+                    </div>
+                </div>
+
+
+                <!-- 15. Bitvavo - UE comisioane mici -->
+                <div class="exchange-card low-fees recommended" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); position: relative;">
+                    <div class="badge-container" style="position: absolute; top: -10px; left: 20px; background: #2563eb; color: white; padding: 0.5rem 1.5rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">🇪🇺 UE</div>
+                    <div class="exchange-header" style="display: flex; align-items: center; gap: 1rem; margin: 1rem 0 1.5rem;">
+                        <div class="logo"><img src="https://seeklogo.com/images/B/bitvavo-logo-0F79B6B0A9-seeklogo.com.png" alt="Bitvavo logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';"></div>
+                        <div>
+                            <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Bitvavo</h3>
+                            <div class="rating" style="color: #ffd700; font-size: 1.1rem;">★★★★☆ <span style="color: var(--text-secondary); font-size: 0.9rem;">(4.2/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom: 1.5rem; color: var(--text-secondary);">Exchange olandez cu comisioane foarte mici.</div>
+                    <div class="action-container" style="text-align: center;">
+                        <a href="https://bitvavo.com/?ref=BITCOIN_RO" target="_blank" rel="sponsored nofollow" style="display:inline-block;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;padding:1rem 2rem;border-radius:30px;font-weight:700" onclick="trackAffiliateClick('Bitvavo','cta_click')">Cumpără Bitcoin →</a>
+                    </div>
+                </div>
+
+                <!-- 16. Revolut - Cumpărare rapidă (must be 3rd overall) -->
+                <div class="exchange-card beginners" data-name="revolut" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); position: relative;">
+                    <div class="badge-container" style="position: absolute; top: -10px; left: 20px; background: #0ea5e9; color: white; padding: 0.5rem 1.5rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">💳 RAPID</div>
+                    <div class="exchange-header" style="display: flex; align-items: center; gap: 1rem; margin: 1rem 0 1.5rem;">
+                        <div class="logo"><img src="https://cdn.simpleicons.org/revolut/0ea5e9" alt="Revolut logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';"></div>
+                        <div>
+                            <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Revolut</h3>
+                            <div class="rating" style="color: #ffd700; font-size: 1.1rem;">★★★☆☆ <span style="color: var(--text-secondary); font-size: 0.9rem;">(3.8/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom: 1.5rem; color: var(--text-secondary);">Cumpărări rapide în aplicație, simplu pentru începători.</div>
+                    <div class="action-container" style="text-align: center;">
+                        <a href="https://revolut.com/referral/?referral-code=cataliuiy!SEP1-25-AR-H3&amp;geo-redirect" target="_blank" rel="sponsored nofollow noopener noreferrer" style="display:inline-block;background:linear-gradient(135deg,#0ea5e9,#3b82f6);color:#fff;padding:1rem 2rem;border-radius:30px;font-weight:700" onclick="trackAffiliateClick('Revolut','cta_click')">Cumpără Bitcoin →</a>
+                    </div>
+                </div>
+
+                <!-- 17. Kraken Pro - Pro tools -->
+                <div class="exchange-card low-fees" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); position: relative;">
+                    <div class="badge-container" style="position: absolute; top: -10px; left: 20px; background: #6d28d9; color: white; padding: 0.5rem 1.5rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">🛠️ PRO</div>
+                    <div class="exchange-header" style="display: flex; align-items: center; gap: 1rem; margin: 1rem 0 1.5rem;">
+                        <div class="logo"><img src="https://cryptologos.cc/logos/kraken-kraken-logo.png" alt="Kraken Pro logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';"></div>
+                        <div>
+                            <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Kraken Pro</h3>
+                            <div class="rating" style="color: #ffd700; font-size: 1.1rem;">★★★★☆ <span style="color: var(--text-secondary); font-size: 0.9rem;">(4.4/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom: 1.5rem; color: var(--text-secondary);">Comisioane mai mici, instrumente avansate.</div>
+                    <div class="action-container" style="text-align: center;">
+                        <a href="https://kraken.com/pro?ref=BITCOIN_RO" target="_blank" rel="sponsored nofollow" style="display:inline-block;background:linear-gradient(135deg,#6d28d9,#8b5cf6);color:#fff;padding:1rem 2rem;border-radius:30px;font-weight:700" onclick="trackAffiliateClick('Kraken Pro','cta_click')">Cumpără Bitcoin →</a>
+                    </div>
+                </div>
+
+                <!-- 18. Bitget - Copy trading -->
+                <div class="exchange-card recommended beginners" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); position: relative;">
+                    <div class="badge-container" style="position: absolute; top: -10px; left: 20px; background: #10b981; color: white; padding: 0.5rem 1.5rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">👥 COPY</div>
+                    <div class="exchange-header" style="display: flex; align-items: center; gap: 1rem; margin: 1rem 0 1.5rem;">
+                        <div class="logo"><img src="https://seeklogo.com/images/B/bitget-logo-7B4C0F0A01-seeklogo.com.png" alt="Bitget logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';"></div>
+                        <div>
+                            <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Bitget</h3>
+                            <div class="rating" style="color: #ffd700; font-size: 1.1rem;">★★★☆☆ <span style="color: var(--text-secondary); font-size: 0.9rem;">(3.9/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom: 1.5rem; color: var(--text-secondary);">Copy trading pentru începători.</div>
+                    <div class="action-container" style="text-align: center;">
+                        <a href="https://bitget.com/referral/BITCOIN_RO" target="_blank" rel="sponsored nofollow" style="display:inline-block;background:linear-gradient(135deg,#10b981,#22c55e);color:#fff;padding:1rem 2rem;border-radius:30px;font-weight:700" onclick="trackAffiliateClick('Bitget','cta_click')">Cumpără Bitcoin →</a>
+                    </div>
+                </div>
+
+                <!-- 19. MEXC - Altcoins multe -->
+                <div class="exchange-card low-fees" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); position: relative;">
+                    <div class="badge-container" style="position: absolute; top: -10px; left: 20px; background: #14b8a6; color: white; padding: 0.5rem 1.5rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">🧩 ALTCOINS</div>
+                    <div class="exchange-header" style="display: flex; align-items: center; gap: 1rem; margin: 1rem 0 1.5rem;">
+                        <div class="logo"><img src="https://seeklogo.com/images/M/mexc-global-logo-79B6D0CFA3-seeklogo.com.png" alt="MEXC logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';"></div>
+                        <div>
+                            <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">MEXC</h3>
+                            <div class="rating" style="color: #ffd700; font-size: 1.1rem;">★★★☆☆ <span style="color: var(--text-secondary); font-size: 0.9rem;">(3.9/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom: 1.5rem; color: var(--text-secondary);">Selecție uriașă de monede.</div>
+                    <div class="action-container" style="text-align: center;">
+                        <a href="https://mexc.com/signup?ref=BITCOIN_RO" target="_blank" rel="sponsored nofollow" style="display:inline-block;background:linear-gradient(135deg,#14b8a6,#0ea5e9);color:#fff;padding:1rem 2rem;border-radius:30px;font-weight:700" onclick="trackAffiliateClick('MEXC','cta_click')">Cumpără Bitcoin →</a>
+                    </div>
+                </div>
+
+                <!-- 20. Kraken Futures -->
+                <div class="exchange-card low-fees" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); position: relative;">
+                    <div class="badge-container" style="position: absolute; top: -10px; left: 20px; background: #7c3aed; color: white; padding: 0.5rem 1.5rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">📊 FUTURES</div>
+                    <div class="exchange-header" style="display: flex; align-items: center; gap: 1rem; margin: 1rem 0 1.5rem;">
+                        <div class="logo"><img src="https://cryptologos.cc/logos/kraken-kraken-logo.png" alt="Kraken Futures logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';"></div>
+                        <div>
+                            <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Kraken Futures</h3>
+                            <div class="rating" style="color: #ffd700; font-size: 1.1rem;">★★★★☆ <span style="color: var(--text-secondary); font-size: 0.9rem;">(4.3/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom: 1.5rem; color: var(--text-secondary);">Derivate pe Kraken cu reputație solidă.</div>
+                    <div class="action-container" style="text-align: center;">
+                        <a href="https://kraken.com/futures?ref=BITCOIN_RO" target="_blank" rel="sponsored nofollow" style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;padding:1rem 2rem;border-radius:30px;font-weight:700" onclick="trackAffiliateClick('Kraken Futures','cta_click')">Cumpără Bitcoin →</a>
+                    </div>
+                </div>
+
+                <!-- 21. Uphold - Multi asset -->
+                <div class="exchange-card beginners" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); position: relative;">
+                    <div class="badge-container" style="position: absolute; top: -10px; left: 20px; background: #16a34a; color: white; padding: 0.5rem 1.5rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">🟢 MULTI-ASSET</div>
+                    <div class="exchange-header" style="display: flex; align-items: center; gap: 1rem; margin: 1rem 0 1.5rem;">
+                        <div class="logo"><img src="https://cdn.simpleicons.org/uphold/16a34a" alt="Uphold logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';"></div>
+                        <div>
+                            <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Uphold</h3>
+                            <div class="rating" style="color: #ffd700; font-size: 1.1rem;">★★★☆☆ <span style="color: var(--text-secondary); font-size: 0.9rem;">(3.9/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom: 1.5rem; color: var(--text-secondary);">Crypto + acțiuni + metale prețioase.</div>
+                    <div class="action-container" style="text-align: center;">
+                        <a href="https://uphold.com/register?ref=BITCOIN_RO" target="_blank" rel="sponsored nofollow" style="display:inline-block;background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;padding:1rem 2rem;border-radius:30px;font-weight:700" onclick="trackAffiliateClick('Uphold','cta_click')">Cumpără Bitcoin →</a>
+                    </div>
+                </div>
+
+                <!-- 22. Nexo - Dobânzi -->
+                <div class="exchange-card beginners" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); position: relative;">
+                    <div class="badge-container" style="position: absolute; top: -10px; left: 20px; background: #2563eb; color: white; padding: 0.5rem 1.5rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">💸 DOBÂNZI</div>
+                    <div class="exchange-header" style="display: flex; align-items: center; gap: 1rem; margin: 1rem 0 1.5rem;">
+                        <div class="logo"><img src="https://cryptologos.cc/logos/nexo-nexo-logo.png" alt="Nexo logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';"></div>
+                        <div>
+                            <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Nexo</h3>
+                            <div class="rating" style="color: #ffd700; font-size: 1.1rem;">★★★★☆ <span style="color: var(--text-secondary); font-size: 0.9rem;">(4.1/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom: 1.5rem; color: var(--text-secondary);">Dobânzi pe crypto și card cu cashback.</div>
+                    <div class="action-container" style="text-align: center;">
+                        <a href="https://nexo.io/register?ref=BITCOIN_RO" target="_blank" rel="sponsored nofollow" style="display:inline-block;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;padding:1rem 2rem;border-radius:30px;font-weight:700" onclick="trackAffiliateClick('Nexo','cta_click')">Cumpără Bitcoin →</a>
+                    </div>
+                </div>
+
+                <!-- 23. Swissborg - Investiții simple -->
+                <div class="exchange-card beginners recommended" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); position: relative;">
+                    <div class="badge-container" style="position: absolute; top: -10px; left: 20px; background: #0ea5e9; color: white; padding: 0.5rem 1.5rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">🇨🇭 SIMPLU</div>
+                    <div class="exchange-header" style="display: flex; align-items: center; gap: 1rem; margin: 1rem 0 1.5rem;">
+                        <div class="logo"><img src="https://seeklogo.com/images/S/swissborg-logo-7B0E41A68D-seeklogo.com.png" alt="Swissborg logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';"></div>
+                        <div>
+                            <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Swissborg</h3>
+                            <div class="rating" style="color: #ffd700; font-size: 1.1rem;">★★★☆☆ <span style="color: var(--text-secondary); font-size: 0.9rem;">(3.8/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom: 1.5rem; color: var(--text-secondary);">Investiții ușoare cu portofolii inteligente.</div>
+                    <div class="action-container" style="text-align: center;">
+                        <a href="https://swissborg.com/app?ref=BITCOIN_RO" target="_blank" rel="sponsored nofollow" style="display:inline-block;background:linear-gradient(135deg,#0ea5e9,#22d3ee);color:#fff;padding:1rem 2rem;border-radius:30px;font-weight:700" onclick="trackAffiliateClick('Swissborg','cta_click')">Cumpără Bitcoin →</a>
+                    </div>
+                </div>
+
+                <!-- 24. Ledger Live - Self-custody buy -->
+                <div class="exchange-card beginners" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); position: relative;">
+                    <div class="badge-container" style="position: absolute; top: -10px; left: 20px; background: #111827; color: white; padding: 0.5rem 1.5rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">🔐 SELF-CUSTODY</div>
+                    <div class="exchange-header" style="display: flex; align-items: center; gap: 1rem; margin: 1rem 0 1.5rem;">
+                        <div class="logo"><img src="https://seeklogo.com/images/L/ledger-logo-1D4C6C62ED-seeklogo.com.png" alt="Ledger logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';"></div>
+                        <div>
+                            <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Ledger Live</h3>
+                            <div class="rating" style="color: #ffd700; font-size: 1.1rem;">★★★☆☆ <span style="color: var(--text-secondary); font-size: 0.9rem;">(3.7/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom: 1.5rem; color: var(--text-secondary);">Cumpără direct în aplicația Ledger, păstrezi cheile.</div>
+                    <div class="action-container" style="text-align: center;">
+                        <a href="https://shop.ledger.com/?ref=BITCOIN_RO" target="_blank" rel="sponsored nofollow" style="display:inline-block;background:linear-gradient(135deg,#111827,#374151);color:#fff;padding:1rem 2rem;border-radius:30px;font-weight:700" onclick="trackAffiliateClick('Ledger','cta_click')">Cumpără Bitcoin →</a>
+                    </div>
+                </div>
+
+                <!-- 11. Gate.io - Trading avansat -->
+                <div class="exchange-card" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); transition: all 0.3s ease; position: relative;">
+                    <div class="badge-container" style="position: absolute; top: -10px; left: 20px; background: #6366f1; color: white; padding: 0.5rem 1.5rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">
+                        🔄 DeFi
+                    </div>
+                    <div class="exchange-header" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; margin-top: 1rem;">
+                        <div class="logo">
+                            <img src="https://cryptologos.cc/logos/gate-token-gt-logo.png" alt="Gate.io logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';">
+                        </div>
+                        <div>
+                            <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem;">Gate.io</h3>
+                            <div class="rating" style="color: #ffd700; font-size: 1.1rem;">★★★★☆ <span style="color: var(--text-secondary); font-size: 0.9rem;">(3.9/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom: 1.5rem;">
+                        <div style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem; line-height: 1.6;">
+                            Exchange cu focus pe DeFi și trading derivate avansat.
+                        </div>
+                        <div class="feature-list" style="display: grid; gap: 0.5rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--success-green); font-size: 0.9rem;">✓ DeFi și NFT marketplace</div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--success-green); font-size: 0.9rem;">✓ 1400+ criptomonede</div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--success-green); font-size: 0.9rem;">✓ Copy trading disponibil</div>
+                        </div>
+                    </div>
+                    <div class="action-container" style="text-align: center;">
+                        <a href="https://gate.io/signup/BITCOIN_RO" target="_blank" rel="sponsored nofollow" 
+                           style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 1rem 2rem; border-radius: 30px; text-decoration: none; font-weight: 700; font-size: 1rem; text-transform: uppercase; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);"
+                           onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(99, 102, 241, 0.4)'"
+                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(99, 102, 241, 0.3)'"
+                           onclick="trackAffiliateClick('Gate.io', 'cta_click')">
+                            Cumpără Bitcoin →
+                        </a>
+                        <div style="margin-top: 0.8rem; font-size: 0.8rem; color: var(--text-secondary);">
+                            🌐 Ecosistem crypto complet
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 12. Crypto.com - Card și rewards -->
+                <div class="exchange-card recommended beginners" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); transition: all 0.3s ease; position: relative;">
+                    <div class="badge-container" style="position: absolute; top: -10px; left: 20px; background: #003cdc; color: white; padding: 0.5rem 1.5rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">
+                        💳 CARD CRYPTO
+                    </div>
+                    <div class="exchange-header" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; margin-top: 1rem;">
+                        <div class="logo">
+                            <img src="https://cryptologos.cc/logos/cronos-cro-logo.png" alt="Crypto.com logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';">
+                        </div>
+                        <div>
+                            <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem;">Crypto.com</h3>
+                            <div class="rating" style="color: #ffd700; font-size: 1.1rem;">★★★★☆ <span style="color: var(--text-secondary); font-size: 0.9rem;">(4.2/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom: 1.5rem;">
+                        <div style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem; line-height: 1.6;">
+                            Platforma cu cel mai bun card crypto și program de recompense.
+                        </div>
+                        <div class="feature-list" style="display: grid; gap: 0.5rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--success-green); font-size: 0.9rem;">✓ Card Visa cu cashback 8%</div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--success-green); font-size: 0.9rem;">✓ Staking rewards până la 14.5%</div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--success-green); font-size: 0.9rem;">✓ App mobilă premiată</div>
+                        </div>
+                    </div>
+                    <div class="action-container" style="text-align: center;">
+                        <a href="https://crypto.com/app/BITCOIN_RO" target="_blank" rel="sponsored nofollow" 
+                           style="display: inline-block; background: linear-gradient(135deg, #003cdc, #1e40af); color: white; padding: 1rem 2rem; border-radius: 30px; text-decoration: none; font-weight: 700; font-size: 1rem; text-transform: uppercase; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 60, 220, 0.3);"
+                           onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0, 60, 220, 0.4)'"
+                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0, 60, 220, 0.3)'"
+                           onclick="trackAffiliateClick('Crypto.com', 'cta_click')">
+                            Cumpără Bitcoin →
+                        </a>
+                        <div style="margin-top: 0.8rem; font-size: 0.8rem; color: var(--text-secondary);">
+                            🎁 Bonus $25 + card gratuit
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- 02. Coinbase - Începători -->
+                <div class="exchange-card beginners recommended" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); position: relative;">
+                    <div class="badge-container" style="position:absolute;top:-10px;left:20px;background:#2563eb;color:#fff;padding:.5rem 1.5rem;border-radius:20px;font-size:.8rem;font-weight:700;">🧭 Începători</div>
+                    <div class="exchange-header" style="display:flex;align-items:center;gap:1rem;margin:1rem 0 1.5rem;">
+                        <div class="logo"><img src="https://cryptologos.cc/logos/coinbase-coin-logo.png" alt="Coinbase logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';"></div>
+                        <div>
+                            <h3 style="font-size:1.5rem;font-weight:700;color:var(--text-primary);">Coinbase</h3>
+                            <div class="rating" style="color:#ffd700;font-size:1.1rem;">★★★★☆ <span style="color:var(--text-secondary);font-size:.9rem;">(4.5/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom:1.5rem;color:var(--text-secondary);">Cea mai simplă experiență pentru începători.</div>
+                    <div class="action-container" style="text-align:center;">
+                        <a href="https://coinbase.com/join/romania" target="_blank" rel="sponsored nofollow" style="display:inline-block;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;padding:1rem 2rem;border-radius:30px;font-weight:700" onclick="trackAffiliateClick('Coinbase','cta_click')">Cumpără Bitcoin →</a>
+                    </div>
+                </div>
+
+                <!-- 03. Kraken - Securitate -->
+                <div class="exchange-card low-fees" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); position: relative;">
+                    <div class="badge-container" style="position:absolute;top:-10px;left:20px;background:#6b7280;color:#fff;padding:.5rem 1.5rem;border-radius:20px;font-size:.8rem;font-weight:700;">🛡️ Securitate</div>
+                    <div class="exchange-header" style="display:flex;align-items:center;gap:1rem;margin:1rem 0 1.5rem;">
+                        <div class="logo"><img src="https://cryptologos.cc/logos/kraken-kraken-logo.png" alt="Kraken logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';"></div>
+                        <div>
+                            <h3 style="font-size:1.5rem;font-weight:700;color:var(--text-primary);">Kraken</h3>
+                            <div class="rating" style="color:#ffd700;font-size:1.1rem;">★★★★☆ <span style="color:var(--text-secondary);font-size:.9rem;">(4.4/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom:1.5rem;color:var(--text-secondary);">Reputație excelentă și comisioane competitive.</div>
+                    <div class="action-container" style="text-align:center;">
+                        <a href="https://kraken.com/sign-up?ref=romania" target="_blank" rel="sponsored nofollow" style="display:inline-block;background:linear-gradient(135deg,#6b7280,#111827);color:#fff;padding:1rem 2rem;border-radius:30px;font-weight:700" onclick="trackAffiliateClick('Kraken','cta_click')">Cumpără Bitcoin →</a>
+                    </div>
+                </div>
+
+                <!-- 04. eToro - Social Trading -->
+                <div class="exchange-card beginners" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); position: relative;">
+                    <div class="badge-container" style="position:absolute;top:-10px;left:20px;background:#10b981;color:#fff;padding:.5rem 1.5rem;border-radius:20px;font-size:.8rem;font-weight:700;">👥 Social</div>
+                    <div class="exchange-header" style="display:flex;align-items:center;gap:1rem;margin:1rem 0 1.5rem;">
+                        <div class="logo"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/EToro_logo.svg/200px-EToro_logo.svg.png" alt="eToro logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';"></div>
+                        <div>
+                            <h3 style="font-size:1.5rem;font-weight:700;color:var(--text-primary);">eToro</h3>
+                            <div class="rating" style="color:#ffd700;font-size:1.1rem;">★★★★☆ <span style="color:var(--text-secondary);font-size:.9rem;">(4.3/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom:1.5rem;color:var(--text-secondary);">Copy trading și portofolii smart.</div>
+                    <div class="action-container" style="text-align:center;">
+                        <a href="https://etoro.tw/romania-bitcoin" target="_blank" rel="sponsored nofollow" style="display:inline-block;background:linear-gradient(135deg,#10b981,#059669);color:#fff;padding:1rem 2rem;border-radius:30px;font-weight:700" onclick="trackAffiliateClick('eToro','cta_click')">Cumpără Bitcoin →</a>
+                    </div>
+                </div>
+
+                <!-- 05. Bitpanda - European -->
+                <div class="exchange-card beginners recommended" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); position: relative;">
+                    <div class="badge-container" style="position:absolute;top:-10px;left:20px;background:#dc2626;color:#fff;padding:.5rem 1.5rem;border-radius:20px;font-size:.8rem;font-weight:700;">🇪🇺 European</div>
+                    <div class="exchange-header" style="display:flex;align-items:center;gap:1rem;margin:1rem 0 1.5rem;">
+                        <div class="logo"><img src="https://cryptologos.cc/logos/bitpanda-ecosystem-token-best-logo.png" alt="Bitpanda logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';"></div>
+                        <div>
+                            <h3 style="font-size:1.5rem;font-weight:700;color:var(--text-primary);">Bitpanda</h3>
+                            <div class="rating" style="color:#ffd700;font-size:1.1rem;">★★★★☆ <span style="color:var(--text-secondary);font-size:.9rem;">(4.2/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom:1.5rem;color:var(--text-secondary);">Reglementat în UE, app foarte bună.</div>
+                    <div class="action-container" style="text-align:center;">
+                        <a href="https://bitpanda.com/?ref=romania" target="_blank" rel="sponsored nofollow" style="display:inline-block;background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;padding:1rem 2rem;border-radius:30px;font-weight:700" onclick="trackAffiliateClick('Bitpanda','cta_click')">Cumpără Bitcoin →</a>
+                    </div>
+                </div>
+
+                <!-- 06. Bitstamp - Din 2011 -->
+                <div class="exchange-card low-fees" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); position: relative;">
+                    <div class="badge-container" style="position:absolute;top:-10px;left:20px;background:#16a34a;color:#fff;padding:.5rem 1.5rem;border-radius:20px;font-size:.8rem;font-weight:700;">🏛️ Din 2011</div>
+                    <div class="exchange-header" style="display:flex;align-items:center;gap:1rem;margin:1rem 0 1.5rem;">
+                        <div class="logo"><img src="https://cryptologos.cc/logos/bitstamp-logo.png" alt="Bitstamp logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';"></div>
+                        <div>
+                            <h3 style="font-size:1.5rem;font-weight:700;color:var(--text-primary);">Bitstamp</h3>
+                            <div class="rating" style="color:#ffd700;font-size:1.1rem;">★★★★☆ <span style="color:var(--text-secondary);font-size:.9rem;">(4.1/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom:1.5rem;color:var(--text-secondary);">Reputație excelentă, SEPA rapid.</div>
+                    <div class="action-container" style="text-align:center;">
+                        <a href="https://bitstamp.net/account/register/?ref=romania" target="_blank" rel="sponsored nofollow" style="display:inline-block;background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;padding:1rem 2rem;border-radius:30px;font-weight:700" onclick="trackAffiliateClick('Bitstamp','cta_click')">Cumpără Bitcoin →</a>
+                    </div>
+                </div>
+
+                <!-- 07. Gemini - Trustworthy -->
+                <div class="exchange-card beginners" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); position: relative;">
+                    <div class="badge-container" style="position:absolute;top:-10px;left:20px;background:#0ea5e9;color:#fff;padding:.5rem 1.5rem;border-radius:20px;font-size:.8rem;font-weight:700;">🔒 Siguranță</div>
+                    <div class="exchange-header" style="display:flex;align-items:center;gap:1rem;margin:1rem 0 1.5rem;">
+                        <div class="logo"><img src="https://cryptologos.cc/logos/gemini-dollar-gusd-logo.png" alt="Gemini logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';"></div>
+                        <div>
+                            <h3 style="font-size:1.5rem;font-weight:700;color:var(--text-primary);">Gemini</h3>
+                            <div class="rating" style="color:#ffd700;font-size:1.1rem;">★★★★☆ <span style="color:var(--text-secondary);font-size:.9rem;">(4.0/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom:1.5rem;color:var(--text-secondary);">Reglementat în New York, custodie sigură.</div>
+                    <div class="action-container" style="text-align:center;">
+                        <a href="https://gemini.com/register?ref=romania" target="_blank" rel="sponsored nofollow" style="display:inline-block;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;padding:1rem 2rem;border-radius:30px;font-weight:700" onclick="trackAffiliateClick('Gemini','cta_click')">Cumpără Bitcoin →</a>
+                    </div>
+                </div>
+
+                <!-- 08. Huobi - Global -->
+                <div class="exchange-card low-fees" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); position: relative;">
+                    <div class="badge-container" style="position:absolute;top:-10px;left:20px;background:#111827;color:#fff;padding:.5rem 1.5rem;border-radius:20px;font-size:.8rem;font-weight:700;">🌍 Global</div>
+                    <div class="exchange-header" style="display:flex;align-items:center;gap:1rem;margin:1rem 0 1.5rem;">
+                        <div class="logo"><img src="https://cryptologos.cc/logos/huobi-token-ht-logo.png" alt="Huobi logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';"></div>
+                        <div>
+                            <h3 style="font-size:1.5rem;font-weight:700;color:var(--text-primary);">Huobi</h3>
+                            <div class="rating" style="color:#ffd700;font-size:1.1rem;">★★★★☆ <span style="color:var(--text-secondary);font-size:.9rem;">(4.0/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom:1.5rem;color:var(--text-secondary);">Lichiditate mare, produse variate.</div>
+                    <div class="action-container" style="text-align:center;">
+                        <a href="https://huobi.com/register?ref=romania" target="_blank" rel="sponsored nofollow" style="display:inline-block;background:linear-gradient(135deg,#111827,#374151);color:#fff;padding:1rem 2rem;border-radius:30px;font-weight:700" onclick="trackAffiliateClick('Huobi','cta_click')">Cumpără Bitcoin →</a>
+                    </div>
+                </div>
+
+                <!-- 09. Bitfinex - Profesional -->
+                <div class="exchange-card low-fees" style="background: var(--white); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow); position: relative;">
+                    <div class="badge-container" style="position:absolute;top:-10px;left:20px;background:#22c55e;color:#fff;padding:.5rem 1.5rem;border-radius:20px;font-size:.8rem;font-weight:700;">💼 Profesional</div>
+                    <div class="exchange-header" style="display:flex;align-items:center;gap:1rem;margin:1rem 0 1.5rem;">
+                        <div class="logo"><img src="https://cryptologos.cc/logos/bitfinex-leo-leo-logo.png" alt="Bitfinex logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';"></div>
+                        <div>
+                            <h3 style="font-size:1.5rem;font-weight:700;color:var(--text-primary);">Bitfinex</h3>
+                            <div class="rating" style="color:#ffd700;font-size:1.1rem;">★★★★☆ <span style="color:var(--text-secondary);font-size:.9rem;">(4.0/5)</span></div>
+                        </div>
+                    </div>
+                    <div class="features" style="margin-bottom:1.5rem;color:var(--text-secondary);">Trading avansat, lichiditate mare.</div>
+                    <div class="action-container" style="text-align:center;">
+                        <a href="https://bitfinex.com/register?ref=romania" target="_blank" rel="sponsored nofollow" style="display:inline-block;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;padding:1rem 2rem;border-radius:30px;font-weight:700" onclick="trackAffiliateClick('Bitfinex','cta_click')">Cumpără Bitcoin →</a>
+                    </div>
+                </div>
+
+                <!-- 10. KuCoin (altcoins) already listed above; skipping duplicate to keep total at 24 -->
+
+            </div> <!-- /#exchanges-container -->
         </div>
     </section>
 
-    <!-- Filtru și Sortare -->
-    <section class="container">
-        <div class="exchange-filters">
-            <div class="filter-group">
-                <label>Sortează după:</label>
-                <select id="sort-exchanges" 
-                        onchange="trackEvent('filter_change', 'user_interaction', 'sort_exchanges_' + this.value);">
-                    <option value="rating">Rating</option>
-                    <option value="fees">Comisioane</option>
-                    <option value="volume">Volum tranzacții</option>
-                    <option value="established">Anul înființării</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label>Tipul schimbului:</label>
-                <select id="filter-type">
-                    <option value="all">Toate</option>
-                    <option value="centralized">Centralizate</option>
-                    <option value="p2p">Peer-to-Peer</option>
-                    <option value="instant">Schimb Instant</option>
-                </select>
-            </div>
-        </div>
-    </section>
+    <script>
+    // Filtrare client-side pentru cardurile de exchange
+    function filterExchanges(filter) {
+        try {
+            const container = document.getElementById('exchanges-container');
+            if (!container) return;
+            const buttons = document.querySelectorAll('.exchange-filters .filter-btn');
 
-    <!-- Lista Exchange-urilor - Design Nou cu Tile-uri Compacte -->
-    <section class="exchanges-grid-section">
-        <div class="container">
-            <div class="exchanges-compact-grid" id="exchanges-container">
-                
-                <!-- Binance - Recomandat #1 -->
-                <div class="exchange-tile featured" data-rating="4.8" data-fees="0.1" data-type="centralized">
-                    <div class="tile-badge recommended">Recomandat #1</div>
-                    <div class="tile-logo">
-                        <img src="https://cryptologos.cc/logos/binance-coin-bnb-logo.png" alt="Binance România">
-                    </div>
-                    <h3 class="exchange-name">Binance<span class="country-flag">🇷🇴</span></h3>
-                    <div class="rating-stars">★★★★★</div>
-                    <div class="key-features">
-                        <div class="feature">✓ Comision 0.1% - cel mai mic din România</div>
-                        <div class="feature">✓ Depunere gratuită prin card bancar</div>
-                        <div class="feature">✓ Retragere rapidă în RON</div>
-                        <div class="feature">✓ Aplicație mobilă premium</div>
-                        <div class="feature">✓ Suport clienți în română</div>
-                        <div class="feature">✓ Licență oficială în UE</div>
-                    </div>
-                    <div class="tile-actions">
-                        <a href="https://accounts.binance.com/register?ref=ROMANIA" class="btn-cta" target="_blank" rel="sponsored nofollow" onclick="trackAffiliateClick('Binance', 'tile_click');">
-                            ÎNCEPE PE BINANCE →
-                        </a>
-                    </div>
-                </div>
+            // Active button state
+            buttons.forEach(btn => btn.classList.remove('active'));
+            const activeBtn = Array.from(buttons).find(b => (b.getAttribute('onclick') || '').includes(`filterExchanges('${filter}')`));
+            if (activeBtn) activeBtn.classList.add('active');
 
-                <!-- Coinbase Pro - Cel mai sigur -->
-                <div class="exchange-tile popular" data-rating="4.5" data-fees="0.5" data-type="centralized">
-                    <div class="tile-badge secure">Cel mai sigur</div>
-                    <div class="tile-logo">
-                        <img src="https://cryptologos.cc/logos/coinbase-coin-logo.png" alt="Coinbase Pro">
-                    </div>
-                    <h3 class="exchange-name">Coinbase Pro</h3>
-                    <div class="rating-stars">★★★★☆</div>
-                    <div class="key-features">
-                        <div class="feature">✓ Cea mai mare siguranță din lume</div>
-                        <div class="feature">✓ Reglementat în SUA și Europa</div>
-                        <div class="feature">✓ Interfață perfectă pentru începători</div>
-                        <div class="feature">✓ Asigurare fonduri până la $250,000</div>
-                        <div class="feature">✓ Card de debit Bitcoin gratuit</div>
-                        <div class="feature">✓ Câștigi 4% APY pe staking</div>
-                    </div>
-                    <div class="tile-actions">
-                        <a href="https://coinbase.com/join/romania" class="btn-cta" target="_blank" rel="sponsored nofollow" onclick="trackAffiliateClick('Coinbase', 'tile_click');">
-                            ÎNCEARCĂ COINBASE →
-                        </a>
-                    </div>
-                </div>
+            // Collect cards and keep original order snapshot on first run
+            if (!container._originalOrder) {
+                container._originalOrder = Array.from(container.children);
+            }
+            const allCards = Array.from(container._originalOrder);
 
-                <!-- eToro - Social Trading -->
-                <div class="exchange-tile social" data-rating="4.3" data-fees="1.0" data-type="social">
-                    <div class="tile-badge social">Social Trading</div>
-                    <div class="tile-logo">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/EToro_logo.svg/200px-EToro_logo.svg.png" alt="eToro România">
-                    </div>
-                    <h3 class="exchange-name">eToro România</h3>
-                    <div class="rating-stars">★★★★☆</div>
-                    <div class="key-features">
-                        <div class="feature">✓ Copy Trading - copiază traderii profesioniști</div>
-                        <div class="feature">✓ Platformă reglementată CySEC</div>
-                        <div class="feature">✓ Depunere minimă doar 50$</div>
-                        <div class="feature">✓ Fără comisione la cumpărarea Bitcoin</div>
-                        <div class="feature">✓ Portofoliu diversificat crypto</div>
-                        <div class="feature">✓ Comunitate activă de traderi</div>
-                    </div>
-                    <div class="tile-actions">
-                        <a href="https://etoro.tw/romania-bitcoin" class="btn-cta" target="_blank" rel="sponsored nofollow" onclick="trackAffiliateClick('eToro', 'tile_click');">
-                            DESCOPERĂ ETORO →
-                        </a>
-                    </div>
-                </div>
+            // Priority names (must be included and top for ANY filter)
+            const priority = ['binance', 'bybit', 'revolut'];
 
-                <!-- Kraken - Securitate maximă -->
-                <div class="exchange-tile secure" data-rating="4.4" data-fees="0.26" data-type="centralized">
-                    <div class="tile-badge secure">Securitate maximă</div>
-                    <div class="tile-logo">
-                        <img src="https://cryptologos.cc/logos/kraken-kraken-logo.png" alt="Kraken">
-                    </div>
-                    <h3 class="exchange-name">Kraken</h3>
-                    <div class="rating-stars">★★★★☆</div>
-                    <div class="key-features">
-                        <div class="feature">✓ Niciodată hacked în 10+ ani</div>
-                        <div class="feature">✓ Comisioane 0.16% - 0.26%</div>
-                        <div class="feature">✓ Depozit minim doar 1 EUR</div>
-                        <div class="feature">✓ Trading cu leverage până la 5x</div>
-                        <div class="feature">✓ Staking cu recompense mari</div>
-                        <div class="feature">✓ API pentru traderi avansați</div>
-                    </div>
-                    <div class="tile-actions">
-                        <a href="https://kraken.com/sign-up?ref=romania" class="btn-cta" target="_blank" rel="sponsored nofollow" onclick="trackAffiliateClick('Kraken', 'tile_click');">
-                            TRADING SECURIZAT →
-                        </a>
-                    </div>
-                </div>
+            // Helper to check visibility for filter
+            const passes = (card) => {
+                const name = (card.dataset.name || '').toLowerCase();
+                if (filter === 'all') return true;
+                // Priority trio always visible regardless of filter
+                if (priority.includes(name)) return true;
+                return card.classList.contains(filter);
+            };
 
-                <!-- Bitpanda - Austria -->
-                <div class="exchange-tile european" data-rating="4.2" data-fees="1.49" data-type="centralized">
-                    <div class="tile-badge european">European</div>
-                    <div class="tile-logo">
-                        <img src="https://cryptologos.cc/logos/bitpanda-ecosystem-token-best-logo.png" alt="Bitpanda">
-                    </div>
-                    <h3 class="exchange-name">Bitpanda</h3>
-                    <div class="rating-stars">★★★★☆</div>
-                    <div class="key-features">
-                        <div class="feature">✓ Exchange european din Austria</div>
-                        <div class="feature">✓ Reglementat în UE</div>
-                        <div class="feature">✓ Suport în română</div>
-                        <div class="feature">✓ Schimb instant Bitcoin</div>
-                        <div class="feature">✓ Card crypto Bitpanda</div>
-                        <div class="feature">✓ Investiții în metale prețioase</div>
-                    </div>
-                    <div class="tile-actions">
-                        <a href="https://bitpanda.com/?ref=romania" class="btn-cta" target="_blank" rel="sponsored nofollow" onclick="trackAffiliateClick('Bitpanda', 'tile_click');">
-                            ÎNCEARCĂ BITPANDA →
-                        </a>
-                    </div>
-                </div>
+            // Build new ordered list
+            const ordered = [];
+            // Add priority cards that pass filter
+            priority.forEach(name => {
+                const card = allCards.find(c => (c.dataset.name || '').toLowerCase() === name);
+                if (card && passes(card)) ordered.push(card);
+            });
+            // Add the rest, preserving original order
+            allCards.forEach(card => {
+                const name = (card.dataset.name || '').toLowerCase();
+                if (priority.includes(name)) return; // already handled
+                if (passes(card)) ordered.push(card);
+            });
 
-                <!-- Bitstamp - Cel mai vechi -->
-                <div class="exchange-tile established" data-rating="4.1" data-fees="0.5" data-type="centralized">
-                    <div class="tile-badge established">Din 2011</div>
-                    <div class="tile-logo">
-                        <img src="https://cryptologos.cc/logos/bitstamp-logo.png" alt="Bitstamp">
-                    </div>
-                    <h3 class="exchange-name">Bitstamp</h3>
-                    <div class="rating-stars">★★★★☆</div>
-                    <div class="key-features">
-                        <div class="feature">✓ Cel mai vechi exchange din Europa</div>
-                        <div class="feature">✓ Licență bancară în Luxemburg</div>
-                        <div class="feature">✓ Lichiditate foarte mare</div>
-                        <div class="feature">✓ Comisioane competitive</div>
-                        <div class="feature">✓ Transfer SEPA rapid</div>
-                        <div class="feature">✓ Reputație excelentă</div>
-                    </div>
-                    <div class="tile-actions">
-                        <a href="https://bitstamp.net/account/register/?ref=romania" class="btn-cta" target="_blank" rel="sponsored nofollow" onclick="trackAffiliateClick('Bitstamp', 'tile_click');">
-                            ÎNCEPE PE BITSTAMP →
-                        </a>
-                    </div>
-                </div>
+            // Clear and re-append
+            container.innerHTML = '';
+            ordered.forEach(card => container.appendChild(card));
+        } catch (e) {
+            console && console.warn && console.warn('Filter error', e);
+        }
+    }
 
-                <!-- Gemini - Trustworthy -->
-                <div class="exchange-tile trustworthy" data-rating="4.0" data-fees="1.49" data-type="centralized">
-                    <div class="tile-badge trustworthy">De încredere</div>
-                    <div class="tile-logo">
-                        <img src="https://cryptologos.cc/logos/gemini-dollar-gusd-logo.png" alt="Gemini">
-                    </div>
-                    <h3 class="exchange-name">Gemini</h3>
-                    <div class="rating-stars">★★★★☆</div>
-                    <div class="key-features">
-                        <div class="feature">✓ Fondat de gemenii Winklevoss</div>
-                        <div class="feature">✓ Reglementat în New York</div>
-                        <div class="feature">✓ Custodie instituțională</div>
-                        <div class="feature">✓ Asigurare FDIC</div>
-                        <div class="feature">✓ Interfață simplă</div>
-                        <div class="feature">✓ Securitate militară</div>
-                    </div>
-                    <div class="tile-actions">
-                        <a href="https://gemini.com/register?ref=romania" class="btn-cta" target="_blank" rel="sponsored nofollow" onclick="trackAffiliateClick('Gemini', 'tile_click');">
-                            ÎNCEARCĂ GEMINI →
-                        </a>
-                    </div>
-                </div>
+    // Setează filtrul implicit la încărcare
+    document.addEventListener('DOMContentLoaded', function() {
+        filterExchanges('all');
 
-                <!-- KuCoin - Altcoins -->
-                <div class="exchange-tile altcoins" data-rating="4.2" data-fees="0.1" data-type="centralized">
-                    <div class="tile-badge altcoins">500+ Cripto</div>
-                    <div class="tile-logo">
-                        <img src="https://cryptologos.cc/logos/kucoin-token-kcs-logo.png" alt="KuCoin">
-                    </div>
-                    <h3 class="exchange-name">KuCoin</h3>
-                    <div class="rating-stars">★★★★☆</div>
-                    <div class="key-features">
-                        <div class="feature">✓ Over 500 criptomonede</div>
-                        <div class="feature">✓ Comisioane foarte mici</div>
-                        <div class="feature">✓ Trading cu futures</div>
-                        <div class="feature">✓ KCS token rewards</div>
-                        <div class="feature">✓ Fără KYC până la 5 BTC</div>
-                        <div class="feature">✓ API avansat pentru botți</div>
-                    </div>
-                    <div class="tile-actions">
-                        <a href="https://kucoin.com/register?ref=romania" class="btn-cta" target="_blank" rel="sponsored nofollow" onclick="trackAffiliateClick('KuCoin', 'tile_click');">
-                            EXPLOREAZĂ KUCOIN →
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Huobi - Global -->
-                <div class="exchange-tile global" data-rating="4.0" data-fees="0.2" data-type="centralized">
-                    <div class="tile-badge global">Global</div>
-                    <div class="tile-logo">
-                        <img src="https://cryptologos.cc/logos/huobi-token-ht-logo.png" alt="Huobi">
-                    </div>
-                    <h3 class="exchange-name">Huobi Global</h3>
-                    <div class="rating-stars">★★★★☆</div>
-                    <div class="key-features">
-                        <div class="feature">✓ Top 3 exchange mondial</div>
-                        <div class="feature">✓ Lichiditate enormă</div>
-                        <div class="feature">✓ DeFi staking</div>
-                        <div class="feature">✓ Margin trading</div>
-                        <div class="feature">✓ Pool mining</div>
-                        <div class="feature">✓ NFT marketplace</div>
-                    </div>
-                    <div class="tile-actions">
-                        <a href="https://huobi.com/register?ref=romania" class="btn-cta" target="_blank" rel="sponsored nofollow" onclick="trackAffiliateClick('Huobi', 'tile_click');">
-                            ÎNCEPE PE HUOBI →
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Gate.io - Advanced -->
-                <div class="exchange-tile advanced" data-rating="4.1" data-fees="0.2" data-type="centralized">
-                    <div class="tile-badge advanced">Avansat</div>
-                    <div class="tile-logo">
-                        <img src="https://cryptologos.cc/logos/gate-token-gt-logo.png" alt="Gate.io">
-                    </div>
-                    <h3 class="exchange-name">Gate.io</h3>
-                    <div class="rating-stars">★★★★☆</div>
-                    <div class="key-features">
-                        <div class="feature">✓ 1000+ perechi trading</div>
-                        <div class="feature">✓ Futures cu leverage 100x</div>
-                        <div class="feature">✓ Copy trading</div>
-                        <div class="feature">✓ Startup launchpad</div>
-                        <div class="feature">✓ Yield farming</div>
-                        <div class="feature">✓ Options trading</div>
-                    </div>
-                    <div class="tile-actions">
-                        <a href="https://gate.io/register?ref=romania" class="btn-cta" target="_blank" rel="sponsored nofollow" onclick="trackAffiliateClick('Gate.io', 'tile_click');">
-                            TRADING AVANSAT →
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Bybit - Derivate -->
-                <div class="exchange-tile derivatives" data-rating="4.3" data-fees="0.1" data-type="derivatives">
-                    <div class="tile-badge derivatives">Derivate</div>
-                    <div class="tile-logo">
-                        <img src="https://cryptologos.cc/logos/bybit-bit-logo.png" alt="Bybit">
-                    </div>
-                    <h3 class="exchange-name">Bybit</h3>
-                    <div class="rating-stars">★★★★☆</div>
-                    <div class="key-features">
-                        <div class="feature">✓ Specialist în derivate crypto</div>
-                        <div class="feature">✓ Leverage până la 100x</div>
-                        <div class="feature">✓ Execuție ultra-rapidă</div>
-                        <div class="feature">✓ Bonus pentru noi utilizatori</div>
-                        <div class="feature">✓ Trading competiții</div>
-                        <div class="feature">✓ Analiza tehnică avansată</div>
-                    </div>
-                    <div class="tile-actions">
-                        <a href="https://bybit.com/register?ref=romania" class="btn-cta" target="_blank" rel="sponsored nofollow" onclick="trackAffiliateClick('Bybit', 'tile_click');">
-                            DERIVATE CRYPTO →
-                        </a>
-                    </div>
-                </div>
-
-                <!-- OKX - Complete -->
-                <div class="exchange-tile complete" data-rating="4.2" data-fees="0.1" data-type="centralized">
-                    <div class="tile-badge complete">Complet</div>
-                    <div class="tile-logo">
-                        <img src="https://cryptologos.cc/logos/okb-okb-logo.png" alt="OKX">
-                    </div>
-                    <h3 class="exchange-name">OKX</h3>
-                    <div class="rating-stars">★★★★☆</div>
-                    <div class="key-features">
-                        <div class="feature">✓ Exchange complet cu toate features</div>
-                        <div class="feature">✓ Web3 wallet integrat</div>
-                        <div class="feature">✓ DeFi și NFT</div>
-                        <div class="feature">✓ Staking cu recompense mari</div>
-                        <div class="feature">✓ P2P trading</div>
-                        <div class="feature">✓ Earn products</div>
-                    </div>
-                    <div class="tile-actions">
-                        <a href="https://okx.com/register?ref=romania" class="btn-cta" target="_blank" rel="sponsored nofollow" onclick="trackAffiliateClick('OKX', 'tile_click');">
-                            DESCOPERĂ OKX →
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Crypto.com - Card crypto -->
-                <div class="exchange-tile card" data-rating="4.1" data-fees="0.4" data-type="centralized">
-                    <div class="tile-badge card">Card Crypto</div>
-                    <div class="tile-logo">
-                        <img src="https://cryptologos.cc/logos/cronos-cro-logo.png" alt="Crypto.com">
-                    </div>
-                    <h3 class="exchange-name">Crypto.com</h3>
-                    <div class="rating-stars">★★★★☆</div>
-                    <div class="key-features">
-                        <div class="feature">✓ Card Visa cu cashback crypto</div>
-                        <div class="feature">✓ CRO staking rewards</div>
-                        <div class="feature">✓ Aplicație mobilă premium</div>
-                        <div class="feature">✓ Sponsor F1 și fotbal</div>
-                        <div class="feature">✓ DeFi Earn până la 14%</div>
-                        <div class="feature">✓ NFT marketplace</div>
-                    </div>
-                    <div class="tile-actions">
-                        <a href="https://crypto.com/register?ref=romania" class="btn-cta" target="_blank" rel="sponsored nofollow" onclick="trackAffiliateClick('Crypto.com', 'tile_click');">
-                            CARD CRYPTO →
-                        </a>
-                    </div>
-                </div>
-
-                <!-- FTX EU - Rebuild -->
-                <div class="exchange-tile rebuild" data-rating="3.8" data-fees="0.2" data-type="centralized">
-                    <div class="tile-badge rebuild">Reconstruit</div>
-                    <div class="tile-logo">
-                        <img src="https://cryptologos.cc/logos/ftx-token-ftt-logo.png" alt="FTX EU">
-                    </div>
-                    <h3 class="exchange-name">FTX EU</h3>
-                    <div class="rating-stars">★★★☆☆</div>
-                    <div class="key-features">
-                        <div class="feature">✓ Reconstruit pentru Europa</div>
-                        <div class="feature">✓ Interfață inovativă</div>
-                        <div class="feature">✓ Reglementat în UE</div>
-                        <div class="feature">✓ Trading avansat</div>
-                        <div class="feature">✓ Subaccounts</div>
-                        <div class="feature">✓ API profesional</div>
-                    </div>
-                    <div class="tile-actions">
-                        <a href="https://ftx.eu/register?ref=romania" class="btn-cta" target="_blank" rel="sponsored nofollow" onclick="trackAffiliateClick('FTX EU', 'tile_click');">
-                            ÎNCEPE PE FTX EU →
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Bitfinex - Profesional -->
-                <div class="exchange-tile professional" data-rating="4.0" data-fees="0.2" data-type="centralized">
-                    <div class="tile-badge professional">Profesional</div>
-                    <div class="tile-logo">
-                        <img src="https://cryptologos.cc/logos/bitfinex-leo-leo-logo.png" alt="Bitfinex">
-                    </div>
-                    <h3 class="exchange-name">Bitfinex</h3>
-                    <div class="rating-stars">★★★★☆</div>
-                    <div class="key-features">
-                        <div class="feature">✓ Trading profesional avansat</div>
-                        <div class="feature">✓ Lichiditate foarte mare</div>
-                        <div class="feature">✓ Margin funding</div>
-                        <div class="feature">✓ OTC desk</div>
-                        <div class="feature">✓ Lending cu dobândă</div>
-                        <div class="feature">✓ Analiza on-chain</div>
-                    </div>
-                    <div class="tile-actions">
-                        <a href="https://bitfinex.com/register?ref=romania" class="btn-cta" target="_blank" rel="sponsored nofollow" onclick="trackAffiliateClick('Bitfinex', 'tile_click');">
-                            TRADING PROFESIONAL →
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Binance.US - SUA -->
-                <div class="exchange-tile usa" data-rating="4.4" data-fees="0.1" data-type="centralized">
-                    <div class="tile-badge usa">Pentru SUA</div>
-                    <div class="tile-logo">
-                        <img src="https://cryptologos.cc/logos/binance-usd-busd-logo.png" alt="Binance.US">
-                    </div>
-                    <h3 class="exchange-name">Binance.US</h3>
-                    <div class="rating-stars">★★★★☆</div>
-                    <div class="key-features">
-                        <div class="feature">✓ Versiunea US a Binance</div>
-                        <div class="feature">✓ Reglementat în SUA</div>
-                        <div class="feature">✓ Comisioane mici</div>
-                        <div class="feature">✓ Staking rewards</div>
-                        <div class="feature">✓ Dollar cost averaging</div>
-                        <div class="feature">✓ Debit card crypto</div>
-                    </div>
-                    <div class="tile-actions">
-                        <a href="https://binance.us/register?ref=romania" class="btn-cta" target="_blank" rel="sponsored nofollow" onclick="trackAffiliateClick('Binance.US', 'tile_click');">
-                            BINANCE SUA →
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Coinlist - Early access -->
-                <div class="exchange-tile early" data-rating="4.0" data-fees="0.5" data-type="centralized">
-                    <div class="tile-badge early">Early Access</div>
-                    <div class="tile-logo">
-                        <img src="https://images.crunchbase.com/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/erkxwhl1gd48xfhe2yld" alt="CoinList">
-                    </div>
-                    <h3 class="exchange-name">CoinList</h3>
-                    <div class="rating-stars">★★★★☆</div>
-                    <div class="key-features">
-                        <div class="feature">✓ Acces timpuriu la token-uri noi</div>
-                        <div class="feature">✓ Reglementat în SUA</div>
-                        <div class="feature">✓ KYC strict pentru calitate</div>
-                        <div class="feature">✓ Token sales exclusive</div>
-                        <div class="feature">✓ Custody institutional</div>
-                        <div class="feature">✓ Proiecte verificate</div>
-                    </div>
-                    <div class="tile-actions">
-                        <a href="https://coinlist.co/register?ref=romania" class="btn-cta" target="_blank" rel="sponsored nofollow" onclick="trackAffiliateClick('CoinList', 'tile_click');">
-                            ACCES TIMPURIU →
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Uphold - Multi-asset -->
-                <div class="exchange-tile multiasset" data-rating="3.9" data-fees="0.8" data-type="centralized">
-                    <div class="tile-badge multiasset">Multi-Asset</div>
-                    <div class="tile-logo">
-                        <img src="https://cdn.worldvectorlogo.com/logos/uphold.svg" alt="Uphold">
-                    </div>
-                    <h3 class="exchange-name">Uphold</h3>
-                    <div class="rating-stars">★★★☆☆</div>
-                    <div class="key-features">
-                        <div class="feature">✓ Crypto + acțiuni + metale prețioase</div>
-                        <div class="feature">✓ Fără comisioane trading</div>
-                        <div class="feature">✓ Conversia automată</div>
-                        <div class="feature">✓ Reward cards</div>
-                        <div class="feature">✓ Anything-to-anything</div>
-                        <div class="feature">✓ Transparent rezerve</div>
-                    </div>
-                    <div class="tile-actions">
-                        <a href="https://uphold.com/register?ref=romania" class="btn-cta" target="_blank" rel="sponsored nofollow" onclick="trackAffiliateClick('Uphold', 'tile_click');">
-                            MULTI-ASSET →
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Nexo - Banking -->
-                <div class="exchange-tile banking" data-rating="4.1" data-fees="0" data-type="banking">
-                    <div class="tile-badge banking">Crypto Banking</div>
-                    <div class="tile-logo">
-                        <img src="https://cryptologos.cc/logos/nexo-nexo-logo.png" alt="Nexo">
-                    </div>
-                    <h3 class="exchange-name">Nexo</h3>
-                    <div class="rating-stars">★★★★☆</div>
-                    <div class="key-features">
-                        <div class="feature">✓ Primul crypto bank din lume</div>
-                        <div class="feature">✓ Dobândă până la 16% pe crypto</div>
-                        <div class="feature">✓ Împrumuturi cu crypto colateral</div>
-                        <div class="feature">✓ Card Nexo cu cashback</div>
-                        <div class="feature">✓ Asigurare $375M BitGo</div>
-                        <div class="feature">✓ Licențe bancare complete</div>
-                    </div>
-                    <div class="tile-actions">
-                        <a href="https://nexo.io/register?ref=romania" class="btn-cta" target="_blank" rel="sponsored nofollow" onclick="trackAffiliateClick('Nexo', 'tile_click');">
-                            CRYPTO BANKING →
-                        </a>
-                    </div>
-                </div>
-
-                <!-- BlockFi - Lending -->
-                <div class="exchange-tile lending" data-rating="3.7" data-fees="1" data-type="lending">
-                    <div class="tile-badge lending">Împrumuturi</div>
-                    <div class="tile-logo">
-                        <img src="https://cryptologos.cc/logos/blockfi-logo.png" alt="BlockFi">
-                    </div>
-                    <h3 class="exchange-name">BlockFi</h3>
-                    <div class="rating-stars">★★★☆☆</div>
-                    <div class="key-features">
-                        <div class="feature">✓ Specialist în împrumuturi crypto</div>
-                        <div class="feature">✓ Dobândă competitivă</div>
-                        <div class="feature">✓ Credit card cu Bitcoin rewards</div>
-                        <div class="feature">✓ Fără comisioane trading</div>
-                        <div class="feature">✓ FDIC insurance (USD)</div>
-                        <div class="feature">✓ Dollar cost averaging</div>
-                    </div>
-                    <div class="tile-actions">
-                        <a href="https://blockfi.com/register?ref=romania" class="btn-cta" target="_blank" rel="sponsored nofollow" onclick="trackAffiliateClick('BlockFi', 'tile_click');">
-                            ÎMPRUMUTURI CRYPTO →
-                        </a>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
+        // Set referrerPolicy and fallback for logos that may be blocked or missing
+        try {
+            const placeholder = '<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';
+            // Icon-only sources (SimpleIcons) to avoid wordmark logos
+            const iconMap = {
+                binance: 'https://cdn.simpleicons.org/binance/f59e0b',
+                bybit: '<?= get_stylesheet_directory_uri(); ?>/assets/img/bybit-logo.svg',
+                revolut: 'https://cdn.simpleicons.org/revolut/0ea5e9',
+                kucoin: 'https://cdn.simpleicons.org/kucoin/24d0ff',
+                okx: 'https://cdn.simpleicons.org/okx/111827',
+                bitvavo: 'https://cdn.simpleicons.org/bitvavo/2563eb',
+                kraken: 'https://cdn.simpleicons.org/kraken/6d28d9',
+                mexc: 'https://cdn.simpleicons.org/mexc/14b8a6',
+                bitget: 'https://cdn.simpleicons.org/bitget/10b981',
+                bitpanda: 'https://cdn.simpleicons.org/bitpanda/dc2626',
+                bitstamp: 'https://cdn.simpleicons.org/bitstamp/16a34a',
+                gemini: 'https://cdn.simpleicons.org/gemini/0ea5e9',
+                huobi: 'https://cdn.simpleicons.org/huobi/111827',
+                bitfinex: 'https://cdn.simpleicons.org/bitfinex/22c55e',
+                gateio: 'https://cdn.simpleicons.org/gateio/6366f1',
+                cryptocom: 'https://cdn.simpleicons.org/cryptocom/003cdc',
+                coinbase: 'https://cdn.simpleicons.org/coinbase/2563eb',
+                etoro: 'https://cdn.simpleicons.org/etoro/10b981',
+                swissborg: 'https://cdn.simpleicons.org/swissborg/0ea5e9',
+                ledger: 'https://cdn.simpleicons.org/ledger/111827',
+                uphold: 'https://cdn.simpleicons.org/uphold/16a34a',
+                nexo: 'https://cdn.simpleicons.org/nexo/2563eb'
+            };
+            const toRootDomain = (hostname) => {
+                try {
+                    const parts = hostname.split('.');
+                    if (parts.length <= 2) return hostname;
+                    // handle co.uk and similar tlds naively by taking last 2 by default
+                    const tld2 = parts.slice(-2).join('.');
+                    // if tld is like co.uk, take last 3
+                    if (/(^co\.|^com\.|^org\.|^net\.)/.test(parts.slice(-2)[0] + '.')) {
+                        return parts.slice(-3).join('.');
+                    }
+                    return tld2;
+                } catch { return hostname; }
+            };
+            document.querySelectorAll('.exchange-card .logo img').forEach(img => {
+                if (!img.getAttribute('referrerpolicy')) img.setAttribute('referrerpolicy', 'no-referrer');
+                if (!img.getAttribute('crossorigin')) img.setAttribute('crossorigin', 'anonymous');
+                // Try to proactively swap to icon-only for known brands
+                try {
+                    const card = img.closest('.exchange-card');
+                    const title = (card && card.querySelector('h3') ? card.querySelector('h3').textContent : '').trim().toLowerCase();
+                    let key = (card && card.dataset.name ? card.dataset.name : title).toLowerCase().replace(/\s+/g,'').replace(/\./g,'');
+                    // Normalize some variants
+                    if (key.includes('kraken')) key = 'kraken';
+                    if (key.includes('crypto')) key = 'cryptocom';
+                    if (key.includes('gateio') || key.includes('gate')) key = 'gateio';
+                    if (iconMap[key]) {
+                        img.src = iconMap[key];
+                    }
+                } catch(_) {}
+                img.addEventListener('error', function onErr() {
+                    img.removeEventListener('error', onErr);
+                    // Try to find CTA link in the same card and build a favicon (icon-only) fallback
+                    try {
+                        const card = img.closest('.exchange-card');
+                        const cta = card && card.querySelector('.action-container a[href]');
+                        if (cta) {
+                            const url = new URL(cta.getAttribute('href'));
+                            const root = toRootDomain(url.hostname.replace(/^www\./,'').replace(/^accounts\./,'').replace(/^app\./,'').replace(/^shop\./,''));
+                            const favicon = 'https://www.google.com/s2/favicons?domain=' + root + '&sz=64';
+                            const probe = new Image();
+                            probe.onload = () => { img.src = favicon; };
+                            probe.onerror = () => { img.src = placeholder; };
+                            probe.referrerPolicy = 'no-referrer';
+                            probe.crossOrigin = 'anonymous';
+                            probe.src = favicon;
+                            return;
+                        }
+                    } catch(_) {}
+                    img.src = placeholder;
+                }, { once: true });
+            });
+        } catch (e) {
+            console && console.warn && console.warn('Logo hardening error', e);
+        }
+    });
+    </script>
 
     <!-- Ghid Rapid -->
     <section class="quick-guide">

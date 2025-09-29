@@ -229,40 +229,40 @@ function get_recommended_exchanges() {
                 'Suport clienți în română',
                 'Licență oficială în UE'
             ),
-            'affiliate_link' => '#binance-affiliate',
+            'affiliate_link' => 'https://accounts.binance.com/en/register?ref=21315882',
             'description' => 'Cea mai mare platformă de tranzacționare crypto din lume'
         ),
         array(
-            'name' => 'Coinbase Pro',
-            'logo' => 'C',
-            'rating' => 4.6,
-            'badge' => 'Cel mai sigur',
+            'name' => 'Bybit',
+            'logo' => 'Y',
+            'rating' => 4.3,
+            'badge' => 'Derivate',
             'features' => array(
-                'Cea mai mare siguranță din lume',
-                'Reglementat în SUA și Europa',
-                'Interfață perfectă pentru începători',
-                'Asigurare fonduri până la $250,000',
-                'Card de debit Bitcoin gratuit',
-                'Câștigă 4% APY pe staking'
+                'Comisioane 0.1% pe spot',
+                'Futures și derivate pentru traderi',
+                'Lichiditate ridicată',
+                'Execuție rapidă a ordinelor',
+                'Aplicație mobilă performantă',
+                'Promoții și bonusuri periodice'
             ),
-            'affiliate_link' => '#coinbase-affiliate',
-            'description' => 'Exchange-ul cel mai de încredere pentru începători'
+            'affiliate_link' => 'https://www.bybit.com/en/invite/?ref=ZW6OLQ',
+            'description' => 'Platformă populară pentru derivate și trading avansat'
         ),
         array(
-            'name' => 'eToro România',
-            'logo' => 'e',
-            'rating' => 4.2,
-            'badge' => 'Social Trading',
+            'name' => 'Revolut',
+            'logo' => 'R',
+            'rating' => 3.8,
+            'badge' => 'Cumpărare rapidă',
             'features' => array(
-                'Copy Trading - copiază traderii profesioniști',
-                'Platformă reglementată CySEC',
-                'Depunere minimă doar 50$',
-                'Fără comisioane la cumpărarea Bitcoin',
-                'Portofoliu diversificat crypto',
-                'Comunitate activă de traderi'
+                'Cumpărare instantă în aplicație',
+                'Depuneri rapide cu card bancar',
+                'IBAN european și transferuri SEPA',
+                'Interfață simplă pentru începători',
+                'Card fizic și virtual',
+                'Schimb valutar rapid'
             ),
-            'affiliate_link' => '#etoro-affiliate',
-            'description' => 'Platforma ideală pentru social trading'
+            'affiliate_link' => 'https://revolut.com/referral/?referral-code=cataliuiy!SEP1-25-AR-H3&geo-redirect',
+            'description' => 'Cea mai simplă variantă pentru începători să cumpere rapid'
         )
     );
     
@@ -327,7 +327,7 @@ function exchanges_list_shortcode($atts) {
                                 <li><?php echo esc_html($feature); ?></li>
                             <?php endforeach; ?>
                         </ul>
-                        <a href="<?php echo esc_url($exchange['affiliate_link']); ?>" class="exchange-cta" rel="nofollow sponsored">
+                        <a href="<?php echo esc_url($exchange['affiliate_link']); ?>" class="exchange-cta" target="_blank" rel="nofollow sponsored noopener noreferrer">
                             Începe pe <?php echo esc_html(explode(' ', $exchange['name'])[0]); ?> →
                         </a>
                     </div>
@@ -552,10 +552,12 @@ function bitcoinul_ro_custom_post_types() {
             'not_found_in_trash' => 'Niciun exchange în coș',
         ),
         'public'       => true,
+        // Mutăm arhiva CPT pe un slug diferit pentru a evita conflictul cu pagina /exchange-uri/
         'has_archive'  => true,
         'supports'     => array('title', 'editor', 'thumbnail', 'excerpt', 'custom-fields'),
         'menu_icon'    => 'dashicons-chart-line',
-        'rewrite'      => array('slug' => 'exchange-uri'),
+        // Folosim 'exchanges' ca slug pentru single-uri și arhivă: /exchanges/
+        'rewrite'      => array('slug' => 'exchanges', 'with_front' => false),
     ));
     
     // Taxonomie pentru tipurile de exchange-uri
@@ -725,7 +727,8 @@ function bitcoinul_ro_force_recreate_pages() {
 function bitcoinul_ro_handle_page_recreation() {
     // Verifică dacă parametrul este prezent în URL și utilizatorul are permisiuni
     if (isset($_GET['recreate_pages']) && current_user_can('manage_options')) {
-        bitcoinul_ro_recreate_pages();
+        // Corecție: apelează funcția existentă
+        bitcoinul_ro_force_recreate_pages();
         
         // Redirect cu mesaj de succes
         wp_redirect(add_query_arg(array(
@@ -755,3 +758,80 @@ function bitcoinul_ro_admin_recreate_pages() {
     }
 }
 add_action('admin_init', 'bitcoinul_ro_admin_recreate_pages');
+
+/**
+ * Fix rapid pentru routing-ul paginii Exchange-uri pe producție
+ * Accesează /wp-admin/?fix_exchanges_routing=1 ca admin pentru a rula.
+ * - Se asigură că pagina cu slug-ul 'exchange-uri' există și are template-ul corect.
+ * - Forțează flush la rewrite rules astfel încât /exchange-uri/ să trimită către pagină, nu către arhivă.
+ */
+function bitcoinul_ro_fix_exchanges_routing() {
+    if (!is_admin() || !current_user_can('manage_options')) return;
+    if (!isset($_GET['fix_exchanges_routing'])) return;
+
+    // 1) Creează/actualizează pagina 'exchange-uri' cu template-ul corect
+    $slug = 'exchange-uri';
+    $title = 'Exchange-uri Bitcoin România';
+    $template = 'page-exchange-uri.php';
+
+    $page = get_page_by_path($slug);
+    if (!$page) {
+        $page_id = wp_insert_post(array(
+            'post_title'   => $title,
+            'post_name'    => $slug,
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+        ));
+        if ($page_id && !is_wp_error($page_id)) {
+            update_post_meta($page_id, '_wp_page_template', $template);
+        }
+    } else {
+        update_post_meta($page->ID, '_wp_page_template', $template);
+    }
+
+    // 2) Flush rewrite rules pentru a invalida cache-ul de permalinkuri
+    bitcoinul_ro_custom_post_types();
+    flush_rewrite_rules();
+
+    // 3) Afișează un mesaj în admin
+    add_action('admin_notices', function() {
+        echo '<div class="notice notice-success is-dismissible"><p>Routing-ul pentru /exchange-uri/ a fost reparat. Dacă folosești cache (plugin/Cloudflare), golește-l.</p></div>';
+    });
+}
+add_action('admin_init', 'bitcoinul_ro_fix_exchanges_routing');
+
+/**
+ * Auto-fix routing for /exchange-uri/ after deploying theme files.
+ * If rewrite rules point /exchange-uri/ to the CPT archive instead of the page,
+ * we flush rules once automatically so the page template takes precedence.
+ */
+function bitcoinul_ro_autofix_exchange_page_routing() {
+    // Run only on front-end to avoid slowing down admin; ensure CPTs are registered first.
+    if (is_admin()) return;
+
+    // Avoid repeated flush within a short window
+    if (get_transient('bitcoinul_ro_routing_fix_done')) return;
+
+    $page = get_page_by_path('exchange-uri');
+    if (!$page) return; // No page, nothing to fix automatically.
+
+    // Read current rewrite rules
+    $rules = get_option('rewrite_rules');
+    if (!is_array($rules)) return;
+
+    // If a rule for ^exchange-uri/?$ exists and routes to a post_type archive, flush.
+    // Desired is index.php?pagename=exchange-uri; undesired is index.php?post_type=exchange
+    foreach ($rules as $pattern => $target) {
+        if ($pattern === '^exchange-uri/?$') {
+            if (strpos($target, 'post_type=exchange') !== false && strpos($target, 'pagename=exchange-uri') === false) {
+                // Make sure CPTs are registered, then flush once
+                bitcoinul_ro_custom_post_types();
+                flush_rewrite_rules(false);
+                set_transient('bitcoinul_ro_routing_fix_done', 1, HOUR_IN_SECONDS);
+            }
+            break;
+        }
+    }
+}
+// Run late in init to ensure CPT registration already happened
+add_action('init', 'bitcoinul_ro_autofix_exchange_page_routing', 50);

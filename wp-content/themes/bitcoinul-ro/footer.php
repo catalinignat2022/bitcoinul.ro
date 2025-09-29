@@ -48,9 +48,9 @@
                 <div class="footer-section">
                     <h3>Exchange-uri Bitcoin</h3>
                     <ul>
-                        <li><a href="#binance-affiliate" rel="nofollow sponsored">Binance România</a></li>
-                        <li><a href="#coinbase-affiliate" rel="nofollow sponsored">Coinbase Pro</a></li>
-                        <li><a href="#etoro-affiliate" rel="nofollow sponsored">eToro România</a></li>
+                        <li><a href="https://accounts.binance.com/en/register?ref=21315882" target="_blank" rel="nofollow sponsored noopener noreferrer">Binance România</a></li>
+                        <li><a href="https://www.bybit.com/en/invite/?ref=ZW6OLQ" target="_blank" rel="nofollow sponsored noopener noreferrer">Bybit</a></li>
+                        <li><a href="https://revolut.com/referral/?referral-code=cataliuiy!SEP1-25-AR-H3&amp;geo-redirect" target="_blank" rel="nofollow sponsored noopener noreferrer">Revolut</a></li>
                         <li><a href="#kraken-affiliate" rel="nofollow sponsored">Kraken Exchange</a></li>
                         <li><a href="#crypto-com-affiliate" rel="nofollow sponsored">Crypto.com</a></li>
                         <li><a href="<?php echo esc_url(home_url('/comparatie-exchange-uri/')); ?>">Compară toate →</a></li>
@@ -292,10 +292,18 @@ window.addEventListener('load', function() {
                 "@type": "Offer",
                 "itemOffered": {
                     "@type": "Service",
-                    "name": "Coinbase Pro",
+                    "name": "Bybit",
                     "description": "Exchange-ul cel mai sigur pentru Bitcoin în România"
                 }
-            }
+                },
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Revolut",
+                        "description": "Cumpărare instantă de Bitcoin în aplicația Revolut"
+                    }
+                }
         ]
     }
 }

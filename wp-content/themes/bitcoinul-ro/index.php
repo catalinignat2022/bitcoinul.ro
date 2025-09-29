@@ -95,7 +95,9 @@ get_header(); ?>
                 <div class="exchange-card fade-in-up">
                     <div class="exchange-badge">Recomandat #1</div>
                     <div class="exchange-header">
-                        <div class="exchange-logo">B</div>
+                        <div class="exchange-logo brand-binance">
+                            <img src="https://cdn.simpleicons.org/binance/ffffff" alt="Binance logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous">
+                        </div>
                         <h3 class="exchange-name">Binance România</h3>
                         <div class="exchange-rating">
                             <span class="star">★</span>
@@ -115,68 +117,75 @@ get_header(); ?>
                             <li>Suport clienți în română</li>
                             <li>Licență oficială în UE</li>
                         </ul>
-                        <a href="#binance-affiliate" class="exchange-cta" rel="nofollow sponsored">
+                        <a href="https://accounts.binance.com/en/register?ref=21315882" target="_blank" class="exchange-cta" rel="nofollow sponsored noopener noreferrer">
                             Începe pe Binance →
                         </a>
                     </div>
                 </div>
 
-                <!-- Exchange 2 - Coinbase -->
+                <!-- Exchange 2 - Bybit -->
                 <div class="exchange-card fade-in-up">
-                    <div class="exchange-badge">Cel mai sigur</div>
+                    <div class="exchange-badge">Derivate</div>
                     <div class="exchange-header">
-                        <div class="exchange-logo">C</div>
-                        <h3 class="exchange-name">Coinbase Pro</h3>
-                        <div class="exchange-rating">
-                            <span class="star">★</span>
-                            <span class="star">★</span>
-                            <span class="star">★</span>
-                            <span class="star">★</span>
-                            <span class="star">★</span>
-                            <small>(4.6/5)</small>
+                        <div class="exchange-logo brand-bybit" style="background: linear-gradient(135deg, #fff7ed, #f3f4f6);">
+                            <img src="<?= get_stylesheet_directory_uri(); ?>/assets/img/bybit-logo.svg"
+                                 alt="Bybit logo"
+                                 loading="lazy"
+                                 onerror="this.onerror=null; this.src='<?= get_stylesheet_directory_uri(); ?>/assets/img/exchange-placeholder.svg';">
                         </div>
-                    </div>
-                    <div class="exchange-content">
-                        <ul class="exchange-features">
-                            <li>Cea mai mare siguranță din lume</li>
-                            <li>Reglementat în SUA și Europa</li>
-                            <li>Interfață perfectă pentru începători</li>
-                            <li>Asigurare fonduri până la $250,000</li>
-                            <li>Card de debit Bitcoin gratuit</li>
-                            <li>Câștigă 4% APY pe staking</li>
-                        </ul>
-                        <a href="#coinbase-affiliate" class="exchange-cta" rel="nofollow sponsored">
-                            Încearcă Coinbase →
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Exchange 3 - eToro -->
-                <div class="exchange-card fade-in-up">
-                    <div class="exchange-badge">Social Trading</div>
-                    <div class="exchange-header">
-                        <div class="exchange-logo">e</div>
-                        <h3 class="exchange-name">eToro România</h3>
+                        <h3 class="exchange-name">Bybit</h3>
                         <div class="exchange-rating">
                             <span class="star">★</span>
                             <span class="star">★</span>
                             <span class="star">★</span>
                             <span class="star">★</span>
                             <span class="star">☆</span>
-                            <small>(4.2/5)</small>
+                            <small>(4.3/5)</small>
                         </div>
                     </div>
                     <div class="exchange-content">
                         <ul class="exchange-features">
-                            <li>Copy Trading - copiază traderii profesioniști</li>
-                            <li>Platformă reglementată CySEC</li>
-                            <li>Depunere minimă doar 50$</li>
-                            <li>Fără comisioane la cumpărarea Bitcoin</li>
-                            <li>Portofoliu diversificat crypto</li>
-                            <li>Comunitate activă de traderi</li>
+                            <li>Comisioane 0.1% pe spot</li>
+                            <li>Futures și derivate pentru traderi</li>
+                            <li>Lichiditate ridicată</li>
+                            <li>Execuție rapidă a ordinelor</li>
+                            <li>Aplicație mobilă performantă</li>
+                            <li>Promoții și bonusuri periodice</li>
                         </ul>
-                        <a href="#etoro-affiliate" class="exchange-cta" rel="nofollow sponsored">
-                            Descoperă eToro →
+                        <a href="https://www.bybit.com/en/invite/?ref=ZW6OLQ" target="_blank" class="exchange-cta" rel="nofollow sponsored noopener noreferrer">
+                            Începe pe Bybit →
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Exchange 3 - Revolut -->
+                <div class="exchange-card fade-in-up">
+                    <div class="exchange-badge">Cumpărare rapidă</div>
+                    <div class="exchange-header">
+                        <div class="exchange-logo brand-revolut">
+                            <img src="https://cdn.simpleicons.org/revolut/ffffff" alt="Revolut logo" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous">
+                        </div>
+                        <h3 class="exchange-name">Revolut</h3>
+                        <div class="exchange-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">☆</span>
+                            <small>(3.8/5)</small>
+                        </div>
+                    </div>
+                    <div class="exchange-content">
+                        <ul class="exchange-features">
+                            <li>Cumpărare instantă în aplicație</li>
+                            <li>Depuneri rapide cu card bancar</li>
+                            <li>IBAN european și transferuri SEPA</li>
+                            <li>Interfață simplă pentru începători</li>
+                            <li>Card fizic și virtual</li>
+                            <li>Schimb valutar rapid</li>
+                        </ul>
+                        <a href="https://revolut.com/referral/?referral-code=cataliuiy!SEP1-25-AR-H3&amp;geo-redirect" target="_blank" class="exchange-cta" rel="nofollow sponsored noopener noreferrer">
+                            Începe pe Revolut →
                         </a>
                     </div>
                 </div>

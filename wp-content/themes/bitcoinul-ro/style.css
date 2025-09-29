@@ -56,9 +56,6 @@ body {
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-.site-content {
-
-}
 
 /* ===== BITCOIN HERO BANNER ===== */
 .bitcoin-hero-banner {
@@ -466,10 +463,22 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--white);
+    overflow: hidden;
 }
+
+/* Icon within the rounded logo holder */
+.exchange-logo img {
+    width: 60%;
+    height: 60%;
+    object-fit: contain;
+    display: block;
+}
+
+/* Brand background helpers */
+.brand-binance { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+.brand-bybit { background: linear-gradient(135deg, #f59e0b, #f59e0b); }
+.brand-bybit img { width: 72% !important; height: 72% !important; border-radius: 0 !important; object-fit: contain !important; }
+.brand-revolut { background: linear-gradient(135deg, #0ea5e9, #3b82f6); }
 
 .exchange-name {
     font-size: 1.5rem;
