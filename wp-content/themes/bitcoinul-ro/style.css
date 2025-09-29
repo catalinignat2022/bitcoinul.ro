@@ -1,0 +1,2051 @@
+/*
+Theme Name: Bitcoinul.ro - Exchange-uri Bitcoin România
+Description: Temă WordPress optimizată SEO pentru promovarea exchange-urilor de Bitcoin în România. Specializată în affiliate marketing pentru platforme de tranzacționare Bitcoin, Ethereum și criptomonede.
+Author: Cătălin - bitcoinul.ro
+Version: 1.0.0
+Text Domain: bitcoinul-ro
+Tags: bitcoin, cryptocurrency, exchange, romania, affiliate, marketing, seo, responsive
+License: GPL v2 or later
+*/
+
+/* ===== VARIABILE CSS ===== */
+:root {
+    --bitcoin-orange: #f7931a;
+    --bitcoin-dark: #ff6b00;
+    --success-green: #16a085;
+    --warning-red: #e74c3c;
+    --dark-bg: #1a1d23;
+    --light-bg: #f8f9fa;
+    --white: #ffffff;
+    --text-primary: #2c3e50;
+    --text-secondary: #7f8c8d;
+    --border-light: #ecf0f1;
+    --shadow: 0 4px 15px rgba(0,0,0,0.1);
+    --shadow-hover: 0 8px 30px rgba(0,0,0,0.15);
+}
+
+/* ===== RESET & BASE ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.7;
+    color: var(--text-primary);
+    background-color: var(--white);
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* ===== HEADER OPTIMIZAT PENTRU CONVERSII ===== */
+.site-header {
+    background: linear-gradient(135deg, var(--dark-bg) 0%, #2c3e50 100%);
+    padding: 1rem 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.site-content {
+
+}
+
+/* ===== BITCOIN HERO BANNER ===== */
+.bitcoin-hero-banner {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #1e3c72 100%);
+    position: relative;
+    overflow: hidden;
+    min-height: 350px;
+    display: flex;
+    align-items: center;
+}
+
+.bitcoin-hero-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(247, 147, 26, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 107, 0, 0.1) 0%, transparent 50%),
+        linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.02) 50%, transparent 70%);
+    animation: subtleMove 20s ease-in-out infinite;
+}
+
+@keyframes subtleMove {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.hero-background {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+}
+
+.hero-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 3rem;
+    align-items: center;
+    padding: 2.5rem 0;
+}
+
+.hero-image {
+    text-align: center;
+    position: relative;
+}
+
+.bitcoin-logo {
+    width: 200px;
+    height: 200px;
+    filter: drop-shadow(0 10px 30px rgba(247, 147, 26, 0.3));
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+}
+
+.hero-text {
+    color: var(--white);
+}
+
+.hero-main-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, #f7931a 0%, #ff6b00 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-description {
+    font-size: 1.3rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+    line-height: 1.6;
+}
+
+.hero-stats {
+    display: flex;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.stat {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    min-width: 100px;
+}
+
+.stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--bitcoin-orange);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    line-height: 1.3;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.site-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.site-logo h1 {
+    color: var(--bitcoin-orange);
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.site-logo .btc-symbol {
+    font-size: 2rem;
+    color: var(--bitcoin-orange);
+}
+
+.site-logo a {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ===== NAVIGAȚIE ===== */
+.main-navigation ul {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.main-navigation a {
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.main-navigation a:hover {
+    background-color: var(--bitcoin-orange);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+.cta-button {
+    background: linear-gradient(135deg, var(--bitcoin-orange), var(--bitcoin-dark));
+    color: var(--white) !important;
+    padding: 0.8rem 1.5rem !important;
+    border-radius: 25px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: var(--shadow);
+}
+
+.cta-button:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+}
+
+/* ===== MENIU MOBIL ===== */
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    position: relative;
+    width: 30px;
+    height: 30px;
+}
+
+.hamburger-line {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background-color: var(--white);
+    margin: 5px 0;
+    transition: 0.3s;
+    border-radius: 2px;
+}
+
+/* ===== CONȚINUT PRINCIPAL ===== */
+.site-content {
+    padding: 2rem 0;
+}
+
+/* ===== HERO SECTION PENTRU CONVERSII ===== */
+.hero-section {
+    background: linear-gradient(135deg, var(--bitcoin-orange) 0%, var(--bitcoin-dark) 100%);
+    color: var(--white);
+    padding: 4rem 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+    opacity: 0.3;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.hero-subtitle {
+    font-size: 1.3rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.hero-cta {
+    display: inline-block;
+    background-color: var(--white);
+    color: var(--bitcoin-orange);
+    padding: 1rem 2rem;
+    border-radius: 30px;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 1.1rem;
+    box-shadow: var(--shadow-hover);
+    transition: all 0.3s ease;
+}
+
+.hero-cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 35px rgba(0,0,0,0.2);
+}
+
+/* ===== WIDGET PREȚ BITCOIN LIVE ===== */
+.bitcoin-price-widget {
+    background: linear-gradient(135deg, var(--success-green), #1abc9c);
+    color: var(--white);
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    margin: 2rem 0;
+    box-shadow: var(--shadow-hover);
+    position: relative;
+    overflow: hidden;
+}
+
+.bitcoin-price-widget::before {
+    content: '₿';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    font-size: 8rem;
+    opacity: 0.1;
+    font-weight: 700;
+}
+
+.price-label {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.9;
+}
+
+.price-display {
+    font-size: 2.8rem;
+    font-weight: 700;
+    margin: 1rem 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.price-change {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.price-change.positive {
+    color: #2ecc71;
+}
+
+.price-change.negative {
+    color: #e74c3c;
+}
+
+/* ===== SECȚIUNEA EXCHANGE-URI (AFFILIATE) ===== */
+.exchanges-section {
+    padding: 4rem 0;
+    background-color: var(--light-bg);
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    position: relative;
+}
+
+.section-title::after {
+    content: '';
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(135deg, var(--bitcoin-orange), var(--bitcoin-dark));
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 2px;
+}
+
+.section-subtitle {
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-bottom: 3rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.exchanges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin: 3rem 0;
+}
+
+.exchange-card {
+    background: var(--white);
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+    border: 2px solid transparent;
+}
+
+.exchange-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--bitcoin-orange);
+}
+
+.exchange-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: linear-gradient(135deg, var(--bitcoin-orange), var(--bitcoin-dark));
+    color: var(--white);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    z-index: 2;
+}
+
+.exchange-header {
+    padding: 2rem;
+    text-align: center;
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+}
+
+.exchange-logo {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1rem;
+    background-color: var(--bitcoin-orange);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--white);
+}
+
+.exchange-name {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.exchange-rating {
+    display: flex;
+    justify-content: center;
+    gap: 0.2rem;
+    margin-bottom: 1rem;
+}
+
+.star {
+    color: #f39c12;
+    font-size: 1.2rem;
+}
+
+.exchange-content {
+    padding: 0 2rem 2rem;
+}
+
+.exchange-features {
+    list-style: none;
+    margin-bottom: 2rem;
+}
+
+.exchange-features li {
+    padding: 0.5rem 0;
+    color: var(--text-secondary);
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.exchange-features li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--success-green);
+    font-weight: 700;
+}
+
+.exchange-cta {
+    display: block;
+    background: linear-gradient(135deg, var(--bitcoin-orange), var(--bitcoin-dark));
+    color: var(--white);
+    padding: 1rem 2rem;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.exchange-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+    color: var(--white);
+}
+
+/* ===== SECȚIUNEA ARTICOLE/BLOG ===== */
+.blog-section {
+    padding: 4rem 0;
+}
+
+.articles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin: 3rem 0;
+}
+
+.article-card {
+    background: var(--white);
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.article-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.article-thumbnail {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.article-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.article-card:hover .article-thumbnail img {
+    transform: scale(1.1);
+}
+
+.article-content {
+    padding: 1.5rem;
+}
+
+.article-category {
+    display: inline-block;
+    background-color: var(--bitcoin-orange);
+    color: var(--white);
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+}
+
+.article-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.article-title a {
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.article-title a:hover {
+    color: var(--bitcoin-orange);
+}
+
+.article-meta {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.article-excerpt {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.read-more {
+    color: var(--bitcoin-orange);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.read-more:hover {
+    text-decoration: underline;
+}
+
+/* ===== FOOTER ===== */
+.site-footer {
+    background: linear-gradient(135deg, var(--dark-bg) 0%, #2c3e50 100%);
+    color: var(--white);
+    padding: 3rem 0 1rem;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.footer-section h3 {
+    color: var(--bitcoin-orange);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.footer-section ul {
+    list-style: none;
+}
+
+.footer-section ul li {
+    margin-bottom: 0.5rem;
+}
+
+.footer-section a {
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-section a:hover {
+    color: var(--bitcoin-orange);
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 2rem;
+    text-align: center;
+    color: rgba(255,255,255,0.6);
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 1024px) {
+    .hero-wrapper {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        text-align: center;
+    }
+    
+    .hero-main-title {
+        font-size: 3rem;
+    }
+    
+    .bitcoin-logo {
+        width: 160px;
+        height: 160px;
+    }
+    
+    .hero-stats {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .site-header {
+        padding: 0.8rem 0;
+    }
+    
+    .site-content {
+        padding-top: 70px;
+    }
+    
+    .bitcoin-hero-banner {
+        min-height: 280px;
+    }
+    
+    .hero-wrapper {
+        padding: 2rem 0;
+    }
+    
+    .hero-main-title {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .hero-description {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .bitcoin-logo {
+        width: 130px;
+        height: 130px;
+    }
+    
+    .hero-stats {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+    }
+    
+    .stat {
+        min-width: 80px;
+        padding: 0.8rem;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .header-content {
+        justify-content: space-between;
+        flex-direction: row;
+    }
+    
+    .mobile-menu-toggle {
+        display: block !important;
+    }
+    
+    .main-navigation {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--dark-bg);
+        border-top: 1px solid rgba(255,255,255,0.1);
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 999;
+    }
+    
+    .main-navigation.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .main-navigation ul {
+        flex-direction: column !important;
+        padding: 1rem 0;
+        gap: 0 !important;
+    }
+    
+    .main-navigation li {
+        text-align: center;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .main-navigation a {
+        display: block;
+        padding: 1rem !important;
+        border-radius: 0 !important;
+    }
+    
+    /* Animație hamburger activ */
+    .mobile-menu-toggle.active .hamburger-line:nth-child(1) {
+        transform: rotate(-45deg) translate(-5px, 6px);
+    }
+    
+    .mobile-menu-toggle.active .hamburger-line:nth-child(2) {
+        opacity: 0;
+    }
+    
+    .mobile-menu-toggle.active .hamburger-line:nth-child(3) {
+        transform: rotate(45deg) translate(-5px, -6px);
+    }
+    
+    .exchanges-grid,
+    .articles-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .price-display {
+        font-size: 2rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .site-content {
+        padding-top: 60px;
+    }
+    
+    .bitcoin-hero-banner {
+        min-height: 250px;
+    }
+    
+    .hero-wrapper {
+        padding: 1.5rem 0;
+    }
+    
+    .hero-main-title {
+        font-size: 2rem;
+    }
+    
+    .hero-description {
+        font-size: 1rem;
+    }
+    
+    .bitcoin-logo {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .hero-stats {
+        flex-direction: row;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+    }
+    
+    .stat {
+        flex: 1;
+        min-width: 70px;
+        padding: 0.6rem;
+    }
+    
+    .stat-number {
+        font-size: 1.3rem;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+    }
+    
+    .hero-section {
+        padding: 3rem 0;
+    }
+    
+    .exchanges-section,
+    .blog-section {
+        padding: 3rem 0;
+    }
+}
+
+/* ===== ANIMAȚII ===== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* ===== STILURI PENTRU PAGINI PERSONALIZATE ===== */
+
+/* Pagina Exchange-uri */
+.exchange-page .page-hero {
+    background: linear-gradient(135deg, var(--bitcoin-orange) 0%, var(--bitcoin-dark) 100%);
+    color: white;
+    padding: 4rem 0;
+    text-align: center;
+}
+
+.exchange-filters {
+    background: var(--light-bg);
+    padding: 2rem 0;
+    margin: 2rem 0;
+    border-radius: 15px;
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-group label {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.filter-group select {
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-light);
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.exchange-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+}
+
+.exchange-card.featured {
+    border: 3px solid var(--bitcoin-orange);
+    transform: scale(1.02);
+}
+
+.exchange-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.exchange-header {
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* CSS pentru logo-uri SVG circulare */
+.exchange-logo img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.exchange-rating .stars {
+    color: #ffd700;
+    font-size: 1.2rem;
+}
+
+.exchange-badge {
+    background: var(--success-green);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.featured-badge {
+    background: var(--bitcoin-orange);
+}
+
+.exchange-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.detail-row .value.success {
+    color: var(--success-green);
+    font-weight: 600;
+}
+
+.exchange-pros-cons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+.pros h4, .cons h4 {
+    margin-bottom: 1rem;
+}
+
+.pros ul, .cons ul {
+    list-style: none;
+    padding: 0;
+}
+
+.pros li, .cons li {
+    padding: 0.3rem 0;
+}
+
+.exchange-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn-primary {
+    background: var(--bitcoin-orange);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: var(--bitcoin-dark);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--text-primary);
+    border: 2px solid var(--text-primary);
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: var(--text-primary);
+    color: white;
+}
+
+/* Quick Guide Styles */
+.quick-guide {
+    background: var(--light-bg);
+    padding: 4rem 0;
+    margin: 4rem 0;
+}
+
+.steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.step {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+.step-number {
+    background: var(--bitcoin-orange);
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0 auto 1rem;
+}
+
+/* Pagina Ghiduri */
+.guides-page .page-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 4rem 0;
+    text-align: center;
+}
+
+.guides-categories {
+    padding: 2rem 0;
+    background: var(--light-bg);
+    margin: 2rem 0;
+}
+
+.category-filters {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    background: white;
+    border: 2px solid var(--border-light);
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.filter-btn.active,
+.filter-btn:hover {
+    background: var(--bitcoin-orange);
+    color: white;
+    border-color: var(--bitcoin-orange);
+}
+
+.guides-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+.guide-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.guide-card.featured {
+    border: 3px solid var(--bitcoin-orange);
+}
+
+.guide-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.guide-image {
+    background: linear-gradient(135deg, var(--bitcoin-orange), var(--bitcoin-dark));
+    padding: 2rem;
+    text-align: center;
+}
+
+.guide-icon {
+    font-size: 3rem;
+}
+
+.guide-content {
+    padding: 2rem;
+}
+
+.guide-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.difficulty {
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.difficulty.beginner {
+    background: #d4edda;
+    color: #155724;
+}
+
+.difficulty.intermediate {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.difficulty.advanced {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.guide-highlights {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+}
+
+.guide-highlights span {
+    background: var(--light-bg);
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.85rem;
+}
+
+.read-guide-btn {
+    background: var(--bitcoin-orange);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
+    margin-top: 1rem;
+}
+
+.read-guide-btn:hover {
+    background: var(--bitcoin-dark);
+}
+
+/* Quick Start Guide */
+.quick-start-guide {
+    background: var(--light-bg);
+    padding: 4rem 0;
+    margin: 4rem 0;
+}
+
+.quick-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.quick-step {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: var(--shadow);
+}
+
+.step-icon {
+    font-size: 2rem;
+}
+
+.step-link {
+    color: var(--bitcoin-orange);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* Bitcoin FAQ */
+.bitcoin-faq {
+    padding: 4rem 0;
+}
+
+.faq-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.faq-item {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+}
+
+.faq-item h3 {
+    color: var(--bitcoin-orange);
+    margin-bottom: 1rem;
+}
+
+/* Pagina Știri */
+.news-page .page-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 4rem 0;
+    text-align: center;
+}
+
+.news-stats {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin-top: 2rem;
+}
+
+.breaking-news {
+    background: #dc3545;
+    color: white;
+    padding: 1rem 0;
+    margin: 2rem 0;
+}
+
+.breaking-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.breaking-label {
+    background: white;
+    color: #dc3545;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.breaking-ticker {
+    flex: 1;
+    animation: scroll-left 30s linear infinite;
+}
+
+@keyframes scroll-left {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+.news-filters {
+    background: var(--light-bg);
+    padding: 2rem 0;
+    margin: 2rem 0;
+}
+
+.filter-controls {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    align-items: end;
+    flex-wrap: wrap;
+}
+
+.refresh-btn {
+    background: var(--bitcoin-orange);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+.news-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.news-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+}
+
+.news-image {
+    background: linear-gradient(135deg, var(--bitcoin-orange), var(--bitcoin-dark));
+    padding: 2rem;
+    text-align: center;
+    color: white;
+}
+
+.news-icon {
+    font-size: 2rem;
+}
+
+.news-content {
+    padding: 1.5rem;
+}
+
+.news-tag {
+    background: var(--bitcoin-orange);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 1rem;
+}
+
+.news-tag.romania {
+    background: #ce1126;
+}
+
+.news-card h3 a {
+    color: var(--text-primary);
+    text-decoration: none;
+}
+
+.news-card h3 a:hover {
+    color: var(--bitcoin-orange);
+}
+
+.news-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.news-loading {
+    text-align: center;
+    padding: 4rem;
+    grid-column: 1 / -1;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid var(--border-light);
+    border-top: 5px solid var(--bitcoin-orange);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Market Sentiment */
+.market-sentiment {
+    background: var(--light-bg);
+    padding: 4rem 0;
+    margin: 4rem 0;
+}
+
+.sentiment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.sentiment-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+.sentiment-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.sentiment-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--bitcoin-orange);
+    margin-bottom: 0.5rem;
+}
+
+/* Pagina Despre */
+.about-page .page-hero {
+    background: linear-gradient(135deg, var(--dark-bg) 0%, #2c3e50 100%);
+    color: white;
+    padding: 4rem 0;
+    text-align: center;
+}
+
+.mission-section {
+    padding: 4rem 0;
+}
+
+.mission-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+.mission-points {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.point {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.point-icon {
+    font-size: 2rem;
+    min-width: 60px;
+}
+
+.stats-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+.stat-card .stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--bitcoin-orange);
+    margin-bottom: 0.5rem;
+}
+
+.why-choose-us {
+    background: var(--light-bg);
+    padding: 4rem 0;
+}
+
+.benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.benefit-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+.benefit-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.team-section {
+    padding: 4rem 0;
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.team-member {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+.member-avatar {
+    margin-bottom: 1.5rem;
+}
+
+.avatar-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--bitcoin-orange);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto;
+}
+
+.member-role {
+    color: var(--text-secondary);
+    font-weight: 500;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.member-expertise {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.expertise-tag {
+    background: var(--light-bg);
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.85rem;
+}
+
+.partners-section {
+    background: var(--light-bg);
+    padding: 4rem 0;
+}
+
+.partners-intro {
+    text-align: center;
+    margin-bottom: 3rem;
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+}
+
+.partners-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.partner-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+.partner-logo img {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 1rem;
+}
+
+.logo-placeholder {
+    width: 60px;
+    height: 60px;
+    background: var(--bitcoin-orange);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin: 0 auto 1rem;
+}
+
+.partner-status.verified {
+    color: var(--success-green);
+    font-weight: 600;
+    display: block;
+    margin: 0.5rem 0;
+}
+
+.standards-section {
+    padding: 4rem 0;
+}
+
+.standards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.standard-item {
+    text-align: center;
+    padding: 2rem;
+}
+
+.standard-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.community-section {
+    background: var(--light-bg);
+    padding: 4rem 0;
+}
+
+.community-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.community-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+.community-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.join-btn {
+    background: var(--bitcoin-orange);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
+    margin-top: 1rem;
+}
+
+.join-btn:hover {
+    background: var(--bitcoin-dark);
+}
+
+.disclaimer-section {
+    padding: 4rem 0;
+}
+
+.disclaimer-box {
+    background: #fff3cd;
+    border: 2px solid #ffeaa7;
+    border-radius: 15px;
+    padding: 2rem;
+    color: #856404;
+}
+
+.disclaimer-box h3 {
+    color: #856404;
+    margin-bottom: 1rem;
+}
+
+/* Responsive pentru pagini personalizate */
+@media (max-width: 768px) {
+    .mission-grid,
+    .exchange-pros-cons {
+        grid-template-columns: 1fr;
+    }
+    
+    .exchange-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .exchange-actions {
+        flex-direction: column;
+    }
+    
+    .quick-steps,
+    .steps-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-controls {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .news-stats {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+/* ===== UTILITĂȚI ===== */
+.text-center { text-align: center; }
+.text-orange { color: var(--bitcoin-orange); }
+.bg-light { background-color: var(--light-bg); }
+.mb-2 { margin-bottom: 2rem; }
+.mt-2 { margin-top: 2rem; }
+
+/* ===== DESIGN NOU - TILE-URI COMPACTE EXCHANGE-URI ===== */
+.exchanges-grid-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 4rem 0;
+}
+
+.exchanges-compact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.exchange-tile {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.exchange-tile:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+    border-color: var(--bitcoin-orange);
+}
+
+/* Badge-uri pentru fiecare tip de exchange */
+.tile-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tile-badge.recommended { background: linear-gradient(135deg, #28a745, #20c997); }
+.tile-badge.secure { background: linear-gradient(135deg, #007bff, #0056b3); }
+.tile-badge.social { background: linear-gradient(135deg, #17a2b8, #138496); }
+.tile-badge.european { background: linear-gradient(135deg, #6f42c1, #563d7c); }
+.tile-badge.established { background: linear-gradient(135deg, #6c757d, #545b62); }
+.tile-badge.trustworthy { background: linear-gradient(135deg, #fd7e14, #e8650e); }
+.tile-badge.altcoins { background: linear-gradient(135deg, #e83e8c, #d91a72); }
+.tile-badge.global { background: linear-gradient(135deg, #20c997, #17a2b8); }
+.tile-badge.advanced { background: linear-gradient(135deg, #dc3545, #c82333); }
+.tile-badge.derivatives { background: linear-gradient(135deg, #ffc107, #e0a800); }
+.tile-badge.complete { background: linear-gradient(135deg, #28a745, #1e7e34); }
+.tile-badge.card { background: linear-gradient(135deg, #6610f2, #520dc2); }
+.tile-badge.rebuild { background: linear-gradient(135deg, #fd7e14, #dc3545); }
+.tile-badge.professional { background: linear-gradient(135deg, #343a40, #23272b); }
+.tile-badge.usa { background: linear-gradient(135deg, #007bff, #dc3545); }
+.tile-badge.early { background: linear-gradient(135deg, #ffc107, #fd7e14); }
+.tile-badge.multiasset { background: linear-gradient(135deg, #17a2b8, #6f42c1); }
+.tile-badge.banking { background: linear-gradient(135deg, #28a745, #007bff); }
+.tile-badge.lending { background: linear-gradient(135deg, #6c757d, #28a745); }
+
+/* Logo exchange-uri în tile-uri */
+.tile-logo {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem auto;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid #f8f9fa;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tile-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* Numele exchange-ului */
+.exchange-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    color: var(--dark-text);
+}
+
+.country-flag {
+    margin-left: 0.5rem;
+    font-size: 1.2rem;
+}
+
+/* Rating cu stele */
+.rating-stars {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #ffc107;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Features principale */
+.key-features {
+    margin-bottom: 2rem;
+}
+
+.feature {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.8rem;
+    font-size: 0.9rem;
+    color: var(--text-gray);
+    line-height: 1.4;
+}
+
+.feature::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--bitcoin-orange);
+    border-radius: 50%;
+    margin-right: 0.8rem;
+    flex-shrink: 0;
+}
+
+/* Butoanele CTA */
+.tile-actions {
+    text-align: center;
+}
+
+.btn-cta {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--bitcoin-orange) 0%, #ff6b00 100%);
+    color: white;
+    text-decoration: none;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(247, 147, 26, 0.3);
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(247, 147, 26, 0.4);
+    background: linear-gradient(135deg, #ff6b00 0%, var(--bitcoin-orange) 100%);
+    color: white;
+    text-decoration: none;
+}
+
+/* Efecte speciale pentru tile-urile featured */
+.exchange-tile.featured {
+    border: 3px solid var(--bitcoin-orange);
+    background: linear-gradient(135deg, #fff 0%, #fff7e6 100%);
+}
+
+.exchange-tile.featured::before {
+    content: '👑';
+    position: absolute;
+    top: -5px;
+    left: 20px;
+    font-size: 2rem;
+    z-index: 2;
+}
+
+/* Responsive pentru mobile */
+@media (max-width: 768px) {
+    .exchanges-compact-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding: 0 1rem;
+    }
+    
+    .exchange-tile {
+        padding: 1.5rem;
+    }
+    
+    .tile-logo {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .exchange-name {
+        font-size: 1.3rem;
+    }
+    
+    .feature {
+        font-size: 0.85rem;
+    }
+    
+    .btn-cta {
+        padding: 0.8rem 1.5rem;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .tile-badge {
+        position: static;
+        display: inline-block;
+        margin-bottom: 1rem;
+        font-size: 0.7rem;
+    }
+    
+    .exchanges-compact-grid {
+        padding: 0 0.5rem;
+    }
+}
+
+/* ===== OPTIMIZĂRI SEO ===== */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+}
