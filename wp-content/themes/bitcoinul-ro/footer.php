@@ -12,36 +12,7 @@
                         Platforma ta de încredere pentru investiții în Bitcoin în România. 
                         Comparăm cele mai bune exchange-uri și îți oferim ghiduri complete pentru începători.
                     </p>
-                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                        <a href="https://facebook.com/bitcoinulro" 
-                           target="_blank" 
-                           rel="noopener" 
-                           style="color: var(--bitcoin-orange); font-size: 1.5rem;" 
-                           title="Urmărește-ne pe Facebook" 
-                           aria-label="Facebook"
-                           onclick="trackEvent('social_media_click', 'engagement', 'facebook_footer'); return true;">📘</a>
-                        <a href="https://twitter.com/bitcoinulro" 
-                           target="_blank" 
-                           rel="noopener" 
-                           style="color: var(--bitcoin-orange); font-size: 1.5rem;" 
-                           title="Urmărește-ne pe Twitter" 
-                           aria-label="Twitter"
-                           onclick="trackEvent('social_media_click', 'engagement', 'twitter_footer'); return true;">🐦</a>
-                        <a href="https://t.me/bitcoinulro" 
-                           target="_blank" 
-                           rel="noopener" 
-                           style="color: var(--bitcoin-orange); font-size: 1.5rem;" 
-                           title="Alătură-te grupului Telegram" 
-                           aria-label="Telegram"
-                           onclick="trackEvent('social_media_click', 'engagement', 'telegram_footer'); return true;">✈️</a>
-                        <a href="https://youtube.com/bitcoinulro" 
-                           target="_blank" 
-                           rel="noopener" 
-                           style="color: var(--bitcoin-orange); font-size: 1.5rem;" 
-                           title="Urmărește-ne pe YouTube" 
-                           aria-label="YouTube"
-                           onclick="trackEvent('social_media_click', 'engagement', 'youtube_footer'); return true;">📺</a>
-                    </div>
+                    
                 </div>
 
                 <!-- Secțiunea 2: Exchange-uri Recomandate -->
@@ -51,8 +22,6 @@
                         <li><a href="https://accounts.binance.com/en/register?ref=21315882" target="_blank" rel="nofollow sponsored noopener noreferrer">Binance România</a></li>
                         <li><a href="https://www.bybit.com/en/invite/?ref=ZW6OLQ" target="_blank" rel="nofollow sponsored noopener noreferrer">Bybit</a></li>
                         <li><a href="https://revolut.com/referral/?referral-code=cataliuiy!SEP1-25-AR-H3&amp;geo-redirect" target="_blank" rel="nofollow sponsored noopener noreferrer">Revolut</a></li>
-                        <li><a href="#kraken-affiliate" rel="nofollow sponsored">Kraken Exchange</a></li>
-                        <li><a href="#crypto-com-affiliate" rel="nofollow sponsored">Crypto.com</a></li>
                         <li><a href="<?php echo esc_url(home_url('/comparatie-exchange-uri/')); ?>">Compară toate →</a></li>
                     </ul>
                 </div>
@@ -94,7 +63,7 @@
                 <p>&copy; <?php echo date('Y'); ?> <strong><?php bloginfo('name'); ?></strong> - Toate drepturile rezervate.</p>
                 <p style="margin-top: 0.5rem; font-size: 0.9rem;">
                     Dezvoltat cu ❤️ pentru comunitatea Bitcoin din România. 
-                    <span style="color: var(--bitcoin-orange);">Powered by WordPress</span>
+                    <span style="color: var(--bitcoin-orange);">Powered by Bitcoinul.ro</span>
                 </p>
                 
                 <!-- Schema.org pentru footer -->

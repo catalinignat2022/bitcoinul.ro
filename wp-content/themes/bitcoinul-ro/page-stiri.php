@@ -33,17 +33,7 @@ get_header(); ?>
         </div>
     </section>
 
-    <!-- Breaking News -->
-    <section class="breaking-news" id="breaking-news">
-        <div class="container">
-            <div class="breaking-header">
-                <span class="breaking-label">🚨 BREAKING</span>
-                <div class="breaking-ticker" id="breaking-ticker">
-                    Încărcăm ultimele știri...
-                </div>
-            </div>
-        </div>
-    </section>
+    
 
     <!-- Filtre Știri -->
     <section class="news-filters">
@@ -305,10 +295,7 @@ document.addEventListener('DOMContentLoaded', function() {
             newsContainer.appendChild(newsCard);
         });
 
-        // Update breaking news
-        if (articles.length > 0 && clearContainer) {
-            updateBreakingNews(articles[0]);
-        }
+        
     }
 
     // Funcție pentru crearea card-ului de știre
@@ -399,16 +386,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return 'General';
     }
 
-    // Funcție pentru breaking news
-    function updateBreakingNews(article) {
-        const breakingTicker = document.getElementById('breaking-ticker');
-        const href = resolveArticleUrl(article);
-        breakingTicker.innerHTML = `
-            <a href="${href}" target="_blank" rel="nofollow noopener noreferrer">
-                ${article.title}
-            </a>
-        `;
-    }
+    
 
     // Funcții pentru loading states
     function showLoading() {
