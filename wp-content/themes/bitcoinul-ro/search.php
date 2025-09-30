@@ -309,7 +309,7 @@ get_header(); ?>
                     <p style="margin-bottom: 1.5rem; opacity: 0.9; line-height: 1.6;">
                         Cele mai importante evenimente din lumea criptomonedelor
                     </p>
-                    <a href="<?php echo esc_url(home_url('/stiri-bitcoin/')); ?>" 
+                    <a href="<?php echo esc_url(home_url('/stiri/')); ?>" 
                        style="display: inline-block; background: white; color: var(--text-primary); padding: 0.8rem 1.5rem; border-radius: 25px; text-decoration: none; font-weight: 600;">
                         Citește știrile
                     </a>

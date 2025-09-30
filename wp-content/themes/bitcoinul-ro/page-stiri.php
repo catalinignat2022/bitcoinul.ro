@@ -76,7 +76,7 @@ get_header(); ?>
                         <option value="ro-only">Doar .ro</option>
                     </select>
                 </div>
-                <button id="refresh-news" class="refresh-btn">🔄 Actualizează</button>
+                
             </div>
         </div>
     </section>
@@ -186,7 +186,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const newsContainer = document.getElementById('news-container');
     const featuredContainer = document.getElementById('featured-news-container');
     const loadMoreBtn = document.getElementById('load-more-news');
-    const refreshBtn = document.getElementById('refresh-news');
 
     // Endpoint proxy server-side (token din Customizer)
     const NEWS_PROXY = '<?php echo esc_url( admin_url('admin-ajax.php?action=bitcoinul_ro_fetch_news') ); ?>';
@@ -205,31 +204,36 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Funcție pentru încărcarea știrilor crypto
     async function loadCryptoNews(page = 1) {
+        let didFallback = false;
         try {
             showLoading();
-            
-            // Folosim proxy-ul server-side pentru CryptoPanic
             const response = await fetch(`${NEWS_PROXY}&currencies=BTC,ETH&kind=news&page=${page}`);
-            
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            
             const payload = await response.json();
-            // Endpoint-ul nostru răspunde cu { success: true, data: { results: [...] } }
-            const results = (payload && payload.success && payload.data && Array.isArray(payload.data.results))
-                ? payload.data.results
-                : (Array.isArray(payload?.results) ? payload.results : null);
-
-            if (!results) throw new Error('Invalid news payload');
-
-            displayNews(results, page === 1);
-            hideLoading();
-            
+            // Acceptă atât forma WordPress {success:true,data:{results:[]}}, cât și direct {results:[]}
+            let results = [];
+            if (payload) {
+                if (payload.success === true && payload.data && Array.isArray(payload.data.results)) {
+                    results = payload.data.results;
+                } else if (Array.isArray(payload.results)) {
+                    results = payload.results;
+                }
+            }
+            if (!Array.isArray(results) || results.length === 0) {
+                // Fallback UI dacă nu avem rezultate
+                loadFallbackNews();
+                didFallback = true;
+            } else {
+                displayNews(results, page === 1);
+            }
         } catch (error) {
             console.error('Error loading news:', error);
-            // Fallback la știri statice
             loadFallbackNews();
+            didFallback = true;
+        } finally {
+            hideLoading();
         }
     }
 
@@ -423,14 +427,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loadCryptoNews(currentPage);
     });
 
-    refreshBtn.addEventListener('click', function() {
-        currentPage = 1;
-        loadCryptoNews(1);
-        refreshBtn.innerHTML = '🔄 Actualizând...';
-        setTimeout(() => {
-            refreshBtn.innerHTML = '🔄 Actualizează';
-        }, 2000);
-    });
+    // eliminat: traduceri & refresh manual
 
     // Filtrele
     document.getElementById('news-category').addEventListener('change', function() {

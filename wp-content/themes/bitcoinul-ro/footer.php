@@ -65,7 +65,7 @@
                         <li><a href="<?php echo esc_url(home_url('/cum-cumpar-bitcoin/')); ?>">Cum cumpăr Bitcoin?</a></li>
                         <li><a href="<?php echo esc_url(home_url('/portofel-bitcoin-sigur/')); ?>">Portofele Bitcoin sigure</a></li>
                         <li><a href="<?php echo esc_url(home_url('/taxe-bitcoin-romania/')); ?>">Taxe Bitcoin în România</a></li>
-                        <li><a href="<?php echo esc_url(home_url('/stiri-bitcoin/')); ?>">Știri Bitcoin</a></li>
+                        <li><a href="<?php echo esc_url(home_url('/stiri/')); ?>">Știri Bitcoin</a></li>
                         <li><a href="<?php echo esc_url(home_url('/calculatoare-bitcoin/')); ?>">Calculatoare crypto</a></li>
                     </ul>
                 </div>
@@ -74,12 +74,9 @@
                 <div class="footer-section">
                     <h3>Informații Legale</h3>
                     <ul>
-                        <li><a href="<?php echo esc_url(home_url('/despre/')); ?>">Despre noi</a></li>
-                        <li><a href="<?php echo esc_url(home_url('/contact/')); ?>">Contact</a></li>
                         <li><a href="<?php echo esc_url(home_url('/termeni-conditii/')); ?>">Termeni și condiții</a></li>
                         <li><a href="<?php echo esc_url(home_url('/politica-confidentialitate/')); ?>">Politica de confidențialitate</a></li>
                         <li><a href="<?php echo esc_url(home_url('/disclaimer-investitii/')); ?>">Disclaimer investiții</a></li>
-                        <li><a href="<?php echo esc_url(home_url('/affiliate-disclosure/')); ?>">Affiliate Disclosure</a></li>
                     </ul>
                 </div>
 

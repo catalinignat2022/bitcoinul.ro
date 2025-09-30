@@ -149,7 +149,7 @@ get_header(); ?>
       </div>
 
       <div class="guide-cta-bar" style="margin:1.5rem 0 0;display:flex;gap:.75rem;flex-wrap:wrap;">
-        <a class="btn" href="/exchange-uri" style="background:linear-gradient(135deg,#f7931a,#ff6b00);color:#fff;padding:.9rem 1.2rem;border-radius:12px;text-decoration:none;font-weight:700;">Cumpără Bitcoin în siguranță →</a>
+        <a class="btn exchange-cta" data-exchange="Exchange-uri Landing" href="/exchange-uri" style="background:linear-gradient(135deg,#f7931a,#ff6b00);color:#fff;padding:.9rem 1.2rem;border-radius:12px;text-decoration:none;font-weight:700;">Cumpără Bitcoin în siguranță →</a>
         <a class="btn" href="/ghid-bitcoin-incepatori/" style="background:#111827;color:#fff;padding:.9rem 1.2rem;border-radius:12px;text-decoration:none;font-weight:700;">Ghid pentru începători →</a>
       </div>
 

@@ -504,6 +504,36 @@ get_header(); ?>
     </section>
 
     <script>
+    // Fallback: define tracker if theme JS hasn't loaded yet
+    window.trackAffiliateClick = window.trackAffiliateClick || function(exchangeName, action) {
+        try {
+            var href = '';
+            try {
+                if (this && this.tagName === 'A') { href = this.getAttribute('href') || this.href || ''; }
+            } catch (e) {}
+            if (!href && document.activeElement && document.activeElement.tagName === 'A') {
+                href = document.activeElement.getAttribute('href') || document.activeElement.href || '';
+            }
+            if (typeof gtag === 'function') {
+                gtag('event', 'click_exchange_cta', {
+                    event_category: 'engagement',
+                    event_label: exchangeName,
+                    exchange_name: exchangeName || 'Unknown',
+                    link_url: href || ''
+                });
+            } else if (window.dataLayer && Array.isArray(window.dataLayer)) {
+                window.dataLayer.push({
+                    event: 'click_exchange_cta',
+                    exchange_name: exchangeName || 'Unknown',
+                    link_url: href || ''
+                });
+            }
+        } catch (e) { /* no-op */ }
+        return true;
+    };
+    </script>
+
+    <script>
     // Filtrare client-side pentru cardurile de exchange
     function filterExchanges(filter) {
         try {
