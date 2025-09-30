@@ -13,100 +13,80 @@ if (!defined('ABSPATH')) {
  * Configurări de bază ale temei
  */
 function bitcoinul_ro_setup() {
-    
-    // Configurează titlul și tagline-ul site-ului pentru SEO
+    // Configurează titlul și tagline-ul site-ului pentru SEO (rulează la after_setup_theme încă o dată)
     add_action('after_setup_theme', 'bitcoinul_ro_set_site_info');
-    
+
     // Suport pentru traduceri
     load_theme_textdomain('bitcoinul-ro', get_template_directory() . '/languages');
-    
+
     // Suport pentru feed-uri automate
     add_theme_support('automatic-feed-links');
-    
+
     // Suport pentru title tag dinamic
     add_theme_support('title-tag');
-    
+
     // Suport pentru imagini featured
     add_theme_support('post-thumbnails');
-    
-    // Dimensiuni personalizate pentru imagini (optimizate pentru SEO)
+
+    // Dimensiuni personalizate pentru imagini
     add_image_size('exchange-logo', 300, 200, true);
     add_image_size('article-thumbnail', 400, 250, true);
     add_image_size('hero-image', 1200, 600, true);
-    
-    // Suport pentru HTML5
+
+    // Suport HTML5
     add_theme_support('html5', array(
-        'search-form',
-        'comment-form',
-        'comment-list',
-        'gallery',
-        'caption',
-        'script',
-        'style'
+        'search-form', 'comment-form', 'comment-list', 'gallery', 'caption', 'script', 'style'
     ));
-    
-    // Suport pentru logo personalizat
+
+    // Logo personalizat
     add_theme_support('custom-logo', array(
-        'height'      => 80,
-        'width'       => 300,
-        'flex-width'  => true,
-        'flex-height' => true,
+        'height' => 80,
+        'width'  => 300,
+        'flex-width' => true,
+        'flex-height'=> true,
     ));
-    
-    // Suport pentru meniuri
+
+    // Meniuri
     register_nav_menus(array(
-        'primary' => 'Meniu Principal',
-        'footer'  => 'Meniu Footer',
-        'exchanges' => 'Meniu Exchange-uri'
+        'primary'  => 'Meniu Principal',
+        'footer'   => 'Meniu Footer',
+        'exchanges'=> 'Meniu Exchange-uri'
     ));
-    
-    // Suport pentru editor de blocuri Gutenberg
+
+    // Gutenberg styles & wide align
     add_theme_support('wp-block-styles');
     add_theme_support('align-wide');
-    
-    // Suport pentru culori personalizate în editor
+
+    // Paletă culori editor
     add_theme_support('editor-color-palette', array(
-        array(
-            'name'  => 'Bitcoin Orange',
-            'slug'  => 'bitcoin-orange',
-            'color' => '#f7931a',
-        ),
-        array(
-            'name'  => 'Bitcoin Dark',
-            'slug'  => 'bitcoin-dark',
-            'color' => '#ff6b00',
-        ),
-        array(
-            'name'  => 'Success Green',
-            'slug'  => 'success-green',
-            'color' => '#16a085',
-        ),
+        array('name' => 'Bitcoin Orange','slug'=>'bitcoin-orange','color'=>'#f7931a'),
+        array('name' => 'Bitcoin Dark','slug'=>'bitcoin-dark','color'=>'#ff6b00'),
+        array('name' => 'Success Green','slug'=>'success-green','color'=>'#16a085'),
     ));
 }
 add_action('after_setup_theme', 'bitcoinul_ro_setup');
 
 /**
- * Înregistrează și încarcă scripturile și stilurile
+ * Înregistrează și încarcă scripturile și stilurile temei
  */
 function bitcoinul_ro_scripts() {
-    
-    // Stilul principal
+    // Stil principal stylesheet (style.css)
     wp_enqueue_style(
         'bitcoinul-ro-style',
         get_stylesheet_uri(),
         array(),
         wp_get_theme()->get('Version')
     );
-    
-    // Font-uri Google (optimizate pentru performanță)
+
+    // Fonturi (dacă sunt necesare)
     wp_enqueue_style(
         'bitcoinul-ro-fonts',
         'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
         array(),
         null
     );
-    
-    // JavaScript pentru funcționalități interactive
+
+    // Script principal
     wp_enqueue_script(
         'bitcoinul-ro-main',
         get_template_directory_uri() . '/assets/js/main.js',
@@ -114,102 +94,19 @@ function bitcoinul_ro_scripts() {
         wp_get_theme()->get('Version'),
         true
     );
-    
-    // Localizarea scripturilor pentru AJAX
+
+    // Localizare date AJAX (dacă js folosește)
     wp_localize_script('bitcoinul-ro-main', 'bitcoinul_ro_ajax', array(
         'ajax_url' => admin_url('admin-ajax.php'),
         'nonce'    => wp_create_nonce('bitcoinul_ro_nonce'),
-        'site_url' => home_url('/'),
+        'site_url' => home_url('/')
     ));
-    
-    // Script pentru comentarii threaded (dacă sunt activate)
+
     if (is_singular() && comments_open() && get_option('thread_comments')) {
         wp_enqueue_script('comment-reply');
     }
 }
 add_action('wp_enqueue_scripts', 'bitcoinul_ro_scripts');
-
-/**
- * Înregistrează zonele de widget-uri
- */
-function bitcoinul_ro_widgets_init() {
-    
-    // Sidebar principal
-    register_sidebar(array(
-        'name'          => 'Sidebar Principal',
-        'id'            => 'sidebar-1',
-        'description'   => 'Sidebar-ul principal pentru articole și pagini',
-        'before_widget' => '<section id="%1$s" class="widget %2$s">',
-        'after_widget'  => '</section>',
-        'before_title'  => '<h3 class="widget-title">',
-        'after_title'   => '</h3>',
-    ));
-    
-    // Footer widgets
-    for ($i = 1; $i <= 4; $i++) {
-        register_sidebar(array(
-            'name'          => "Footer Widget $i",
-            'id'            => "footer-widget-$i",
-            'description'   => "Zona de widget-uri pentru footer, coloana $i",
-            'before_widget' => '<div id="%1$s" class="footer-widget %2$s">',
-            'after_widget'  => '</div>',
-            'before_title'  => '<h3 class="footer-widget-title">',
-            'after_title'   => '</h3>',
-        ));
-    }
-    
-    // Widget special pentru prețul Bitcoin
-    register_sidebar(array(
-        'name'          => 'Bitcoin Price Widget',
-        'id'            => 'bitcoin-price',
-        'description'   => 'Widget pentru afișarea prețului Bitcoin în timp real',
-        'before_widget' => '<div id="%1$s" class="bitcoin-widget %2$s">',
-        'after_widget'  => '</div>',
-        'before_title'  => '<h3 class="bitcoin-widget-title">',
-        'after_title'   => '</h3>',
-    ));
-}
-add_action('widgets_init', 'bitcoinul_ro_widgets_init');
-
-/**
- * Optimizări SEO pentru meta description și keywords
- */
-function bitcoinul_ro_meta_description() {
-    if (is_home() || is_front_page()) {
-        $description = "Cele mai bune exchange-uri Bitcoin din România. Comparații detaliate, recenzii și ghiduri pentru cumpărarea Bitcoin în siguranță cu comisioane mici.";
-    } elseif (is_single()) {
-        global $post;
-        $description = wp_trim_words(get_the_excerpt($post), 25);
-    } elseif (is_category()) {
-        $description = "Articole despre " . single_cat_title('', false) . " - Ghiduri și știri Bitcoin România";
-    } else {
-        $description = get_bloginfo('description');
-    }
-    
-    if (!empty($description)) {
-        echo '<meta name="description" content="' . esc_attr($description) . '">' . "\n";
-    }
-}
-
-/**
- * Adaugă keywords SEO pentru Bitcoin
- */
-function bitcoinul_ro_meta_keywords() {
-    $keywords = array('bitcoin romania', 'exchange bitcoin', 'cumpar bitcoin', 'vand bitcoin');
-    
-    if (is_single()) {
-        $tags = get_the_tags();
-        if ($tags) {
-            foreach ($tags as $tag) {
-                $keywords[] = $tag->name;
-            }
-        }
-    }
-    
-    if (!empty($keywords)) {
-        echo '<meta name="keywords" content="' . esc_attr(implode(', ', array_unique($keywords))) . '">' . "\n";
-    }
-}
 
 /**
  * Funcție pentru afișarea exchange-urilor recomandate
@@ -1443,16 +1340,33 @@ function bitcoinul_ro_fetch_news_ajax() {
     $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
     $kind = isset($_GET['kind']) ? sanitize_text_field($_GET['kind']) : 'news';
     $curr = isset($_GET['currencies']) ? preg_replace('/[^A-Z,]/', '', $_GET['currencies']) : 'BTC,ETH';
+    // Permit optional override to force public mode (&public=1) otherwise we try private first for richer fields
+    $force_public = isset($_GET['public']) && ( $_GET['public'] === '1' || strtolower($_GET['public']) === 'true');
+    $debug_mode = isset($_GET['debug']) && ( $_GET['debug'] === '1' || strtolower($_GET['debug']) === 'true');
+    $scrape_mode = isset($_GET['scrape']) && ( $_GET['scrape'] === '1' || strtolower($_GET['scrape']) === 'true');
     // Nu filtrăm pe limbi; păstrăm conținutul original din API
     $regions = '';
 
-    // Cache pe 60 minute pentru a conserva cota (plan Developer are oricum 24h delay)
+    // Cache agresiv: implicit 3 ore (configurabil prin constanta BITCOINUL_RO_NEWS_CACHE_TTL)
     $no_cache = isset($_GET['nocache']) && ($_GET['nocache'] === '1' || $_GET['nocache'] === 'true');
+    $cache_ttl = defined('BITCOINUL_RO_NEWS_CACHE_TTL') ? max(60, (int) constant('BITCOINUL_RO_NEWS_CACHE_TTL')) : 3 * HOUR_IN_SECONDS; // minim 60s siguranță
+    // Selectăm implicit API v1 conform cerinței; se poate forța v2 cu &v2=1 sau &use_v2=1
+    $want_v2 = (
+        (isset($_GET['v2']) && ( $_GET['v2']==='1' || strtolower($_GET['v2'])==='true')) ||
+        (isset($_GET['use_v2']) && ( $_GET['use_v2']==='1' || strtolower($_GET['use_v2'])==='true'))
+    );
+    $api_version = $want_v2 ? 'v2' : 'v1';
+
     $cache_key = 'bitcoinul_ro_news_' . md5(serialize(array(
         'page'    => (int) $page,
         'kind'    => (string) $kind,
         'curr'    => (string) $curr,
         'regions' => (string) ($regions ?: ''),
+        // include explicit public request flag (only the user intent, not fallback)
+        'public'  => $force_public ? 'true' : 'false',
+        // include metadata flag as we now request extra fields
+        'metadata'=> 'true',
+        'api_version' => $api_version,
     )));
     $cached = $no_cache ? false : get_transient($cache_key);
     if ($cached) {
@@ -1460,30 +1374,28 @@ function bitcoinul_ro_fetch_news_ajax() {
         wp_send_json_success($cached);
     }
 
-    // 1) Încearcă pe rând: Developer v2 (planul tău), apoi Free v1, apoi v1 generic
-    $base_endpoints = array(
-        'https://cryptopanic.com/api/developer/v2/posts/',
-        'https://cryptopanic.com/api/free/v1/posts/',
-        'https://cryptopanic.com/api/v1/posts/',
-    );
-
+    // 1) CryptoPanic API: by default folosim v1 (/api/v1/posts/) conform cerinței; opțional forțăm v2 cu &v2=1
+    $base_endpoint = $api_version === 'v2' ? 'https://cryptopanic.com/api/developer/v2/posts/' : 'https://cryptopanic.com/api/v1/posts/';
     $args = array('timeout' => 14, 'headers' => array('Accept' => 'application/json'));
-    $code = 0; $body = ''; $last_url = '';
-    foreach ($base_endpoints as $base) {
-        $args_qs = array(
-            'auth_token' => $token,
-            'page'       => max(1, (int) $page),
-            'kind'       => $kind,
-            'currencies' => $curr,
-        );
-        // Nu forțăm public=true / regions; vrem conținutul default
-        $url = add_query_arg($args_qs, $base);
-        $last_url = $url;
-        $resp = wp_remote_get($url, $args);
-        $code = is_wp_error($resp) ? 0 : wp_remote_retrieve_response_code($resp);
-        $body = is_wp_error($resp) ? '' : wp_remote_retrieve_body($resp);
-        if ($code === 200 && !empty($body)) break;
+    $code = 0; $body = ''; $last_url = ''; $mode = '';
+
+    $primary_qs = array(
+        'auth_token' => $token,
+        'page'       => max(1, (int) $page),
+        'kind'       => $kind,
+        'currencies' => $curr,
+    );
+    // Menținem metadata=true pentru v2; pentru v1 îl adăugăm doar dacă planul îl suportă – lăsăm activ oricum (nu dă eroare, ignorat dacă nu e permis)
+    $primary_qs['metadata'] = 'true';
+    if ($force_public) {
+        $primary_qs['public'] = 'true';
     }
+    $url = add_query_arg($primary_qs, $base_endpoint);
+    $last_url = $url;
+    $resp = wp_remote_get($url, $args);
+    $code = is_wp_error($resp) ? 0 : wp_remote_retrieve_response_code($resp);
+    $body = is_wp_error($resp) ? '' : wp_remote_retrieve_body($resp);
+    $mode = $force_public ? 'public_forced' : 'private_first';
 
     $normalized_results = array();
     if ($code === 200 && !empty($body)) {
@@ -1497,15 +1409,788 @@ function bitcoinul_ro_fetch_news_ajax() {
         }
     }
 
-    // Fără fallback/translate: păstrăm doar datele CryptoPanic; dacă nu vin, trimitem listă goală
+    // Dacă nu am forțat public și lipsesc câmpuri (original_url sau source) încercăm fallback public=true
+    $fallback_used = false;
+    if (!$force_public && $code === 200 && !empty($normalized_results)) {
+        $probe = $normalized_results[0];
+        $missing_key_fields = !isset($probe['original_url']) || !isset($probe['source']);
+        if ($missing_key_fields) {
+            $fallback_qs = $primary_qs;
+            $fallback_qs['public'] = 'true';
+            $fallback_url = add_query_arg($fallback_qs, $base_endpoint);
+            $fallback_resp = wp_remote_get($fallback_url, $args);
+            $fallback_code = is_wp_error($fallback_resp) ? 0 : wp_remote_retrieve_response_code($fallback_resp);
+            if ($fallback_code === 200) {
+                $fallback_body = is_wp_error($fallback_resp) ? '' : wp_remote_retrieve_body($fallback_resp);
+                if (!empty($fallback_body)) {
+                    $fb_data = json_decode($fallback_body, true);
+                    if (is_array($fb_data)) {
+                        $fb_results = array();
+                        if (isset($fb_data['results']) && is_array($fb_data['results'])) {
+                            $fb_results = $fb_data['results'];
+                        } elseif (isset($fb_data['data']['results']) && is_array($fb_data['data']['results'])) {
+                            $fb_results = $fb_data['data']['results'];
+                        }
+                        if (!empty($fb_results)) {
+                            $normalized_results = $fb_results;
+                            $last_url = $fallback_url;
+                            $mode = 'public_fallback';
+                            $fallback_used = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Metadate pentru debugging
+    $meta = array(
+        'endpoint' => $last_url,
+        'plan' => $api_version === 'v2' ? 'developer-v2' : 'core-v1',
+        'api_version' => $api_version,
+        'mode' => $mode,
+        'fallback_public_used' => $fallback_used,
+        'cache_ttl' => $cache_ttl,
+    );
+    // verifică primul item pentru câmpuri v2
+    if (!empty($normalized_results) && is_array($normalized_results)) {
+        $first = $normalized_results[0];
+        $meta['has_original_url'] = isset($first['original_url']);
+        $meta['has_source'] = isset($first['source']);
+    }
+
+    // Dacă lipsesc câmpurile v2 (ex: original_url), încearcă un fallback cu RSS ca să extragem linkul sursei
+    $needs_rss_enrichment = false;
+    if (!empty($normalized_results)) {
+        $probe = $normalized_results[0];
+        if (!isset($probe['original_url'])) {
+            $needs_rss_enrichment = true;
+        }
+    }
+
+    // Înainte de RSS, încearcă să îmbogățești din FREE v1 (de obicei include url -> sursă originală)
+    $needs_v1_enrichment = $needs_rss_enrichment;
+    if ($needs_v1_enrichment) {
+        $v1_url = add_query_arg(array(
+            'auth_token' => $token,
+            'page'       => max(1, (int) $page),
+            'kind'       => $kind,
+            'currencies' => $curr,
+            'public'     => 'true'
+        ), 'https://cryptopanic.com/api/v1/posts/');
+        $v1_resp = wp_remote_get($v1_url, array('timeout' => 14, 'headers' => array('Accept' => 'application/json')));
+        $v1_code = is_wp_error($v1_resp) ? 0 : wp_remote_retrieve_response_code($v1_resp);
+        $v1_body = is_wp_error($v1_resp) ? '' : wp_remote_retrieve_body($v1_resp);
+        $meta['v1_enrichment'] = array('attempted' => true, 'ok' => ($v1_code === 200 && !empty($v1_body)));
+        if ($v1_code === 200 && !empty($v1_body)) {
+            $v1_data = json_decode($v1_body, true);
+            if (is_array($v1_data)) {
+                $v1_results = array();
+                if (isset($v1_data['results']) && is_array($v1_data['results'])) {
+                    $v1_results = $v1_data['results'];
+                } elseif (isset($v1_data['data']['results']) && is_array($v1_data['data']['results'])) {
+                    $v1_results = $v1_data['data']['results'];
+                }
+                if (!empty($v1_results)) {
+                    // indexare pe id cu original_url/source
+                    $map = array();
+                    foreach ($v1_results as $it) {
+                        if (!isset($it['id'])) continue;
+                        $oid = (int)$it['id'];
+                        $orig = '';
+                        if (isset($it['original_url']) && $it['original_url']) {
+                            $orig = $it['original_url'];
+                        } elseif (isset($it['source']['original_url']) && $it['source']['original_url']) {
+                            $orig = $it['source']['original_url'];
+                        } elseif (isset($it['url'])) {
+                            $orig = $it['url'];
+                        }
+                        if ($orig) {
+                            $map[$oid] = $orig;
+                        }
+                    }
+                    if (!empty($map)) {
+                        foreach ($normalized_results as &$row) {
+                            if (!isset($row['original_url']) && isset($row['id'])) {
+                                $rid = (int)$row['id'];
+                                if (isset($map[$rid])) {
+                                    $candidate = $map[$rid];
+                                    $host = parse_url($candidate, PHP_URL_HOST);
+                                    if ($host && stripos($host, 'cryptopanic.com') === false) {
+                                        $row['original_url'] = $candidate;
+                                    }
+                                }
+                            }
+                        }
+                        unset($row);
+                        $first = $normalized_results[0];
+                        $meta['has_original_url'] = isset($first['original_url']);
+                    }
+                }
+            }
+        }
+    }
+
+    if ($needs_rss_enrichment) {
+        // Construiește URL RSS de la același endpoint, cu aceiași parametri + format=rss (max 20 items)
+        $rss_url = add_query_arg(array('format' => 'rss'), $last_url);
+        $rss_resp = wp_remote_get($rss_url, array('timeout' => 14));
+        $rss_code = is_wp_error($rss_resp) ? 0 : wp_remote_retrieve_response_code($rss_resp);
+        $rss_body = is_wp_error($rss_resp) ? '' : wp_remote_retrieve_body($rss_resp);
+        $meta['rss_enrichment'] = array('attempted' => true, 'ok' => ($rss_code === 200 && !empty($rss_body)));
+
+        if ($rss_code === 200 && !empty($rss_body)) {
+            // Parse RSS (SimpleXML)
+            $rss = @simplexml_load_string($rss_body);
+                if ($rss && isset($rss->channel) && isset($rss->channel->item)) {
+                    $map_exact = array();      // titlu normalizat complet
+                    $map_slug  = array();      // slugificat
+                    $map_prefix = array();     // prefix alfanumeric (primele 40)
+                    $stats_matches = 0;
+                    $rss_items_store = array(); // păstrăm info pentru debug/fuzzy
+                    $slugify = function($str){
+                        $s = strtolower(html_entity_decode($str, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                        $s = preg_replace('/&[a-z0-9#]+;/', ' ', $s); // entități rămase
+                        $s = preg_replace('/[^a-z0-9]+/','-', $s);
+                        $s = preg_replace('/-+/','-', $s);
+                        $s = trim($s,'-');
+                        return $s;
+                    };
+                    $normalize_title = function($t){
+                        $t_norm = html_entity_decode($t, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                        $t_norm = preg_replace('/\s+/',' ', $t_norm);
+                        return strtolower(trim($t_norm));
+                    };
+                    $alnum_prefix = function($t){
+                        $x = preg_replace('/[^a-z0-9]/i','', strtolower($t));
+                        return substr($x,0,40);
+                    };
+                    foreach ($rss->channel->item as $item) {
+                        $t = (string) $item->title;
+                        $l = (string) $item->link;
+                        $pd= (string) $item->pubDate; // ex: Mon, 30 Sep 2025 10:05:00 +0000
+                        $ts = 0;
+                        if ($pd) {
+                            $ts_try = strtotime($pd);
+                            if ($ts_try) $ts = $ts_try;
+                        }
+                        if ($t && $l) {
+                            $exact = $normalize_title($t);
+                            $slugv = $slugify($t);
+                            $pref  = $alnum_prefix($t);
+                            if ($exact) $map_exact[$exact] = $l;
+                            if ($slugv) $map_slug[$slugv] = $l;
+                            if ($pref)  $map_prefix[$pref][] = $l; // prefix poate coliziona, păstrăm listă
+                            $rss_items_store[] = array(
+                                'title' => $t,
+                                'link'  => $l,
+                                'slug'  => $slugv,
+                                'exact' => $exact,
+                                'pref'  => $pref,
+                                'ts'    => $ts,
+                            );
+                        }
+                    }
+                    foreach ($normalized_results as &$row) {
+                        if (isset($row['original_url']) && $row['original_url']) continue;
+                        $row_title = isset($row['title']) ? $row['title'] : '';
+                        $exact_row = $normalize_title($row_title);
+                        $slug_row  = isset($row['slug']) ? strtolower($row['slug']) : $slugify($row_title);
+                        $pref_row  = $alnum_prefix($row_title);
+                        $published_at = isset($row['published_at']) ? strtotime($row['published_at']) : 0;
+                        $chosen = '';
+                        if ($exact_row && isset($map_exact[$exact_row])) {
+                            $chosen = $map_exact[$exact_row];
+                        } elseif ($slug_row && isset($map_slug[$slug_row])) {
+                            $chosen = $map_slug[$slug_row];
+                        } elseif ($pref_row && isset($map_prefix[$pref_row])) {
+                            // dacă sunt multiple linkuri pe același prefix, alegem primul
+                            $chosen = $map_prefix[$pref_row][0];
+                        }
+                        // Fuzzy fallback dacă tot nu avem chosen: scor Levenshtein/similar_text pe titluri RSS
+                        if (!$chosen && $row_title && !empty($rss_items_store)) {
+                            $bestScore = 0; $bestLink = '';
+                            foreach ($rss_items_store as $rss_it) {
+                                $score = 0;
+                                if (function_exists('similar_text')) {
+                                    similar_text(strtolower($row_title), strtolower($rss_it['title']), $score);
+                                }
+                                // Penalizează dacă published_at este prea departe (>15 minute)
+                                if ($published_at && isset($rss_it['ts']) && $rss_it['ts']) {
+                                    $delta = abs($published_at - $rss_it['ts']);
+                                    if ($delta > 900) { // >15m
+                                        $score *= 0.6; // reduce relevanța
+                                    }
+                                }
+                                if ($score > $bestScore) {
+                                    $bestScore = $score; $bestLink = $rss_it['link'];
+                                }
+                            }
+                            if ($bestScore >= 70 && $bestLink) { // prag acceptabil
+                                $chosen = $bestLink;
+                            }
+                        }
+                        if ($chosen) {
+                            // evită cryptopanic
+                            $host = parse_url($chosen, PHP_URL_HOST);
+                            if ($host && stripos($host,'cryptopanic.com') === false) {
+                                $row['original_url'] = $chosen;
+                                $stats_matches++;
+                            }
+                        }
+                    }
+                    unset($row);
+                    $meta['rss_enrichment']['matches'] = $stats_matches;
+                    if ($debug_mode) {
+                        $meta['rss_enrichment']['rss_items_sample'] = array_slice($rss_items_store, 0, 5);
+                    }
+            }
+        }
+    }
+
+    // Încercare suplimentară: enrich per-articol folosind Developer v2 detail endpoint (/posts/{id}/)
+    // Acest pas completează original_url și source acolo unde lipsesc după v1/RSS, cu cache pe item pentru a limita apelurile.
+    $detail_enriched = 0;
+    $detail_requests = 0;
+    $detail_cache_hits = 0;
+    $detail_limit = 15; // max. articole per pagină pentru care facem detail lookup
+    $detail_attempted = false;
+    if (!empty($normalized_results)) {
+        // strânge item-urile care încă nu au original_url
+        $needs_detail = array();
+        foreach ($normalized_results as $row) {
+            if (!isset($row['original_url']) || empty($row['original_url'])) {
+                if (isset($row['id']) && $row['id']) {
+                    $needs_detail[] = (int)$row['id'];
+                }
+            }
+        }
+
+        if (!empty($needs_detail)) {
+            $detail_attempted = true;
+            $needs_detail = array_slice(array_unique($needs_detail), 0, $detail_limit);
+
+            // index pentru acces rapid la $normalized_results by id (prin referință)
+            $by_id =& $normalized_results; // vom itera cu referințe pe $normalized_results direct
+
+            foreach ($needs_detail as $post_id) {
+                // cache per item
+                $dk = 'bitcoinul_ro_cp_post_' . $post_id . '_v2detail';
+                $detail_obj = get_transient($dk);
+                if ($detail_obj && is_array($detail_obj)) {
+                    $detail_cache_hits++;
+                } else {
+                    $detail_url = 'https://cryptopanic.com/api/developer/v2/posts/' . rawurlencode((string)$post_id) . '/';
+                    $detail_url = add_query_arg(array(
+                        'auth_token' => $token,
+                        // încercăm fără public pentru câmpuri complete
+                        'metadata'   => 'true',
+                    ), $detail_url);
+                    $detail_resp = wp_remote_get($detail_url, array('timeout' => 12, 'headers' => array('Accept' => 'application/json')));
+                    $detail_code = is_wp_error($detail_resp) ? 0 : wp_remote_retrieve_response_code($detail_resp);
+                    $detail_body = is_wp_error($detail_resp) ? '' : wp_remote_retrieve_body($detail_resp);
+                    // dacă lipsesc câmpuri cheie și nu avem 403/429, încercăm fallback public pentru detail
+                    if ($detail_code === 200 && $detail_body) {
+                        $tmp_parsed = json_decode($detail_body, true);
+                        $check_arr = $tmp_parsed;
+                        if (isset($tmp_parsed['data']) && is_array($tmp_parsed['data'])) $check_arr = $tmp_parsed['data'];
+                        $missing_detail_fields = is_array($check_arr) && (!isset($check_arr['original_url']) || !isset($check_arr['source']));
+                        if ($missing_detail_fields) {
+                            $detail_url_public = add_query_arg(array(
+                                'auth_token' => $token,
+                                'public'     => 'true',
+                                'metadata'   => 'true',
+                            ), 'https://cryptopanic.com/api/developer/v2/posts/' . rawurlencode((string)$post_id) . '/');
+                            $detail_resp_pub = wp_remote_get($detail_url_public, array('timeout' => 10, 'headers' => array('Accept' => 'application/json')));
+                            $detail_code_pub = is_wp_error($detail_resp_pub) ? 0 : wp_remote_retrieve_response_code($detail_resp_pub);
+                            if ($detail_code_pub === 200) {
+                                $detail_body_pub = is_wp_error($detail_resp_pub) ? '' : wp_remote_retrieve_body($detail_resp_pub);
+                                if ($detail_body_pub) {
+                                    $detail_body = $detail_body_pub; // înlocuiește corpul
+                                }
+                            }
+                        }
+                    }
+                    $detail_requests++;
+                    if ($detail_code === 200 && !empty($detail_body)) {
+                        $parsed = json_decode($detail_body, true);
+                        // normalizează – unele implementări pot înveli obiectul în 'data' sau 'results'
+                        if (is_array($parsed)) {
+                            if (isset($parsed['id'])) {
+                                $detail_obj = $parsed;
+                            } elseif (isset($parsed['data']) && is_array($parsed['data']) && isset($parsed['data']['id'])) {
+                                $detail_obj = $parsed['data'];
+                            } elseif (isset($parsed['results']) && is_array($parsed['results'])) {
+                                // ia primul element dacă e listă
+                                $first = reset($parsed['results']);
+                                if (is_array($first)) $detail_obj = $first;
+                            }
+                        }
+                        if (is_array($detail_obj)) {
+                            // cache 6 ore
+                            set_transient($dk, $detail_obj, 6 * HOUR_IN_SECONDS);
+                        }
+                    }
+                }
+
+                if (is_array($detail_obj)) {
+                    // aplică enrich pe itemul cu id-ul respectiv
+                    for ($i = 0, $n = count($by_id); $i < $n; $i++) {
+                        if ((int)$by_id[$i]['id'] === $post_id) {
+                            $changed = false;
+                            // completează source dacă lipsește
+                            if (!isset($by_id[$i]['source']) && isset($detail_obj['source']) && is_array($detail_obj['source'])) {
+                                $by_id[$i]['source'] = $detail_obj['source'];
+                                $changed = true;
+                            }
+                            // stabilește original_url din detail, evitând cryptopanic.com
+                            if (!isset($by_id[$i]['original_url']) || empty($by_id[$i]['original_url'])) {
+                                $candidates = array();
+                                if (isset($detail_obj['original_url'])) $candidates[] = $detail_obj['original_url'];
+                                if (isset($detail_obj['url'])) $candidates[] = $detail_obj['url'];
+                                if (isset($by_id[$i]['url'])) $candidates[] = $by_id[$i]['url'];
+                                foreach ($candidates as $cand) {
+                                    if (!is_string($cand) || $cand === '') continue;
+                                    $host = parse_url($cand, PHP_URL_HOST);
+                                    if ($host && stripos($host, 'cryptopanic.com') === false) {
+                                        $by_id[$i]['original_url'] = $cand;
+                                        $changed = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if ($changed) {
+                                $detail_enriched++;
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (!isset($meta['detail_enrichment'])) {
+        $meta['detail_enrichment'] = array(
+            'attempted'   => $detail_attempted,
+            'enriched'    => $detail_enriched,
+            'requests'    => $detail_requests,
+            'cache_hits'  => $detail_cache_hits,
+            'limit'       => $detail_limit,
+            'limit_hit'   => isset($needs_detail) ? (count($needs_detail) > $detail_limit) : false,
+        );
+    }
+
+    // Scraping fallback (opțional &scrape=1) – ca ultimă soluție: încercăm să extragem original_url din pagina publică CryptoPanic news/{slug}/
+    // Îmbunătățit: parsează script-ul __NEXT_DATA__ (Next.js) și caută recursiv câmpul original_url; dacă nu, caută linkuri externe.
+    $scrape_stats = array('attempted' => false, 'enriched' => 0, 'requests' => 0, 'cache_hits' => 0, 'limit' => 8, 'limit_hit' => false, 'next_data_hits' => 0, 'external_link_used' => 0);
+    if ($scrape_mode && !empty($normalized_results)) {
+        $scrape_stats['attempted'] = true;
+        $to_scrape = array();
+        foreach ($normalized_results as $row) {
+            if (empty($row['original_url']) && isset($row['slug'])) {
+                $to_scrape[] = $row['slug'];
+            }
+        }
+        if (!empty($to_scrape)) {
+            if (count($to_scrape) > $scrape_stats['limit']) {
+                $scrape_stats['limit_hit'] = true;
+                $to_scrape = array_slice($to_scrape, 0, $scrape_stats['limit']);
+            }
+            foreach ($to_scrape as $slug) {
+                // cache per slug
+                $ck = 'bitcoinul_ro_cp_scrape_' . md5($slug);
+                $cached_link = get_transient($ck);
+                if ($cached_link) {
+                    $scrape_stats['cache_hits']++;
+                    if ($cached_link !== 'none') {
+                        // aplică în results
+                        for ($i=0,$n=count($normalized_results);$i<$n;$i++) {
+                            if ($normalized_results[$i]['slug'] === $slug && empty($normalized_results[$i]['original_url'])) {
+                                $normalized_results[$i]['original_url'] = $cached_link;
+                                $scrape_stats['enriched']++;
+                                break;
+                            }
+                        }
+                    }
+                    continue;
+                }
+                // construiește URL pagină CP (slug-based). Pattern uzual: /news/{slug}/
+                $page_url = 'https://cryptopanic.com/news/' . rawurlencode($slug) . '/';
+                $resp = wp_remote_get($page_url, array('timeout' => 12, 'headers' => array('Accept' => 'text/html,application/xhtml+xml,application/xml')));
+                $scrape_stats['requests']++;
+                if (!is_wp_error($resp)) {
+                    $html = wp_remote_retrieve_body($resp);
+                    if (is_string($html) && strlen($html) > 200) {
+                        $picked = '';
+                        // 1) Încearcă să extragi JSON din __NEXT_DATA__
+                        if (preg_match('/<script id="__NEXT_DATA__"[^>]*>(\{.*?\})<\/script>/s', $html, $mm)) {
+                            $json_raw = $mm[1];
+                            $json_dec = json_decode($json_raw, true);
+                            if (is_array($json_dec)) {
+                                // căutare recursivă original_url
+                                $stack = array($json_dec);
+                                $found_urls = array();
+                                while ($stack) {
+                                    $node = array_pop($stack);
+                                    if (!is_array($node)) continue;
+                                    foreach ($node as $k => $v) {
+                                        if ($k === 'original_url' && is_string($v) && stripos($v, 'http') === 0) {
+                                            $found_urls[] = $v;
+                                        } elseif (is_array($v)) {
+                                            $stack[] = $v;
+                                        }
+                                    }
+                                }
+                                if (!empty($found_urls)) {
+                                    // alege primul non-cryptopanic
+                                    foreach ($found_urls as $fu) {
+                                        $host = parse_url($fu, PHP_URL_HOST);
+                                        if ($host && stripos($host,'cryptopanic.com') === false) {
+                                            $picked = $fu; break;
+                                        }
+                                    }
+                                    if ($picked) {
+                                        $scrape_stats['next_data_hits']++;
+                                    }
+                                }
+                            }
+                        }
+                        // 2) Dacă nu a mers JSON, fallback la linkuri externe brute
+                        if (!$picked) {
+                            $found = array();
+                            if (preg_match_all('/href=["\'](https?:\/\/[^"\' >]+)["\']/i', $html, $m)) {
+                                foreach ($m[1] as $u) {
+                                    $h = parse_url($u, PHP_URL_HOST);
+                                    if ($h && stripos($h, 'cryptopanic.com') === false) {
+                                        if (preg_match('/\.(png|jpe?g|gif|webp|svg|css|js)(\?|$)/i', $u)) continue;
+                                        $found[] = $u;
+                                    }
+                                }
+                            }
+                            if (!empty($found)) {
+                                usort($found, function($a,$b){return strlen($b) - strlen($a);});
+                                $picked = $found[0];
+                                if ($picked) $scrape_stats['external_link_used']++;
+                            }
+                        }
+                        set_transient($ck, $picked ? $picked : 'none', 6 * HOUR_IN_SECONDS);
+                        if ($picked) {
+                            for ($i=0,$n=count($normalized_results);$i<$n;$i++) {
+                                if ($normalized_results[$i]['slug'] === $slug && empty($normalized_results[$i]['original_url'])) {
+                                    $normalized_results[$i]['original_url'] = $picked;
+                                    $scrape_stats['enriched']++;
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        set_transient($ck, 'none', 3 * HOUR_IN_SECONDS);
+                    }
+                } else {
+                    set_transient($ck, 'none', 2 * HOUR_IN_SECONDS); // eroare rețea
+                }
+            }
+        }
+    }
+    if ($scrape_mode) {
+        $meta['scrape_enrichment'] = $scrape_stats;
+    }
+
+    // Dacă request-ul la v2 a eșuat, explică problema
+    if ($code !== 200 || empty($body)) {
+        $err_msg = $api_version === 'v2'
+            ? 'CryptoPanic Developer v2 a răspuns cu eroare sau fără conținut. Verifică token-ul și planul (ai nevoie minim de Developer).'
+            : 'CryptoPanic Core v1 a răspuns cu eroare sau fără conținut. Verifică token-ul, parametrii și limita de rată. (Dacă mai vrei câmpuri suplimentare încearcă &v2=1)';
+        $err = array(
+            'message' => $err_msg,
+            'http_code' => $code,
+            'endpoint' => $last_url,
+            'api_version' => $api_version,
+        );
+        wp_send_json_error($err, 502);
+    }
+
+    // Asigură original_url atunci când e posibil (fără a trimite către cryptopanic.com)
+    if (!empty($normalized_results) && is_array($normalized_results)) {
+        foreach ($normalized_results as &$row) {
+            if (!isset($row['original_url']) || empty($row['original_url'])) {
+                // a) dacă există url și nu e de pe CryptoPanic, folosește-l
+                if (isset($row['url']) && is_string($row['url'])) {
+                    $host = parse_url($row['url'], PHP_URL_HOST);
+                    if ($host && stripos($host, 'cryptopanic.com') === false) {
+                        $row['original_url'] = $row['url'];
+                        continue;
+                    }
+                }
+                // b) dacă avem domain (sau source.domain), folosește homepage-ul sursei
+                $domain = '';
+                if (isset($row['domain']) && is_string($row['domain'])) {
+                    $domain = $row['domain'];
+                } elseif (isset($row['source']['domain']) && is_string($row['source']['domain'])) {
+                    $domain = $row['source']['domain'];
+                }
+                if ($domain) {
+                    if (!preg_match('#^https?://#i', $domain)) {
+                        $domain = 'https://' . $domain;
+                    }
+                    $host = parse_url($domain, PHP_URL_HOST);
+                    if ($host && stripos($host, 'cryptopanic.com') === false) {
+                        $row['original_url'] = $domain;
+                    }
+                }
+            }
+        }
+        unset($row);
+    }
+
+    // Recalculează indicatorii meta după toate enrich-urile
+    if (!empty($normalized_results) && is_array($normalized_results)) {
+        $first_now = $normalized_results[0];
+        $meta['has_original_url'] = isset($first_now['original_url']);
+        $meta['has_source'] = isset($first_now['source']);
+    }
+
+    // DEBUG extras (opțional) – NU se cache-uiesc dacă debug activ
+    if ($debug_mode) {
+        $sample = array();
+        foreach (array_slice($normalized_results,0,3) as $it) {
+            $sample[] = array(
+                'id' => isset($it['id']) ? $it['id'] : null,
+                'slug' => isset($it['slug']) ? $it['slug'] : null,
+                'title' => isset($it['title']) ? $it['title'] : null,
+                'has_original_url' => isset($it['original_url']),
+            );
+        }
+        $meta['debug'] = array(
+            'sample_items' => $sample,
+            'mode' => $mode,
+            'fallback_used' => $fallback_used,
+        );
+    }
 
     // Return payload
-    $payload = array('results' => is_array($normalized_results) ? $normalized_results : array());
-    if (!$no_cache) set_transient($cache_key, $payload, HOUR_IN_SECONDS);
+    $payload = array(
+        'results' => is_array($normalized_results) ? $normalized_results : array(),
+        'meta' => $meta
+    );
+    if (!$no_cache && !$debug_mode && !$scrape_mode) set_transient($cache_key, $payload, $cache_ttl);
     wp_send_json_success($payload);
 }
 add_action('wp_ajax_bitcoinul_ro_fetch_news', 'bitcoinul_ro_fetch_news_ajax');
 add_action('wp_ajax_nopriv_bitcoinul_ro_fetch_news', 'bitcoinul_ro_fetch_news_ajax');
+
+/**
+ * AJAX: Market metrics (Fear & Greed, BTC Dominance, Total Market Cap)
+ * Fără API key – folosim surse publice:
+ *  - Fear & Greed: https://api.alternative.me/fng/?limit=1&format=json (cache 1h)
+ *  - Global market / dominance: https://api.coingecko.com/api/v3/global (cache 5m)
+ * Endpoint: /wp-admin/admin-ajax.php?action=bitcoinul_ro_market_metrics
+ */
+function bitcoinul_ro_market_metrics_ajax() {
+    // Allow public
+    $now = time();
+    $resp = array();
+    $meta = array();
+
+    // 1) Fear & Greed (1h cache)
+    $fng_cache_key = 'bitcoinul_ro_fng_v1';
+    $fng_cached = get_transient($fng_cache_key);
+    $fng_fresh = false;
+    if (!is_array($fng_cached)) {
+        $fng_url = 'https://api.alternative.me/fng/?limit=1&format=json';
+        $r = wp_remote_get($fng_url, array('timeout' => 12, 'headers' => array('Accept' => 'application/json')));
+        $code = is_wp_error($r) ? 0 : wp_remote_retrieve_response_code($r);
+        if ($code === 200) {
+            $body = wp_remote_retrieve_body($r);
+            $j = json_decode($body, true);
+            if (isset($j['data'][0]) && is_array($j['data'][0])) {
+                $row = $j['data'][0];
+                $fng_cached = array(
+                    'value' => isset($row['value']) ? (int)$row['value'] : null,
+                    'classification' => isset($row['value_classification']) ? $row['value_classification'] : null,
+                    'updated_at' => isset($row['timestamp']) ? gmdate('c', (int)$row['timestamp']) : gmdate('c'),
+                    'source' => 'alternative.me'
+                );
+                set_transient($fng_cache_key, $fng_cached, HOUR_IN_SECONDS); // 1h
+                $fng_fresh = true;
+            }
+        }
+    }
+    if (!is_array($fng_cached)) {
+        // fallback static minimal if totally unavailable
+        $fng_cached = array('value' => null, 'classification' => null, 'updated_at' => gmdate('c'), 'source' => 'alternative.me');
+    }
+    $meta['fng_cache_age'] = $fng_fresh ? 0 : ( isset($fng_cached['updated_at']) ? max(0, $now - strtotime($fng_cached['updated_at'])) : null );
+
+    // 2) Global market (5m cache)
+    $global_cache_key = 'bitcoinul_ro_global_metrics_v1';
+    $global_cached = get_transient($global_cache_key);
+    $global_fresh = false;
+    if (!is_array($global_cached)) {
+        $g_url = 'https://api.coingecko.com/api/v3/global';
+        $gr = wp_remote_get($g_url, array('timeout' => 12, 'headers' => array('Accept' => 'application/json')));
+        $gcode = is_wp_error($gr) ? 0 : wp_remote_retrieve_response_code($gr);
+        if ($gcode === 200) {
+            $gbody = wp_remote_retrieve_body($gr);
+            $gj = json_decode($gbody, true);
+            if (isset($gj['data']) && is_array($gj['data'])) {
+                $d = $gj['data'];
+                $btc_dom = isset($d['market_cap_percentage']['btc']) ? (float)$d['market_cap_percentage']['btc'] : null;
+                $total_cap = isset($d['total_market_cap']['usd']) ? (float)$d['total_market_cap']['usd'] : null;
+                $total_vol = isset($d['total_volume']['usd']) ? (float)$d['total_volume']['usd'] : null;
+                $global_cached = array(
+                    'btc_dominance' => $btc_dom,
+                    'total_market_cap_usd' => $total_cap,
+                    'total_volume_usd' => $total_vol,
+                    'updated_at' => gmdate('c'),
+                    'source' => 'coingecko'
+                );
+                set_transient($global_cache_key, $global_cached, 5 * MINUTE_IN_SECONDS);
+                $global_fresh = true;
+            }
+        }
+    }
+    if (!is_array($global_cached)) {
+        $global_cached = array('btc_dominance' => null, 'total_market_cap_usd' => null, 'total_volume_usd' => null, 'updated_at' => gmdate('c'), 'source' => 'coingecko');
+    }
+    $meta['global_cache_age'] = $global_fresh ? 0 : ( isset($global_cached['updated_at']) ? max(0, $now - strtotime($global_cached['updated_at'])) : null );
+
+    // Format helpers
+    $format_percentage = function($v){ return is_numeric($v) ? round($v, 2) : null; };
+    $format_market_cap = function($v){
+        if (!is_numeric($v) || $v <= 0) return null;
+        if ($v >= 1e12) return '$' . round($v/1e12, 2) . 'T';
+        if ($v >= 1e9)  return '$' . round($v/1e9, 2) . 'B';
+        if ($v >= 1e6)  return '$' . round($v/1e6, 2) . 'M';
+        return '$' . number_format($v, 0, '.', ',');
+    };
+
+    $resp['fear_greed'] = $fng_cached;
+    $resp['dominance'] = array(
+        'btc' => $format_percentage($global_cached['btc_dominance'])
+    );
+    $resp['market_cap'] = array(
+        'usd' => $global_cached['total_market_cap_usd'],
+        'formatted' => $format_market_cap($global_cached['total_market_cap_usd'])
+    );
+    $resp['volume_24h'] = array(
+        'usd' => $global_cached['total_volume_usd'],
+        'formatted' => $format_market_cap($global_cached['total_volume_usd'])
+    );
+    $resp['meta'] = $meta;
+
+    wp_send_json_success($resp);
+}
+add_action('wp_ajax_bitcoinul_ro_market_metrics', 'bitcoinul_ro_market_metrics_ajax');
+add_action('wp_ajax_nopriv_bitcoinul_ro_market_metrics', 'bitcoinul_ro_market_metrics_ajax');
+
+/**
+ * Public Bitcoin News Aggregator (fără API token)
+ * Colectează știri din RSS-uri publice (doar titluri + link sursă) și normalizează.
+ * Surse alese: CoinDesk, CoinTelegraph, Bitcoin Magazine, Bitcoinist, Bitcoin.com News.
+ * Filtrare: reține doar articole care conțin "bitcoin" / "btc" în titlu sau care provin dintr-un domeniu bitcoin-focused.
+ * Cache: 5 minute (agregat), paginare server-side.
+ * Endpoint: /wp-admin/admin-ajax.php?action=bitcoinul_ro_fetch_public_btc_news&page=1
+ */
+function bitcoinul_ro_fetch_public_btc_news() {
+    // Config
+    $per_page = isset($_GET['per_page']) ? max(1, min(50, (int)$_GET['per_page'])) : 24;
+    $page     = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+    $keyword_filter = '/\bbitcoin\b|\bbtc\b/i';
+    $cache_key = 'bitcoinul_ro_public_btc_news_v1';
+    $cache_ttl = 5 * MINUTE_IN_SECONDS; // refresh suficient de des, dar limitează load-ul
+    $now = time();
+
+    $cached = get_transient($cache_key);
+    $meta = array('cached' => true, 'cache_ttl' => $cache_ttl, 'generated_at' => null);
+    if (!is_array($cached) || !isset($cached['items'])) {
+        $meta['cached'] = false;
+        // RSS feed list
+        $feeds = array(
+            array('id'=>'coindesk', 'title'=>'CoinDesk', 'url'=>'https://www.coindesk.com/arc/outboundfeeds/rss/'),
+            array('id'=>'cointelegraph', 'title'=>'CoinTelegraph', 'url'=>'https://cointelegraph.com/rss'),
+            array('id'=>'bitcoinmagazine', 'title'=>'Bitcoin Magazine', 'url'=>'https://bitcoinmagazine.com/feed'),
+            array('id'=>'bitcoinist', 'title'=>'Bitcoinist', 'url'=>'https://bitcoinist.com/feed/'),
+            array('id'=>'bitcoincom', 'title'=>'Bitcoin.com News', 'url'=>'https://news.bitcoin.com/feed/')
+        );
+        $all = array();
+        foreach ($feeds as $f) {
+            $rss_resp = wp_remote_get($f['url'], array('timeout' => 12));
+            if (is_wp_error($rss_resp)) continue;
+            $code = wp_remote_retrieve_response_code($rss_resp);
+            if ($code !== 200) continue;
+            $body = wp_remote_retrieve_body($rss_resp);
+            if (!$body) continue;
+            $xml = @simplexml_load_string($body);
+            if (!$xml) continue;
+            // Support RSS -> channel->item
+            if (isset($xml->channel->item)) {
+                foreach ($xml->channel->item as $it) {
+                    $title = trim((string)$it->title);
+                    $link  = trim((string)$it->link);
+                    if (!$title || !$link) continue;
+                    $pubDate = (string)$it->pubDate ?: (string)$it->date;
+                    $ts = $pubDate ? strtotime($pubDate) : false;
+                    $desc = isset($it->description) ? (string)$it->description : '';
+                    // Filter by Bitcoin keyword unless domain is inherently Bitcoin centric
+                    $host = parse_url($link, PHP_URL_HOST);
+                    $is_bitcoin_domain = false;
+                    if ($host) {
+                        $h = strtolower($host);
+                        if (strpos($h,'bitcoin') !== false) $is_bitcoin_domain = true; // bitcoin magazine / bitcoin.com etc.
+                    }
+                    if (!$is_bitcoin_domain && !preg_match($keyword_filter, $title . ' ' . $desc)) continue;
+                    $clean_summary = '';
+                    if ($desc) {
+                        $clean_summary = wp_strip_all_tags(html_entity_decode($desc, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                        if (strlen($clean_summary) > 280) $clean_summary = mb_substr($clean_summary,0,277) . '...';
+                    }
+                    $all[] = array(
+                        'id' => md5($link),
+                        'title' => $title,
+                        'url' => $link,
+                        'original_url' => $link,
+                        'domain' => $host,
+                        'source' => array('title'=>$f['title'], 'domain'=>$host, 'id'=>$f['id']),
+                        'published_at' => $ts ? gmdate('c', $ts) : gmdate('c'),
+                        'summary' => $clean_summary,
+                    );
+                }
+            }
+        }
+        // Sort desc by published_at
+        usort($all, function($a,$b){
+            return strcmp($b['published_at'], $a['published_at']);
+        });
+        $cached = array(
+            'items' => $all,
+            'count' => count($all),
+            'generated_at' => gmdate('c'),
+        );
+        set_transient($cache_key, $cached, $cache_ttl);
+    }
+    $meta['generated_at'] = isset($cached['generated_at']) ? $cached['generated_at'] : gmdate('c');
+    $meta['total_items'] = isset($cached['count']) ? $cached['count'] : (isset($cached['items']) ? count($cached['items']) : 0);
+    $meta['page'] = $page;
+    $meta['per_page'] = $per_page;
+    $meta['pages'] = $per_page ? ceil(max(1,$meta['total_items']) / $per_page) : 1;
+    $meta['cache_age_sec'] = max(0, $now - strtotime($meta['generated_at']));
+
+    $offset = ($page - 1) * $per_page;
+    $slice = array();
+    if (!empty($cached['items'])) {
+        $slice = array_slice($cached['items'], $offset, $per_page);
+    }
+
+    $payload = array(
+        'results' => $slice,
+        'meta' => $meta
+    );
+    wp_send_json_success($payload);
+}
+add_action('wp_ajax_bitcoinul_ro_fetch_public_btc_news', 'bitcoinul_ro_fetch_public_btc_news');
+add_action('wp_ajax_nopriv_bitcoinul_ro_fetch_public_btc_news', 'bitcoinul_ro_fetch_public_btc_news');
 
 /**
  * XML Sitemap: sitemap.xml + parts (sitemap-pages.xml, sitemap-exchanges.xml, sitemap-taxonomies.xml)
