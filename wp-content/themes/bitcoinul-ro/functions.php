@@ -70,30 +70,40 @@ add_action('after_setup_theme', 'bitcoinul_ro_setup');
  * Înregistrează și încarcă scripturile și stilurile temei
  */
 function bitcoinul_ro_scripts() {
-    // Stil principal stylesheet (style.css)
-    wp_enqueue_style(
-        'bitcoinul-ro-style',
-        get_stylesheet_uri(),
-        array(),
-        wp_get_theme()->get('Version')
-    );
+    // Fonts: use local Inter if available, else Google Fonts
+    $local_font_file = get_template_directory() . '/assets/fonts/inter/Inter-Variable.woff2';
+    $has_local_inter = file_exists($local_font_file);
 
-    // Fonturi (dacă sunt necesare)
-    wp_enqueue_style(
-        'bitcoinul-ro-fonts',
-        'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
-        array(),
-        null
-    );
+    if ($has_local_inter) {
+        // Enqueue local fonts CSS first
+        wp_enqueue_style(
+            'bitcoinul-ro-fonts-local',
+            get_template_directory_uri() . '/assets/css/fonts.css',
+            array(),
+            wp_get_theme()->get('Version')
+        );
+    } else {
+        // Fallback to Google Fonts
+        wp_enqueue_style(
+            'bitcoinul-ro-fonts',
+            'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
+            array(),
+            null
+        );
+    }
 
-    // Script principal
-    wp_enqueue_script(
-        'bitcoinul-ro-main',
-        get_template_directory_uri() . '/assets/js/main.js',
-        array('jquery'),
-        wp_get_theme()->get('Version'),
-        true
-    );
+    // Stil principal stylesheet (minified dacă există)
+    $style_uri = get_stylesheet_uri();
+    $min_path  = get_template_directory() . '/style.min.css';
+    if (file_exists($min_path)) {
+        $style_uri = get_template_directory_uri() . '/style.min.css';
+    }
+    wp_enqueue_style('bitcoinul-ro-style', $style_uri, array(), wp_get_theme()->get('Version'));
+
+    // Script principal (minified dacă există)
+    $main_js = get_template_directory() . '/assets/js/main.min.js';
+    $main_uri = file_exists($main_js) ? (get_template_directory_uri() . '/assets/js/main.min.js') : (get_template_directory_uri() . '/assets/js/main.js');
+    wp_enqueue_script('bitcoinul-ro-main', $main_uri, array('jquery'), wp_get_theme()->get('Version'), true);
 
     // Localizare date AJAX (dacă js folosește)
     wp_localize_script('bitcoinul-ro-main', 'bitcoinul_ro_ajax', array(
@@ -107,6 +117,87 @@ function bitcoinul_ro_scripts() {
     }
 }
 add_action('wp_enqueue_scripts', 'bitcoinul_ro_scripts');
+
+// Add defer to our main script for better Lighthouse score
+add_filter('script_loader_tag', function($tag, $handle, $src){
+    if ($handle === 'bitcoinul-ro-main') {
+        $tag = '<script defer src="' . esc_url($src) . '"></script>';
+    }
+    return $tag;
+}, 10, 3);
+
+// Add preload resource hints for LCP and critical CSS when available
+add_filter('wp_resource_hints', function($urls, $relation_type){
+    if ('preload' === $relation_type) {
+        $min_css = get_template_directory_uri() . '/style.min.css';
+        if (file_exists(get_template_directory() . '/style.min.css')) {
+            $urls[] = array('href' => $min_css, 'as' => 'style');
+        }
+    }
+    return $urls;
+}, 10, 2);
+
+// Preload LCP image on single posts (featured image)
+function bitcoinul_ro_preload_lcp_image() {
+    if (!is_singular() || !has_post_thumbnail()) return;
+    $id = get_post_thumbnail_id();
+    if (!$id) return;
+    $src = wp_get_attachment_image_url($id, 'hero-image');
+    $srcset = wp_get_attachment_image_srcset($id, 'hero-image');
+    $sizes = '(min-width: 1024px) 1200px, 100vw';
+    if ($src) {
+        echo '<link rel="preload" as="image" href="' . esc_url($src) . '" imagesrcset="' . esc_attr($srcset) . '" imagesizes="' . esc_attr($sizes) . '" fetchpriority="high">' . "\n";
+    }
+}
+add_action('wp_head', 'bitcoinul_ro_preload_lcp_image', 5);
+
+// FAQ schema shortcodes: [faq_list] wraps multiple [faq_item q="" a=""]
+global $bitcoinul_ro_faq_items;
+$bitcoinul_ro_faq_items = array();
+
+function bitcoinul_ro_faq_item_shortcode($atts) {
+    global $bitcoinul_ro_faq_items;
+    $atts = shortcode_atts(array('q' => '', 'a' => ''), $atts);
+    $q = trim(wp_strip_all_tags($atts['q']));
+    $a = trim(wp_kses_post($atts['a']));
+    if ($q && $a) {
+        $bitcoinul_ro_faq_items[] = array('q' => $q, 'a' => wp_strip_all_tags($a));
+    }
+    // Render simple HTML for users
+    if ($q && $a) {
+        return '<div class="faq-item"><h3 class="faq-q">' . esc_html($q) . '</h3><p class="faq-a">' . esc_html($a) . '</p></div>';
+    }
+    return '';
+}
+add_shortcode('faq_item', 'bitcoinul_ro_faq_item_shortcode');
+
+function bitcoinul_ro_faq_list_shortcode($atts, $content = '') {
+    global $bitcoinul_ro_faq_items;
+    // reset on entry
+    $bitcoinul_ro_faq_items = array();
+    $html = '<div class="faq-list">' . do_shortcode($content) . '</div>';
+    // output JSON-LD if we have items
+    if (!empty($bitcoinul_ro_faq_items)) {
+        $faq = array(
+            '@context' => 'https://schema.org',
+            '@type' => 'FAQPage',
+            'mainEntity' => array()
+        );
+        foreach ($bitcoinul_ro_faq_items as $it) {
+            $faq['mainEntity'][] = array(
+                '@type' => 'Question',
+                'name' => $it['q'],
+                'acceptedAnswer' => array(
+                    '@type' => 'Answer',
+                    'text' => $it['a']
+                )
+            );
+        }
+        $html .= '<script type="application/ld+json">' . wp_json_encode($faq) . '</script>';
+    }
+    return $html;
+}
+add_shortcode('faq_list', 'bitcoinul_ro_faq_list_shortcode');
 
 /**
  * Funcție pentru afișarea exchange-urilor recomandate
@@ -249,6 +340,27 @@ function bitcoinul_ro_lazy_loading($content) {
 add_filter('the_content', 'bitcoinul_ro_lazy_loading');
 
 /**
+ * Completează automat atributul alt lipsă pe imagini și adaugă width/height când se pot deduce
+ */
+function bitcoinul_ro_fix_img_alt_dimensions($content) {
+    if (is_admin() || is_feed() || empty($content)) return $content;
+    // Adaugă alt dacă lipsește
+    $content = preg_replace_callback('/<img(.*?)>/i', function($m){
+        $tag = $m[0];
+        // alt
+        if (!preg_match('/\salt\s*=\s*["\']/i', $tag)) {
+            // încearcă să derive numele din titlul postului
+            $alt = get_the_title();
+            $tag = preg_replace('/<img/i', '<img alt="' . esc_attr($alt) . '"', $tag, 1);
+        }
+        // width/height: dacă WordPress a inclus dimensiuni în srcset/sizes, lăsăm așa; altfel încercăm să evităm CLS setând width:100% în CSS
+        return $tag;
+    }, $content);
+    return $content;
+}
+add_filter('the_content', 'bitcoinul_ro_fix_img_alt_dimensions', 12);
+
+/**
  * Adaugă schema.org markup pentru articole
  */
 function bitcoinul_ro_article_schema() {
@@ -259,9 +371,11 @@ function bitcoinul_ro_article_schema() {
             '@type' => 'Article',
             'headline' => get_the_title(),
             'description' => wp_trim_words(get_the_excerpt(), 25),
+            // Autor ca Organization pentru consistență de brand
             'author' => array(
-                '@type' => 'Person',
-                'name' => get_the_author()
+                '@type' => 'Organization',
+                'name' => get_bloginfo('name'),
+                'url'  => home_url('/')
             ),
             'publisher' => array(
                 '@type' => 'Organization',
@@ -295,12 +409,36 @@ add_action('wp_head', 'bitcoinul_ro_article_schema');
  */
 function bitcoinul_ro_document_title_parts($title) {
     if (is_home() || is_front_page()) {
-        $title['title'] = 'Cele mai bune Exchange-uri Bitcoin România 2025';
-        $title['tagline'] = 'Comparații, Recenzii și Ghiduri Complete';
+        $title['title'] = 'Cele mai bune exchange-uri Bitcoin în România (2025)';
+        $title['tagline'] = '';
     }
     return $title;
 }
 add_filter('document_title_parts', 'bitcoinul_ro_document_title_parts');
+
+/**
+ * Ensure no accidental noindex site-wide except search/404 handled in header.php
+ */
+add_action('wp_head', function(){
+    // If another plugin injects noindex site-wide, surface a comment hint for debugging
+    if (apply_filters('wp_robots', array()) === array('noindex'=>'noindex')) {
+        echo "\n<!-- atenție: un plugin a setat noindex; verificați setările SEO -->\n";
+    }
+}, 99);
+
+// Preferă indexare pe tot site-ul (în afară de căutare/404) și rich snippets preview
+add_filter('wp_robots', function($robots){
+    if (is_search() || is_404()) {
+        $robots['noindex'] = true;
+        unset($robots['index']);
+    } else {
+        unset($robots['noindex']);
+        $robots['index'] = true;
+        $robots['follow'] = true;
+        $robots['max-image-preview'] = 'large';
+    }
+    return $robots;
+});
 
 /**
  * Adaugă clasa CSS pentru affiliate links
@@ -311,6 +449,66 @@ function bitcoinul_ro_affiliate_links($content) {
     return $content;
 }
 add_filter('the_content', 'bitcoinul_ro_affiliate_links');
+
+/**
+ * Shortcode [actualizat] pentru a afișa data ultimei modificări (luna YYYY) pe pagini/articole
+ */
+function bitcoinul_ro_actualizat_sc($atts){
+    $fmt = isset($atts['format']) ? sanitize_text_field($atts['format']) : 'F Y';
+    $d = get_the_modified_time($fmt);
+    if (!$d) $d = date_i18n($fmt);
+    return '<span class="updated-at">Actualizat: ' . esc_html($d) . '</span>';
+}
+add_shortcode('actualizat', 'bitcoinul_ro_actualizat_sc');
+
+/**
+ * Shortcode [platforms_table] – tabel comparativ platforme (comision, metode, KYC, rating)
+ * Inserabil în articole/pagini pentru SEO/UX.
+ */
+function bitcoinul_ro_platforms_table_sc(){
+        ob_start();
+        ?>
+        <div class="platforms-table-wrap" style="overflow:auto; margin:1rem 0 1.5rem;">
+            <table class="platforms-table" style="width:100%; border-collapse:separate; border-spacing:0 8px;">
+                <thead>
+                    <tr style="text-align:left;">
+                        <th style="padding:.6rem .8rem;">Platformă</th>
+                        <th style="padding:.6rem .8rem;">Comision</th>
+                        <th style="padding:.6rem .8rem;">Metode plată</th>
+                        <th style="padding:.6rem .8rem;">Verificare</th>
+                        <th style="padding:.6rem .8rem;">Rating</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background:#fff; border:1px solid var(--border-light,#e5e7eb);">
+                        <td style="padding:.6rem .8rem; font-weight:700;">Binance</td>
+                        <td style="padding:.6rem .8rem;">0.1% spot</td>
+                        <td style="padding:.6rem .8rem;">Card, Transfer bancar</td>
+                        <td style="padding:.6rem .8rem;">KYC</td>
+                        <td style="padding:.6rem .8rem;">4.8/5</td>
+                    </tr>
+                    <tr style="background:#fff; border:1px solid var(--border-light,#e5e7eb);">
+                        <td style="padding:.6rem .8rem; font-weight:700;">Bybit</td>
+                        <td style="padding:.6rem .8rem;">0.1% spot</td>
+                        <td style="padding:.6rem .8rem;">Card, Transfer bancar</td>
+                        <td style="padding:.6rem .8rem;">KYC</td>
+                        <td style="padding:.6rem .8rem;">4.3/5</td>
+                    </tr>
+                    <tr style="background:#fff; border:1px solid var(--border-light,#e5e7eb);">
+                        <td style="padding:.6rem .8rem; font-weight:700;">Revolut</td>
+                        <td style="padding:.6rem .8rem;">Spread variabil</td>
+                        <td style="padding:.6rem .8rem;">Card</td>
+                        <td style="padding:.6rem .8rem;">KYC</td>
+                        <td style="padding:.6rem .8rem;">3.8/5</td>
+                    </tr>
+                </tbody>
+            </table>
+            <small style="color:#6b7280;">Date orientative • Verifică întotdeauna comisioanele actuale pe site-ul platformei.</small>
+        </div>
+        <?php
+        return ob_get_clean();
+}
+add_shortcode('platforms_table', 'bitcoinul_ro_platforms_table_sc');
 
 /**
  * Funcție helper pentru tracking affiliate
@@ -364,6 +562,14 @@ function disable_wp_emojicons() {
 }
 add_action('init', 'disable_wp_emojicons');
 
+// Best-effort: add Cache-Control to theme static files served via PHP endpoints
+add_filter('script_loader_src', function($src){
+    return add_query_arg('v', wp_get_theme()->get('Version'), $src);
+});
+add_filter('style_loader_src', function($src){
+    return add_query_arg('v', wp_get_theme()->get('Version'), $src);
+});
+
 /**
  * Customizer pentru setări tema
  */
@@ -410,6 +616,41 @@ function bitcoinul_ro_customize_register($wp_customize) {
         'type'     => 'text',
         'description' => 'Cheie gratuită de pe cryptopanic.com (Free API). Folosită pentru pagina Știri.'
     ));
+
+    // Search Console & Bing verification
+    $wp_customize->add_setting('bitcoinul_ro_gsc_verification', array(
+        'default'           => '',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('bitcoinul_ro_gsc_verification', array(
+        'label'    => 'Google Search Console verification code',
+        'section'  => 'bitcoinul_ro_general',
+        'type'     => 'text',
+        'description' => 'Valoarea atributului content pentru meta name="google-site-verification"'
+    ));
+
+    $wp_customize->add_setting('bitcoinul_ro_bing_verification', array(
+        'default'           => '',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    $wp_customize->add_control('bitcoinul_ro_bing_verification', array(
+        'label'    => 'Bing Webmaster verification code',
+        'section'  => 'bitcoinul_ro_general',
+        'type'     => 'text',
+        'description' => 'Valoarea pentru meta name="msvalidate.01"'
+    ));
+
+    // CDN base URL (optional)
+    $wp_customize->add_setting('bitcoinul_ro_cdn_base', array(
+        'default'           => '',
+        'sanitize_callback' => function($v){ return esc_url_raw(trim($v)); }
+    ));
+    $wp_customize->add_control('bitcoinul_ro_cdn_base', array(
+        'label'       => 'CDN Base URL (opțional)',
+        'section'     => 'bitcoinul_ro_general',
+        'type'        => 'url',
+        'description' => 'Ex: https://cdn.exemplu.ro – resursele media și tema vor fi rescrise către acest domeniu.'
+    ));
 }
 add_action('customize_register', 'bitcoinul_ro_customize_register');
 
@@ -432,6 +673,82 @@ function bitcoinul_ro_google_analytics() {
     }
 }
 add_action('wp_head', 'bitcoinul_ro_google_analytics');
+
+/**
+ * CDN rewrite: rescrie URL-urile de media/temă către CDN dacă este setat în Customizer
+ */
+function bitcoinul_ro_cdn_filter($url) {
+    $cdn = trim(get_theme_mod('bitcoinul_ro_cdn_base', ''));
+    if (!$cdn) return $url;
+    $home = home_url();
+    // rescrie doar http(s) absolut către domeniul site-ului
+    if (strpos($url, $home) === 0) {
+        $path = substr($url, strlen($home));
+        $url = rtrim($cdn, '/') . '/' . ltrim($path, '/');
+    }
+    return $url;
+}
+add_filter('wp_get_attachment_url', 'bitcoinul_ro_cdn_filter');
+add_filter('theme_file_uri', 'bitcoinul_ro_cdn_filter');
+add_filter('stylesheet_directory_uri', 'bitcoinul_ro_cdn_filter');
+add_filter('template_directory_uri', 'bitcoinul_ro_cdn_filter');
+
+// Content images: preferă WebP variant when available
+add_filter('the_content', function($content){
+    if (is_admin() || empty($content)) return $content;
+    $content = preg_replace_callback('/<img([^>]+?)src=["\']([^"\']+)["\']([^>]*)>/i', function($m){
+        $before = $m[1]; $src = $m[2]; $after = $m[3];
+        $webp = preg_replace('/\.(jpe?g|png)$/i', '.webp', $src);
+        if ($webp !== $src) {
+            $src_webp_path = str_replace(home_url('/'), ABSPATH, $webp);
+            if (file_exists($src_webp_path)) {
+                return '<picture><source srcset="' . esc_url($webp) . '" type="image/webp"><img' . $before . 'src="' . esc_url($src) . '"' . $after . '></picture>';
+            }
+        }
+        return $m[0];
+    }, $content);
+    return $content;
+}, 14);
+
+/** HowTo schema shortcodes: [howto title="..."] [howto_step title="" image="" time=""]Descriere[/howto_step] [/howto] */
+global $bitcoinul_ro_howto_steps; $bitcoinul_ro_howto_steps = array();
+function bitcoinul_ro_howto_step_sc($atts, $content=''){
+    global $bitcoinul_ro_howto_steps;
+    $atts = shortcode_atts(array('title'=>'','image'=>'','time'=>''), $atts);
+    $step = array(
+        '@type' => 'HowToStep',
+        'name' => wp_strip_all_tags($atts['title']),
+        'text' => wp_strip_all_tags($content),
+    );
+    if (!empty($atts['image'])) {
+        $step['image'] = esc_url($atts['image']);
+    }
+    if (!empty($atts['time'])) {
+        $step['timeRequired'] = $atts['time'];
+    }
+    $bitcoinul_ro_howto_steps[] = $step;
+    // Render basic HTML
+    $html = '<div class="howto-step"><h4>' . esc_html($step['name']) . '</h4><p>' . esc_html(wp_strip_all_tags($content)) . '</p></div>';
+    return $html;
+}
+add_shortcode('howto_step', 'bitcoinul_ro_howto_step_sc');
+
+function bitcoinul_ro_howto_sc($atts, $content=''){
+    global $bitcoinul_ro_howto_steps; $bitcoinul_ro_howto_steps = array();
+    $atts = shortcode_atts(array('title'=>''), $atts);
+    $html = '<section class="howto">' . do_shortcode($content) . '</section>';
+    if (!empty($bitcoinul_ro_howto_steps)) {
+        $schema = array(
+            '@context' => 'https://schema.org',
+            '@type'    => 'HowTo',
+            'name'     => $atts['title'] ?: get_the_title(),
+            'step'     => $bitcoinul_ro_howto_steps,
+        );
+        $html .= '<script type="application/ld+json">' . wp_json_encode($schema) . '</script>';
+    }
+    return $html;
+}
+add_shortcode('howto', 'bitcoinul_ro_howto_sc');
 
 /**
  * Limitează reviziile postărilor pentru performanță
@@ -564,6 +881,14 @@ function bitcoinul_ro_create_pages() {
         'comparatie-exchange-uri' => array(
             'title' => 'Comparație Exchange-uri Bitcoin',
             'template' => 'page-comparatie-exchange-uri.php'
+        ),
+        'despre-noi' => array(
+            'title' => 'Despre noi',
+            'template' => 'page.php'
+        ),
+        'contact' => array(
+            'title' => 'Contact',
+            'template' => 'page.php'
         )
     );
     
@@ -622,6 +947,8 @@ function bitcoinul_ro_setup_menu() {
                 array('title' => 'Exchange-uri', 'url' => home_url('/exchange-uri/')),
                 array('title' => 'Ghiduri', 'url' => home_url('/ghiduri/')),
                 array('title' => 'Știri', 'url' => home_url('/stiri/')),
+                array('title' => 'Despre', 'url' => home_url('/despre-noi/')),
+                array('title' => 'Contact', 'url' => home_url('/contact/')),
             );
             
             foreach ($menu_items as $item) {
@@ -839,6 +1166,65 @@ function bitcoinul_ro_autoseed_legal_pages_once() {
 }
 add_action('init', 'bitcoinul_ro_autoseed_legal_pages_once', 42);
 
+// Auto-seed: creează paginile Despre/Contact dacă lipsesc (o singură dată)
+function bitcoinul_ro_seed_about_contact_once(){
+    $k = 'bitcoinul_ro_about_contact_seeded_v1';
+    if (get_transient($k)) return;
+    $targets = array(
+        'despre-noi' => 'Despre noi',
+        'contact'    => 'Contact',
+    );
+    foreach ($targets as $slug => $title) {
+        $page = get_page_by_path($slug);
+        if (!$page) {
+            wp_insert_post(array(
+                'post_title'  => $title,
+                'post_name'   => $slug,
+                'post_status' => 'publish',
+                'post_type'   => 'page',
+                'post_author' => 1,
+                'comment_status' => 'closed',
+            ));
+        }
+    }
+    set_transient($k, 1, 12 * HOUR_IN_SECONDS);
+}
+add_action('init', 'bitcoinul_ro_seed_about_contact_once', 44);
+
+// Ensure primary menu conține Despre/Contact (o singură dată pe 12h)
+add_action('init', function(){
+    $k = 'bitcoinul_ro_primary_menu_links_done_v1';
+    if (get_transient($k)) return;
+    $locations = get_nav_menu_locations();
+    if (!isset($locations['primary']) || !$locations['primary']) { set_transient($k, 1, 6 * HOUR_IN_SECONDS); return; }
+    $menu_obj = wp_get_nav_menu_object($locations['primary']);
+    if (!$menu_obj) { set_transient($k, 1, 6 * HOUR_IN_SECONDS); return; }
+    $menu_id = $menu_obj->term_id;
+    $items = wp_get_nav_menu_items($menu_id);
+    $exists = array();
+    if ($items) {
+        foreach ($items as $it) {
+            $exists[ untrailingslashit($it->url) ] = true;
+        }
+    }
+    $to_add = array(
+        array('title'=>'Despre','url'=>home_url('/despre-noi/')),
+        array('title'=>'Contact','url'=>home_url('/contact/')),
+    );
+    foreach ($to_add as $it) {
+        $key = untrailingslashit($it['url']);
+        if (!isset($exists[$key])) {
+            wp_update_nav_menu_item($menu_id, 0, array(
+                'menu-item-title' => $it['title'],
+                'menu-item-url'   => $it['url'],
+                'menu-item-status'=> 'publish',
+                'menu-item-type'  => 'custom'
+            ));
+        }
+    }
+    set_transient($k, 1, 12 * HOUR_IN_SECONDS);
+}, 56);
+
 /**
  * Creează/completează meniul de footer cu linkurile cheie (DCA/Calculatoare și tutorialul de cumpărare)
  */
@@ -877,6 +1263,8 @@ function bitcoinul_ro_setup_footer_menu_links() {
             array('title' => 'Calculatoare crypto', 'url' => home_url('/calculatoare-bitcoin/')),
             array('title' => 'Portofele Bitcoin sigure', 'url' => home_url('/portofel-bitcoin-sigur/')),
             array('title' => 'Taxe Bitcoin în România', 'url' => home_url('/taxe-bitcoin-romania/')),
+            array('title' => 'Despre noi', 'url' => home_url('/despre-noi/')),
+            array('title' => 'Contact', 'url' => home_url('/contact/')),
             array('title' => 'Termeni și condiții', 'url' => home_url('/termeni-conditii/')),
             array('title' => 'Politica de confidențialitate', 'url' => home_url('/politica-confidentialitate/')),
             array('title' => 'Disclaimer investiții', 'url' => home_url('/disclaimer-investitii/')),
@@ -906,16 +1294,7 @@ function bitcoinul_ro_setup_footer_menu_links() {
                 }
             }
 
-            // Elimină exact „Despre noi” și „Contact” dacă există (pot fi adăugate de teme/plug-in-uri anterioare)
-            if ($items) {
-                foreach ($items as $it) {
-                    $title = isset($it->title) ? trim($it->title) : '';
-                    $title_norm = function_exists('mb_strtolower') ? mb_strtolower($title) : strtolower($title);
-                    if ($title_norm === 'despre noi' || $title_norm === 'contact') {
-                    wp_delete_post($it->ID, true);
-                    }
-                }
-            }
+            // Nu mai eliminăm Despre/Contact – sunt elemente de trust necesare
         }
 
         foreach ($targets as $t) {
@@ -2093,104 +2472,107 @@ add_action('wp_ajax_nopriv_bitcoinul_ro_market_metrics', 'bitcoinul_ro_market_me
  * Cache: 5 minute (agregat), paginare server-side.
  * Endpoint: /wp-admin/admin-ajax.php?action=bitcoinul_ro_fetch_public_btc_news&page=1
  */
-function bitcoinul_ro_fetch_public_btc_news() {
-    // Config
-    $per_page = isset($_GET['per_page']) ? max(1, min(50, (int)$_GET['per_page'])) : 24;
-    $page     = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+function bitcoinul_ro_collect_public_btc_news() {
     $keyword_filter = '/\bbitcoin\b|\bbtc\b/i';
     $cache_key = 'bitcoinul_ro_public_btc_news_v1';
-    $cache_ttl = 5 * MINUTE_IN_SECONDS; // refresh suficient de des, dar limitează load-ul
-    $now = time();
-
+    $cache_ttl = 5 * MINUTE_IN_SECONDS;
     $cached = get_transient($cache_key);
-    $meta = array('cached' => true, 'cache_ttl' => $cache_ttl, 'generated_at' => null);
-    if (!is_array($cached) || !isset($cached['items'])) {
-        $meta['cached'] = false;
-        // RSS feed list
-        $feeds = array(
-            array('id'=>'coindesk', 'title'=>'CoinDesk', 'url'=>'https://www.coindesk.com/arc/outboundfeeds/rss/'),
-            array('id'=>'cointelegraph', 'title'=>'CoinTelegraph', 'url'=>'https://cointelegraph.com/rss'),
-            array('id'=>'bitcoinmagazine', 'title'=>'Bitcoin Magazine', 'url'=>'https://bitcoinmagazine.com/feed'),
-            array('id'=>'bitcoinist', 'title'=>'Bitcoinist', 'url'=>'https://bitcoinist.com/feed/'),
-            array('id'=>'bitcoincom', 'title'=>'Bitcoin.com News', 'url'=>'https://news.bitcoin.com/feed/')
-        );
-        $all = array();
-        foreach ($feeds as $f) {
-            $rss_resp = wp_remote_get($f['url'], array('timeout' => 12));
-            if (is_wp_error($rss_resp)) continue;
-            $code = wp_remote_retrieve_response_code($rss_resp);
-            if ($code !== 200) continue;
-            $body = wp_remote_retrieve_body($rss_resp);
-            if (!$body) continue;
-            $xml = @simplexml_load_string($body);
-            if (!$xml) continue;
-            // Support RSS -> channel->item
-            if (isset($xml->channel->item)) {
-                foreach ($xml->channel->item as $it) {
-                    $title = trim((string)$it->title);
-                    $link  = trim((string)$it->link);
-                    if (!$title || !$link) continue;
-                    $pubDate = (string)$it->pubDate ?: (string)$it->date;
-                    $ts = $pubDate ? strtotime($pubDate) : false;
-                    $desc = isset($it->description) ? (string)$it->description : '';
-                    // Filter by Bitcoin keyword unless domain is inherently Bitcoin centric
-                    $host = parse_url($link, PHP_URL_HOST);
-                    $is_bitcoin_domain = false;
-                    if ($host) {
-                        $h = strtolower($host);
-                        if (strpos($h,'bitcoin') !== false) $is_bitcoin_domain = true; // bitcoin magazine / bitcoin.com etc.
-                    }
-                    if (!$is_bitcoin_domain && !preg_match($keyword_filter, $title . ' ' . $desc)) continue;
-                    $clean_summary = '';
-                    if ($desc) {
-                        $clean_summary = wp_strip_all_tags(html_entity_decode($desc, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-                        if (strlen($clean_summary) > 280) $clean_summary = mb_substr($clean_summary,0,277) . '...';
-                    }
-                    $all[] = array(
-                        'id' => md5($link),
-                        'title' => $title,
-                        'url' => $link,
-                        'original_url' => $link,
-                        'domain' => $host,
-                        'source' => array('title'=>$f['title'], 'domain'=>$host, 'id'=>$f['id']),
-                        'published_at' => $ts ? gmdate('c', $ts) : gmdate('c'),
-                        'summary' => $clean_summary,
-                    );
+    if (is_array($cached) && isset($cached['items'])) {
+        return $cached;
+    }
+    // RSS feed list
+    $feeds = array(
+        array('id'=>'coindesk', 'title'=>'CoinDesk', 'url'=>'https://www.coindesk.com/arc/outboundfeeds/rss/'),
+        array('id'=>'cointelegraph', 'title'=>'CoinTelegraph', 'url'=>'https://cointelegraph.com/rss'),
+        array('id'=>'bitcoinmagazine', 'title'=>'Bitcoin Magazine', 'url'=>'https://bitcoinmagazine.com/feed'),
+        array('id'=>'bitcoinist', 'title'=>'Bitcoinist', 'url'=>'https://bitcoinist.com/feed/'),
+        array('id'=>'bitcoincom', 'title'=>'Bitcoin.com News', 'url'=>'https://news.bitcoin.com/feed/')
+    );
+    $all = array();
+    foreach ($feeds as $f) {
+        $rss_resp = wp_remote_get($f['url'], array('timeout' => 12));
+        if (is_wp_error($rss_resp)) continue;
+        $code = wp_remote_retrieve_response_code($rss_resp);
+        if ($code !== 200) continue;
+        $body = wp_remote_retrieve_body($rss_resp);
+        if (!$body) continue;
+        $xml = @simplexml_load_string($body);
+        if (!$xml) continue;
+        if (isset($xml->channel->item)) {
+            foreach ($xml->channel->item as $it) {
+                $title = trim((string)$it->title);
+                $link  = trim((string)$it->link);
+                if (!$title || !$link) continue;
+                $pubDate = (string)$it->pubDate ?: (string)$it->date;
+                $ts = $pubDate ? strtotime($pubDate) : false;
+                $desc = isset($it->description) ? (string)$it->description : '';
+                $host = parse_url($link, PHP_URL_HOST);
+                $is_bitcoin_domain = false;
+                if ($host) {
+                    $h = strtolower($host);
+                    if (strpos($h,'bitcoin') !== false) $is_bitcoin_domain = true;
                 }
+                if (!$is_bitcoin_domain && !preg_match($keyword_filter, $title . ' ' . $desc)) continue;
+                $clean_summary = '';
+                if ($desc) {
+                    $clean_summary = wp_strip_all_tags(html_entity_decode($desc, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                    if (function_exists('mb_substr')) {
+                        if (mb_strlen($clean_summary) > 280) $clean_summary = mb_substr($clean_summary,0,277) . '...';
+                    } else {
+                        if (strlen($clean_summary) > 280) $clean_summary = substr($clean_summary,0,277) . '...';
+                    }
+                }
+                $all[] = array(
+                    'id' => md5($link),
+                    'title' => $title,
+                    'url' => $link,
+                    'original_url' => $link,
+                    'domain' => $host,
+                    'source' => array('title'=>$f['title'], 'domain'=>$host, 'id'=>$f['id']),
+                    'published_at' => $ts ? gmdate('c', $ts) : gmdate('c'),
+                    'summary' => $clean_summary,
+                );
             }
         }
-        // Sort desc by published_at
-        usort($all, function($a,$b){
-            return strcmp($b['published_at'], $a['published_at']);
-        });
-        $cached = array(
-            'items' => $all,
-            'count' => count($all),
-            'generated_at' => gmdate('c'),
-        );
-        set_transient($cache_key, $cached, $cache_ttl);
     }
-    $meta['generated_at'] = isset($cached['generated_at']) ? $cached['generated_at'] : gmdate('c');
-    $meta['total_items'] = isset($cached['count']) ? $cached['count'] : (isset($cached['items']) ? count($cached['items']) : 0);
-    $meta['page'] = $page;
-    $meta['per_page'] = $per_page;
-    $meta['pages'] = $per_page ? ceil(max(1,$meta['total_items']) / $per_page) : 1;
-    $meta['cache_age_sec'] = max(0, $now - strtotime($meta['generated_at']));
+    usort($all, function($a,$b){ return strcmp($b['published_at'], $a['published_at']); });
+    $cached = array(
+        'items' => $all,
+        'count' => count($all),
+        'generated_at' => gmdate('c'),
+    );
+    set_transient($cache_key, $cached, $cache_ttl);
+    return $cached;
+}
 
+function bitcoinul_ro_fetch_public_btc_news() {
+    $per_page = isset($_GET['per_page']) ? max(1, min(50, (int)$_GET['per_page'])) : 24;
+    $page     = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+    $now = time();
+    $bundle = bitcoinul_ro_collect_public_btc_news();
+    $total = isset($bundle['count']) ? (int)$bundle['count'] : (isset($bundle['items']) ? count($bundle['items']) : 0);
+    $generated = isset($bundle['generated_at']) ? $bundle['generated_at'] : gmdate('c');
     $offset = ($page - 1) * $per_page;
     $slice = array();
-    if (!empty($cached['items'])) {
-        $slice = array_slice($cached['items'], $offset, $per_page);
+    if (!empty($bundle['items'])) {
+        $slice = array_slice($bundle['items'], $offset, $per_page);
     }
-
-    $payload = array(
-        'results' => $slice,
-        'meta' => $meta
+    $meta = array(
+        'generated_at' => $generated,
+        'total_items' => $total,
+        'page' => $page,
+        'per_page' => $per_page,
+        'pages' => $per_page ? ceil(max(1,$total) / $per_page) : 1,
+        'cache_age_sec' => max(0, $now - strtotime($generated)),
+        'cached' => true,
     );
+    $payload = array('results' => $slice, 'meta' => $meta);
     wp_send_json_success($payload);
 }
 add_action('wp_ajax_bitcoinul_ro_fetch_public_btc_news', 'bitcoinul_ro_fetch_public_btc_news');
 add_action('wp_ajax_nopriv_bitcoinul_ro_fetch_public_btc_news', 'bitcoinul_ro_fetch_public_btc_news');
+
+// (Eliminat) Funcția experimentală pentru știri Binance a fost înlăturată la cerere – codul principal al temei continuă fără această sursă.
 
 /**
  * XML Sitemap: sitemap.xml + parts (sitemap-pages.xml, sitemap-exchanges.xml, sitemap-taxonomies.xml)
@@ -2407,10 +2789,18 @@ add_action('template_redirect', 'bitcoinul_ro_handle_sitemap_request', 0);
 // Add Sitemap line into robots.txt
 function bitcoinul_ro_add_robots_sitemap($output, $public) {
     $sitemap_url = home_url('/sitemap.xml');
-    if (strpos($output, 'Sitemap:') === false) {
-        $output .= "\nSitemap: " . $sitemap_url . "\n";
+    $out = $output;
+    // If robots is empty, set a permissive default
+    if (!trim($out)) {
+        $out = "User-agent: *\nAllow: /\n";
+    } else {
+        // Replace a stray Disallow: / with Allow: /
+        $out = preg_replace('/^\s*Disallow:\s*\/\s*$/mi', 'Allow: /', $out);
     }
-    return $output;
+    if (stripos($out, 'sitemap:') === false) {
+        $out .= "\nSitemap: " . $sitemap_url . "\n";
+    }
+    return $out;
 }
 add_filter('robots_txt', 'bitcoinul_ro_add_robots_sitemap', 10, 2);
 

@@ -81,6 +81,42 @@ get_header(); ?>
                     
                 </header>
 
+                <!-- BreadcrumbList JSON-LD -->
+                <?php
+                $bc_items = array(
+                    array(
+                        '@type' => 'ListItem',
+                        'position' => 1,
+                        'name' => 'Acasă',
+                        'item' => home_url('/')
+                    )
+                );
+                $position = 2;
+                if ($post->post_parent) {
+                    $parent = get_post($post->post_parent);
+                    if ($parent) {
+                        $bc_items[] = array(
+                            '@type' => 'ListItem',
+                            'position' => $position++,
+                            'name' => get_the_title($parent),
+                            'item' => get_permalink($parent)
+                        );
+                    }
+                }
+                $bc_items[] = array(
+                    '@type' => 'ListItem',
+                    'position' => $position,
+                    'name' => get_the_title(),
+                    'item' => get_permalink()
+                );
+                $bc_schema = array(
+                    '@context' => 'https://schema.org',
+                    '@type' => 'BreadcrumbList',
+                    'itemListElement' => $bc_items
+                );
+                echo '<script type="application/ld+json">' . wp_json_encode($bc_schema) . '</script>';
+                ?>
+
                 <!-- Cuprins pentru pagini lungi -->
                 <?php 
                 $content = get_the_content();

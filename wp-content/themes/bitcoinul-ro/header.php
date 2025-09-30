@@ -6,23 +6,89 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     
     <!-- SEO Meta Tags optimizate pentru Bitcoin România -->
-    <meta name="description" content="<?php echo get_bloginfo('description') ?: 'Cele mai bune exchange-uri Bitcoin din România. Comparații, recenzii și ghiduri pentru cumpărarea Bitcoin în siguranță cu comisioane mici.'; ?>">
+    <?php
+      // Meta Description dinamic: excerpt pentru single/page, descrierea termenului pe arhive, fallback la tagline
+      $meta_description = '';
+      if (is_singular()) {
+          $excerpt = get_the_excerpt();
+          if ($excerpt) {
+              $meta_description = wp_strip_all_tags($excerpt);
+          } else {
+              $content = get_post_field('post_content', get_the_ID());
+              if ($content) $meta_description = wp_strip_all_tags(wp_trim_words($content, 35, ''));
+          }
+      } elseif (is_category() || is_tag() || is_tax()) {
+          $term = get_queried_object();
+          if ($term && !is_wp_error($term)) {
+              $meta_description = wp_strip_all_tags(term_description($term));
+          }
+      }
+      if (!$meta_description) {
+          $meta_description = get_bloginfo('description') ?: 'Comparăm exchange-uri Bitcoin din România: comisioane, securitate, ghiduri. Vezi topul 2025 și începe în siguranță.';
+      }
+      if (is_home() || is_front_page()) {
+          $meta_description = 'Învață cum să cumperi Bitcoin în România în 2025. Ghiduri, comparații de platforme și sfaturi de securitate — începe aici pe Bitcoinul.ro.';
+      }
+      // Trim la ~155 caractere
+      $md_trim = function($text){
+          $text = trim(preg_replace('/\s+/', ' ', $text));
+          if (function_exists('mb_substr')) {
+              return (mb_strlen($text) > 155) ? (mb_substr($text, 0, 152) . '…') : $text;
+          }
+          return (strlen($text) > 155) ? (substr($text, 0, 152) . '…') : $text;
+      };
+      $meta_description = $md_trim($meta_description);
+      // Robots: noindex pentru căutare și 404; follow pe paginare
+      $robots = 'index, follow';
+      if (is_search() || is_404()) {
+          $robots = 'noindex, follow';
+      }
+    ?>
+    <meta name="description" content="<?php echo esc_attr($meta_description); ?>">
     <meta name="keywords" content="bitcoin romania, exchange bitcoin, cumpar bitcoin, vand bitcoin, platforma bitcoin, binance romania, coinbase romania, crypto romania">
-    <meta name="author" content="<?php echo get_bloginfo('name'); ?>">
-    <meta name="robots" content="index, follow">
+    <meta name="author" content="<?php echo esc_attr(get_bloginfo('name')); ?>">
+    <meta name="robots" content="<?php echo esc_attr($robots); ?>">
     
     <!-- Open Graph pentru Social Media -->
     <meta property="og:title" content="<?php echo is_home() ? get_bloginfo('name') . ' - ' . get_bloginfo('description') : wp_get_document_title(); ?>">
-    <meta property="og:description" content="<?php echo get_bloginfo('description') ?: 'Ghidul complet pentru cumpărarea Bitcoin în România. Exchange-uri verificate, comisioane mici, tranzacții sigure.'; ?>">
+    <meta property="og:description" content="<?php echo esc_attr($meta_description); ?>">
     <meta property="og:type" content="<?php echo is_single() ? 'article' : 'website'; ?>">
-    <meta property="og:url" content="<?php echo get_permalink(); ?>">
+    <?php
+      // Canonical URL robust
+      $canonical = function_exists('wp_get_canonical_url') ? wp_get_canonical_url() : '';
+      if (!$canonical) {
+          if (is_singular()) {
+              $canonical = get_permalink();
+          } elseif (is_home() || is_front_page()) {
+              $canonical = home_url('/');
+          } else {
+              // Fallback: URL curent fără parametri periculoși
+              $canonical = home_url(add_query_arg(array(), remove_query_arg(array(), $_SERVER['REQUEST_URI'] ?? '/')));
+          }
+      }
+      // OG/Twitter image – featured sau site icon/fallback
+      $og_image = '';
+      if (is_singular() && has_post_thumbnail()) {
+          $og_image = get_the_post_thumbnail_url(null, 'full');
+      }
+      if (!$og_image) {
+          if (function_exists('get_site_icon_url') && get_site_icon_url()) {
+              $og_image = get_site_icon_url(512);
+          } else {
+              $og_image = get_template_directory_uri() . '/assets/favicon.png';
+          }
+      }
+    ?>
+    <meta property="og:url" content="<?php echo esc_url($canonical); ?>">
     <meta property="og:site_name" content="<?php bloginfo('name'); ?>">
     <meta property="og:locale" content="ro_RO">
+    <meta property="og:image" content="<?php echo esc_url($og_image); ?>">
+    <meta name="twitter:image" content="<?php echo esc_url($og_image); ?>">
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="<?php echo is_home() ? get_bloginfo('name') . ' - ' . get_bloginfo('description') : wp_get_document_title(); ?>">
-    <meta name="twitter:description" content="<?php echo get_bloginfo('description') ?: 'Exchange-uri Bitcoin România verificate pentru siguranță maximă'; ?>">
+    <meta name="twitter:description" content="<?php echo esc_attr($meta_description); ?>">
     
     <!-- Schema.org pentru SEO -->
     <script type="application/ld+json">
@@ -44,82 +110,67 @@
         }
     }
     </script>
+        <?php if (is_home() || is_front_page()): ?>
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "<?php echo esc_js(get_bloginfo('name')); ?>",
+            "url": "<?php echo esc_url(home_url('/')); ?>",
+            "logo": "<?php echo esc_url(get_template_directory_uri() . '/assets/favicon.png'); ?>",
+            "sameAs": [
+                "https://t.me/bitcoinulro"
+            ]
+        }
+        </script>
+        <?php endif; ?>
+                <?php if (is_archive() || is_category() || is_tag()): ?>
+                <script type="application/ld+json">
+                {
+                    "@context": "https://schema.org",
+                    "@type": "BreadcrumbList",
+                    "itemListElement": [
+                        {"@type":"ListItem","position":1,"name":"Acasă","item":"<?php echo esc_url(home_url('/')); ?>"},
+                        {"@type":"ListItem","position":2,"name":"<?php echo esc_js( single_term_title('', false) ?: post_type_archive_title('', false) ?: 'Arhivă' ); ?>","item":"<?php echo esc_url( $canonical ); ?>"}
+                    ]
+                }
+                </script>
+                <?php endif; ?>
     
-    <!-- Preconnect pentru optimizarea performanței -->
+        <!-- Preconnect pentru optimizarea performanței -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://api.coingecko.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <?php $cdn_base = trim(get_theme_mod('bitcoinul_ro_cdn_base', '')); if ($cdn_base): ?>
+    <link rel="preconnect" href="<?php echo esc_url($cdn_base); ?>" crossorigin>
+    <?php endif; ?>
+    <!-- Preload font CSS (Inter) – stylesheet is enqueued via functions.php -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+        <?php 
+            // Preload local Inter variable font if present
+            $local_woff2 = get_template_directory() . '/assets/fonts/inter/Inter-Variable.woff2';
+            if (file_exists($local_woff2)) : ?>
+                <link rel="preload" as="font" type="font/woff2" href="<?php echo esc_url(get_template_directory_uri() . '/assets/fonts/inter/Inter-Variable.woff2'); ?>" crossorigin>
+        <?php endif; ?>
     
     <!-- Canonical URL pentru SEO -->
-    <link rel="canonical" href="<?php echo get_permalink(); ?>">
+    <link rel="canonical" href="<?php echo esc_url($canonical); ?>">
+    <!-- Hreflang (site în română) -->
+    <link rel="alternate" hreflang="ro-RO" href="<?php echo esc_url($canonical); ?>">
+    <link rel="alternate" hreflang="x-default" href="<?php echo esc_url($canonical); ?>">
     
     <!-- Favicon și iconițe -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E₿%3C/text%3E%3C/svg%3E">
+    <link rel="icon" type="image/svg+xml" href="<?php echo get_template_directory_uri(); ?>/assets/favicon.svg">
     <link rel="apple-touch-icon" href="<?php echo get_template_directory_uri(); ?>/assets/apple-touch-icon.png">
     
-    <!-- Google tag (gtag.js) pentru Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TS60H80BJ7"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-TS60H80BJ7', {
-        // Configurări suplimentare pentru urmărire avansată
-        page_title: document.title,
-        page_location: window.location.href,
-        send_page_view: true,
-        // Enhanced ecommerce pentru affiliate tracking
-        custom_map: {
-          'custom_parameter_1': 'exchange_click',
-          'custom_parameter_2': 'guide_engagement'
-        }
-      });
-
-      // Funcție pentru urmărirea evenimentelor custom
-      function trackEvent(eventName, eventCategory, eventLabel, value) {
-        gtag('event', eventName, {
-          event_category: eventCategory,
-          event_label: eventLabel,
-          value: value
-        });
-      }
-
-      // Funcție pentru urmărirea click-urilor pe link-urile afiliate
-      function trackAffiliateClick(exchangeName, linkType) {
-        gtag('event', 'affiliate_click', {
-          event_category: 'affiliate_marketing',
-          event_label: exchangeName + '_' + linkType,
-          custom_parameter_1: 'exchange_click'
-        });
-      }
-
-      // Funcție pentru urmărirea angajamentului cu ghidurile
-      function trackGuideEngagement(guideName, action) {
-        gtag('event', 'guide_interaction', {
-          event_category: 'content_engagement',
-          event_label: guideName + '_' + action,
-          custom_parameter_2: 'guide_engagement'
-        });
-      }
-
-      // Funcție pentru urmărirea timpului petrecut pe pagină
-      function trackTimeOnPage() {
-        let startTime = Date.now();
-        
-        window.addEventListener('beforeunload', function() {
-          let timeSpent = Math.round((Date.now() - startTime) / 1000);
-          gtag('event', 'time_on_page', {
-            event_category: 'engagement',
-            event_label: document.title,
-            value: timeSpent
-          });
-        });
-      }
-      
-      // Inițializează urmărirea timpului
-      trackTimeOnPage();
-    </script>
+        <?php 
+            // Meta Search Console (opțional) – setări în Customizer
+            $gsc_ver = trim(get_theme_mod('bitcoinul_ro_gsc_verification', ''));
+            if ($gsc_ver) echo '<meta name="google-site-verification" content="' . esc_attr($gsc_ver) . '">';
+            $bing_ver = trim(get_theme_mod('bitcoinul_ro_bing_verification', ''));
+            if ($bing_ver) echo '<meta name="msvalidate.01" content="' . esc_attr($bing_ver) . '">';
+        ?>
     
     <?php wp_head(); ?>
     
@@ -127,7 +178,7 @@
     <style>
         /* Optimizări critice pentru viteza de încărcare */
         body { font-display: swap; }
-        img { loading: lazy; }
+        img { loading: lazy; height: auto; max-width: 100%; }
         
         /* Stiluri critice pentru Above the Fold */
         .site-header {
@@ -144,11 +195,24 @@
             padding: 4rem 0;
             margin-top: 80px;
         }
+        /* Brand text next to logo */
+        .site-logo { display: inline-flex; align-items: center; gap: .5rem; }
+        .site-title { font-weight: 800; letter-spacing: .2px; color: #e5e7eb; line-height: 1; font-size: 1.1rem; }
+        .site-title .tld { color: #f9a34d; }
+        @media (min-width: 992px) { .site-title { font-size: 1.25rem; } }
+        .updated-at{display:inline-block;margin:.25rem 0 .5rem;color:#6b7280;font-size:.9rem}
     </style>
 </head>
 
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
+
+<script>
+// Safe no-op analytics helpers (avoid errors if GA is not configured)
+window.trackEvent = window.trackEvent || function(){ try{ if(window.gtag){ gtag('event', arguments[0]||'event', {event_category: arguments[1]||'', event_label: arguments[2]||'', value: arguments[3]||0}); } }catch(e){} };
+window.trackAffiliateClick = window.trackAffiliateClick || function(exchangeName, linkType){ try{ if(window.gtag){ gtag('event','affiliate_click',{event_category:'affiliate_marketing',event_label:(exchangeName||'')+'_'+(linkType||'')}); } }catch(e){} };
+window.trackGuideEngagement = window.trackGuideEngagement || function(guideName, action){ try{ if(window.gtag){ gtag('event','guide_interaction',{event_category:'content_engagement',event_label:(guideName||'')+'_'+(action||'')}); } }catch(e){} };
+</script>
 
 <div id="page" class="site">
     
@@ -160,7 +224,7 @@
                 <div class="site-logo">
                     <a href="<?php echo esc_url(home_url('/')); ?>" rel="home" title="bitcoinul.ro - Acasă">
                         <span class="btc-symbol" aria-hidden="true">₿</span>
-                        <h1>bitcoinul.ro</h1>
+                        <span class="site-title" aria-label="bitcoinul.ro">bitcoinul<span class="tld">.ro</span></span>
                     </a>
                 </div>
                 
@@ -184,9 +248,16 @@
                     ));
                     ?>
                 </nav>
+
+                <!-- Căutare vizibilă în header -->
+                <form role="search" method="get" class="site-search" action="<?php echo esc_url(home_url('/')); ?>">
+                    <label class="sr-only" for="s">Căutare</label>
+                    <input type="search" id="s" class="search-field" placeholder="Caută ghiduri, exchange-uri…" value="<?php echo get_search_query(); ?>" name="s" />
+                    <button type="submit" class="search-submit" aria-label="Caută">🔎</button>
+                </form>
                 
                 <!-- Buton mobil pentru meniu -->
-                <button class="mobile-menu-toggle" aria-controls="primary-menu" aria-expanded="false" style="display: none;">
+                <button class="mobile-menu-toggle" aria-controls="primary-menu" aria-expanded="false" style="display: none;" aria-label="Deschide meniul principal">
                     <span class="sr-only">Deschide meniul</span>
                     <span class="hamburger-line"></span>
                     <span class="hamburger-line"></span>
@@ -317,4 +388,42 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+</script>
+
+<style>
+.site-search{display:flex;gap:.5rem;align-items:center;margin-left:1rem}
+.site-search .search-field{background:#111827;color:#fff;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:.5rem .75rem;min-width:220px}
+.site-search .search-submit{background:linear-gradient(135deg,#f7931a,#ff6b00);color:#fff;border:none;border-radius:8px;padding:.5rem .75rem;font-weight:700;cursor:pointer}
+@media (max-width:768px){.site-search{display:none}}
+</style>
+
+<!-- Cookie consent minimal (GDPR) -->
+<style>
+.cookie-consent{position:fixed;left:1rem;right:1rem;bottom:1rem;z-index:9999;background:#111827;color:#fff;padding:1rem 1.25rem;border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,.35);display:none}
+.cookie-consent a{color:#f7931a;text-decoration:underline}
+.cookie-actions{display:flex;gap:.5rem;margin-top:.75rem;flex-wrap:wrap}
+.cookie-btn{background:linear-gradient(135deg,#f7931a,#ff6b00);color:#fff;border:none;border-radius:10px;padding:.6rem 1rem;font-weight:700;cursor:pointer}
+.cookie-btn.secondary{background:#374151}
+</style>
+<div id="cookie-consent" class="cookie-consent" role="dialog" aria-live="polite" aria-label="Consimțământ cookies">
+    Folosim cookies pentru a îmbunătăți experiența și a analiza traficul. Poți citi detalii în <a href="<?php echo esc_url(home_url('/politica-confidentialitate/')); ?>">Politica de confidențialitate</a>.
+    <div class="cookie-actions">
+        <button class="cookie-btn" id="cookie-accept">Accept</button>
+        <button class="cookie-btn secondary" id="cookie-later">Mai târziu</button>
+    </div>
+    <small style="opacity:.8;display:block;margin-top:.25rem">Poți modifica preferințele oricând din setările browserului.</small>
+    </div>
+<script>
+(function(){
+    const box=document.getElementById('cookie-consent');
+    if(!box) return;
+    const key='btc_cookie_consent_v1';
+    const accepted=localStorage.getItem(key);
+    if(!accepted){ box.style.display='block'; }
+    const acceptBtn=document.getElementById('cookie-accept');
+    const laterBtn=document.getElementById('cookie-later');
+    function close(){ box.style.display='none'; }
+    acceptBtn&&acceptBtn.addEventListener('click',function(){ localStorage.setItem(key,'1'); close(); });
+    laterBtn&&laterBtn.addEventListener('click',close);
+})();
 </script>

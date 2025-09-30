@@ -42,18 +42,53 @@ get_header(); ?>
         </div>
     </section>
 
-    <!-- Latest News Feed -->
+    <!-- Latest News Feed (SSR + hydrate) -->
     <section class="news-feed">
         <div class="container">
             <h2>📰 Ultimele Știri</h2>
             <div class="news-grid" id="news-container">
-                <!-- Loading state -->
-                <div class="news-loading">
-                    <div class="loading-spinner"></div>
-                    <p>Încărcăm ultimele știri Bitcoin...</p>
-                </div>
+                <?php
+                // Server-side render first page for SEO
+                if (!function_exists('bitcoinul_ro_collect_public_btc_news')) {
+                    // fallback: simple placeholder
+                    echo '<div class="news-loading"><div class="loading-spinner"></div><p>Încărcăm ultimele știri Bitcoin...</p></div>';
+                } else {
+                    $bundle = bitcoinul_ro_collect_public_btc_news();
+                    $items = isset($bundle['items']) ? array_slice($bundle['items'], 0, 24) : array();
+                    $featuredCount = 0;
+                    foreach ($items as $it) {
+                        // Keep only Bitcoin items (collector already filters, but be safe)
+                        $title = isset($it['title']) ? $it['title'] : '';
+                        $summary = isset($it['summary']) ? $it['summary'] : '';
+                        if (!preg_match('/\bbitcoin\b|\bbtc\b/i', $title . ' ' . $summary)) continue;
+                        $href = isset($it['original_url']) && $it['original_url'] ? $it['original_url'] : (isset($it['url']) ? $it['url'] : '#');
+                        $source = '';
+                        if (!empty($it['source'])) {
+                            if (is_array($it['source'])) { $source = (isset($it['source']['title']) ? $it['source']['title'] : (isset($it['source']['domain']) ? $it['source']['domain'] : '')); }
+                            elseif (is_string($it['source'])) { $source = $it['source']; }
+                        } else {
+                            $source = isset($it['domain']) ? $it['domain'] : 'Bitcoin News';
+                        }
+                        $date = isset($it['published_at']) ? esc_attr($it['published_at']) : '';
+                        // Render simple card
+                        echo '<article class="news-card">';
+                        echo '  <div class="news-image"><div class="news-icon">📰</div></div>';
+                        echo '  <div class="news-content">';
+                        echo '    <span class="news-tag">Bitcoin</span>';
+                        echo '    <h3><a href="' . esc_url($href) . '" target="_blank" rel="nofollow noopener noreferrer">' . esc_html($title) . '</a></h3>';
+                        $text = $summary ? $summary : $title;
+                        echo '    <p>' . esc_html(mb_substr($text, 0, 180)) . '...</p>';
+                        echo '    <div class="news-meta">';
+                        if ($date) echo '      <span class="news-date" data-pub="' . $date . '">Actualizat</span>';
+                        echo '      <span class="news-source">' . esc_html($source) . '</span>';
+                        echo '    </div>';
+                        echo '  </div>';
+                        echo '</article>';
+                    }
+                }
+                ?>
             </div>
-            
+
             <div class="load-more-container">
                 <button id="load-more-news" class="btn-secondary">Încarcă mai multe știri</button>
             </div>
@@ -159,28 +194,27 @@ document.addEventListener('DOMContentLoaded', function() {
             // forțează public=true din proxy și adaugă parametru de busting ca să nu ia cache vechi
             // Removed nocache=1 to allow server-side caching via transient
             // Endpoint public agregat (fără fallback CryptoPanic)
-            const response = await fetch(`${NEWS_PUBLIC}&page=${page}&per_page=24&_=${Date.now()}`);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            const payload = await response.json();
-            // Acceptă atât forma WordPress {success:true,data:{results:[]}}, cât și direct {results:[]}
-            let results = [];
-            if (payload) {
-                if (payload.success === true && payload.data && Array.isArray(payload.data.results)) {
-                    results = payload.data.results; // structură WP standard
-                } else if (payload.success === true && payload.data && Array.isArray(payload.data.results) === false && Array.isArray(payload.data)) {
-                    results = payload.data; // fallback
-                } else if (Array.isArray(payload.results)) {
-                    results = payload.results; // direct
+            const publicResp = await fetch(`${NEWS_PUBLIC}&page=${page}&per_page=24&_=${Date.now()}`);
+
+            let publicResults = [];
+            if (publicResp && publicResp.ok) {
+                const payload = await publicResp.json();
+                if (payload) {
+                    if (payload.success === true && payload.data && Array.isArray(payload.data.results)) {
+                        publicResults = payload.data.results;
+                    } else if (payload.success === true && payload.data && Array.isArray(payload.data.results) === false && Array.isArray(payload.data)) {
+                        publicResults = payload.data;
+                    } else if (Array.isArray(payload.results)) {
+                        publicResults = payload.results;
+                    }
                 }
             }
-            if (!Array.isArray(results) || results.length === 0) {
-                // Fallback UI dacă nu avem rezultate
+
+            if (!publicResults.length) {
                 loadFallbackNews();
                 didFallback = true;
             } else {
-                displayNews(results, page === 1);
+                displayNews(publicResults, page === 1);
             }
         } catch (error) {
             console.error('Error loading news:', error);
@@ -247,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function() {
             newsContainer.innerHTML = '';
             if (featuredContainer) featuredContainer.innerHTML = '';
         }
-        let featuredAdded = 0;
+    let featuredAdded = 0;
         articles.forEach((article) => {
             // Asigură afișarea exclusivă a știrilor Bitcoin
             if (!isBitcoinArticle(article)) return;
@@ -256,10 +290,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const isFeatured = featuredAdded < 3 && clearContainer;
             const newsCard = createNewsCard(article, isFeatured); // Primele 3 (filtrate) sunt featured
             
-            if (isFeatured) {
-                // Adaugă la featured
-                featuredContainer.appendChild(newsCard.cloneNode(true));
-                featuredAdded++;
+            if (isFeatured && featuredContainer) {
+                // Dacă serverul nu a randat featured, doar atunci populăm
+                if (!featuredContainer.children || featuredContainer.children.length < 1) {
+                    featuredContainer.appendChild(newsCard.cloneNode(true));
+                    featuredAdded++;
+                }
             }
             
             newsContainer.appendChild(newsCard);
@@ -390,6 +426,7 @@ document.addEventListener('DOMContentLoaded', function() {
             'bloomberg.com': '💼',
             'reuters.com': '📈',
             'zf.ro': '🇷🇴',
+            'binance.com': '🟡',
             'default': '🔗'
         };
         

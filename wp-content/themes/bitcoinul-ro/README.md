@@ -310,3 +310,27 @@ Această temă este optimizată pentru affiliate marketing legal. Asigură-te c�
 **Dezvoltat cu ❤️ pentru comunitatea Bitcoin din România**
 
 Pentru întrebări și suport tehnic: contact@bitcoinul.ro
+
+## 📐 Schema HowTo rapid (shortcodes)
+
+Poți genera Schema.org HowTo direct din conținut folosind shortcodurile incluse:
+
+Exemplu:
+
+```
+[howto title="Cum să cumperi Bitcoin în România"]
+    [howto_step title="Alege o platformă de încredere"]Verifică licențe, comisioane și reputația.[/howto_step]
+    [howto_step title="Creează cont și finalizează KYC"]Completează datele corect și activează 2FA.[/howto_step]
+    [howto_step title="Depune RON și cumpără BTC"]Folosește spot, evită levierul la început.[/howto_step]
+    [howto_step title="Transferă în portofelul tău"]Notează seed phrase-ul offline, nu îl partaja niciodată.[/howto_step]
+[/howto]
+```
+
+FAQ: 
+
+```
+[faq_list]
+    [faq_item q="Este legal Bitcoin în România?" a="Da, dar respectă reglementările fiscale și declară câștigurile."]
+    [faq_item q="Care e suma minimă?" a="Poți începe de la 50–100 RON pe multe platforme."]
+[/faq_list]
+```

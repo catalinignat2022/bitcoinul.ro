@@ -40,6 +40,9 @@ get_header(); ?>
                     <h1 class="article-title" style="font-size: 2.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; line-height: 1.2;">
                         <?php the_title(); ?>
                     </h1>
+                    <div class="updated-at" style="text-align:center; margin-top:-.5rem; margin-bottom:.5rem; color:#6b7280;">
+                        Actualizat: <?php echo esc_html( get_the_modified_date('F Y') ); ?>
+                    </div>
                     
                     <div class="article-meta" style="display: flex; justify-content: center; align-items: center; gap: 2rem; flex-wrap: wrap; color: var(--text-secondary); margin-bottom: 2rem;">
                         <time datetime="<?php echo get_the_date('c'); ?>" style="display: flex; align-items: center; gap: 0.5rem;">
@@ -64,15 +67,57 @@ get_header(); ?>
                     <?php if (has_post_thumbnail()) : ?>
                         <div class="featured-image" style="margin: 2rem 0; border-radius: 15px; overflow: hidden; box-shadow: var(--shadow-hover);">
                             <?php 
-                            the_post_thumbnail('hero-image', array(
-                                'alt' => get_the_title(),
-                                'loading' => 'eager'
-                            )); 
+                            echo wp_get_attachment_image(
+                                get_post_thumbnail_id(),
+                                'hero-image',
+                                false,
+                                array(
+                                    'alt' => get_the_title(),
+                                    'loading' => 'eager',
+                                    'fetchpriority' => 'high',
+                                    'sizes' => '(min-width: 1024px) 1200px, 100vw'
+                                )
+                            );
                             ?>
                         </div>
                     <?php endif; ?>
                     
                 </header>
+
+                <!-- BreadcrumbList JSON-LD -->
+                <?php
+                $breadcrumb_items = array(
+                    array(
+                        '@type' => 'ListItem',
+                        'position' => 1,
+                        'name' => 'Acasă',
+                        'item' => home_url('/')
+                    )
+                );
+                if (!empty($categories)) {
+                    $breadcrumb_items[] = array(
+                        '@type' => 'ListItem',
+                        'position' => 2,
+                        'name' => $categories[0]->name,
+                        'item' => get_category_link($categories[0]->term_id)
+                    );
+                    $pos = 3;
+                } else {
+                    $pos = 2;
+                }
+                $breadcrumb_items[] = array(
+                    '@type' => 'ListItem',
+                    'position' => $pos,
+                    'name' => get_the_title(),
+                    'item' => get_permalink()
+                );
+                $breadcrumb_schema = array(
+                    '@context' => 'https://schema.org',
+                    '@type' => 'BreadcrumbList',
+                    'itemListElement' => $breadcrumb_items
+                );
+                echo '<script type="application/ld+json">' . wp_json_encode($breadcrumb_schema) . '</script>';
+                ?>
 
                 <!-- Cuprins (Table of Contents) pentru articole lungi -->
                 <div id="table-of-contents" style="background: var(--light-bg); padding: 2rem; border-radius: 15px; margin-bottom: 2rem; border-left: 4px solid var(--bitcoin-orange);">

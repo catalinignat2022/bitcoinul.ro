@@ -232,9 +232,7 @@ window.addEventListener('load', function() {
     "url": "<?php echo home_url(); ?>",
     "logo": "<?php echo get_template_directory_uri(); ?>/assets/logo.png",
     "sameAs": [
-        "https://facebook.com/bitcoinulro",
-        "https://twitter.com/bitcoinulro",
-        "https://t.me/bitcoinulro"
+
     ],
     "address": {
         "@type": "PostalAddress",
