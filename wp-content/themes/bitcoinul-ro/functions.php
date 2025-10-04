@@ -157,9 +157,12 @@ $bitcoinul_ro_faq_items = array();
 
 function bitcoinul_ro_faq_item_shortcode($atts) {
     global $bitcoinul_ro_faq_items;
-    $atts = shortcode_atts(array('q' => '', 'a' => ''), $atts);
-    $q = trim(wp_strip_all_tags($atts['q']));
-    $a = trim(wp_kses_post($atts['a']));
+    // acceptă atât q/a cât și question/answer pentru ergonomie
+    $atts = shortcode_atts(array('q' => '', 'a' => '', 'question' => '', 'answer' => ''), $atts);
+    $q_raw = $atts['q'] ?: $atts['question'];
+    $a_raw = $atts['a'] ?: $atts['answer'];
+    $q = trim(wp_strip_all_tags($q_raw));
+    $a = trim(wp_kses_post($a_raw));
     if ($q && $a) {
         $bitcoinul_ro_faq_items[] = array('q' => $q, 'a' => wp_strip_all_tags($a));
     }
@@ -438,6 +441,20 @@ add_filter('wp_robots', function($robots){
         $robots['max-image-preview'] = 'large';
     }
     return $robots;
+});
+
+// Template specific pentru articolul cu slug-ul 'bitcoin-vs-banii-traditionali-oferta-fixa-21m'
+add_filter('single_template', function($template) {
+    if (is_single()) {
+        $post = get_queried_object();
+        if ($post && isset($post->post_name) && $post->post_name === 'bitcoin-vs-banii-traditionali-oferta-fixa-21m') {
+            $custom = locate_template('bitcoin-vs-banii-traditionali-oferta-fixa-21m.php');
+            if ($custom) {
+                return $custom;
+            }
+        }
+    }
+    return $template;
 });
 
 /**
@@ -884,7 +901,7 @@ function bitcoinul_ro_create_pages() {
         ),
         'despre-noi' => array(
             'title' => 'Despre noi',
-            'template' => 'page.php'
+            'template' => 'page-despre-noi.php'
         ),
         'contact' => array(
             'title' => 'Contact',
@@ -1190,6 +1207,432 @@ function bitcoinul_ro_seed_about_contact_once(){
     set_transient($k, 1, 12 * HOUR_IN_SECONDS);
 }
 add_action('init', 'bitcoinul_ro_seed_about_contact_once', 44);
+
+// Leagă template-ul personalizat pentru /despre-noi/ dacă pagina există deja
+add_action('init', function(){
+    $k = 'bitcoinul_ro_about_template_bound_v1';
+    if (get_transient($k)) return;
+    $page = get_page_by_path('despre-noi');
+    if ($page && $page->post_type === 'page') {
+        $tpl = get_post_meta($page->ID, '_wp_page_template', true);
+        if ($tpl !== 'page-despre-noi.php') {
+            update_post_meta($page->ID, '_wp_page_template', 'page-despre-noi.php');
+        }
+        if ($page->post_status !== 'publish') {
+            wp_update_post(array('ID' => $page->ID, 'post_status' => 'publish'));
+        }
+    }
+    set_transient($k, 1, 12 * HOUR_IN_SECONDS);
+}, 45);
+
+/**
+ * Seed: publică un articol „Bitcoin vs. banii tradiționali: de ce contează oferta fixă de 21M” (o singură dată)
+ * - Creează post publicat cu ~1000 de cuvinte, bine structurat și linkuri interne
+ * - Sideload imagine featured (Unsplash, licență permisivă) în Media Library și setează featured image
+ */
+function bitcoinul_ro_seed_article_21m_once(){
+        $flag = 'bitcoinul_ro_seed_post_bitcoin_vs_fiat_21m_v1';
+        if (get_option($flag)) return;
+
+        // Evită dublurile după slug
+        $slug = 'bitcoin-vs-banii-traditionali-oferta-fixa-21m';
+        $existing = get_page_by_path($slug, OBJECT, 'post');
+        if ($existing) { update_option($flag, 1); return; }
+
+        // Asigură categorii utile (folosește wp_insert_term care e disponibil pe frontend)
+        if (!term_exists('Analiză', 'category')) { wp_insert_term('Analiză', 'category'); }
+        if (!term_exists('Educație', 'category')) { wp_insert_term('Educație', 'category'); }
+        $cat_ids = array();
+        $t = get_term_by('name', 'Analiză', 'category'); if ($t) $cat_ids[] = (int)$t->term_id;
+        $t = get_term_by('name', 'Educație', 'category'); if ($t) $cat_ids[] = (int)$t->term_id;
+
+        $title = 'Bitcoin vs. banii tradiționali: de ce contează oferta fixă de 21M';
+        $excerpt = 'Comparație clară între Bitcoin și banii tradiționali: oferta fixă de 21M, halving, raritate programatică, transparență și impactul asupra inflației și comportamentului investitorilor.';
+
+        ob_start(); ?>
+<p><em>[actualizat]</em></p>
+<p><strong>Bitcoin</strong> este primul activ monetar digital cu o <strong>ofertă fixă</strong>, plafonată la <strong>21 de milioane</strong> de unități. Spre deosebire de <em>banii tradiționali</em> (monede fiat precum RON, EUR, USD), a căror ofertă poate fi ajustată de băncile centrale, Bitcoin are o <strong>politică monetară programatică</strong>, verificabilă public și inalterabilă fără consensul rețelei.</p>
+
+<h2>Oferta fixă de 21M: mecanismul care creează raritate programată</h2>
+<p>Protocolul Bitcoin stabilește o <strong>rată de emisie descrescătoare</strong> prin evenimentul numit <strong>halving</strong>, care are loc aproximativ la fiecare patru ani. Recompensa pentru minerii care securizează rețeaua scade la jumătate, reducând astfel emisia de monedă nouă. În timp, această rată tinde către zero, iar oferta totală convergă spre 21M. Rezultatul este o <strong>raritate predictibilă</strong>, diferită fundamental de expansiunea monetară discreționară din sistemul fiat.</p>
+
+<h2>Bitcoin vs. monede fiat: diferențe structurale</h2>
+<h3>1) Politica monetară</h3>
+<ul>
+    <li><strong>Bitcoin</strong>: regulă fixă (21M), emisie descrescătoare, cod deschis, verificabil de oricine.</li>
+    <li><strong>Fiat</strong>: politică variabilă, decizii de comitete, instrumente neconvenționale (QE/QT), obiective de inflație.</li>
+    <li>Consecință: Bitcoin oferă <strong>previzibilitate</strong> și <strong>neutraliate</strong>; fiat oferă <strong>elasticitate</strong> macroeconomică.</li>
+    </ul>
+<h3>2) Inflatie și putere de cumpărare</h3>
+<ul>
+    <li><strong>Bitcoin</strong>: inflație <em>programatică</em>, în scădere în timp; protecție la diluare pe termen lung dacă adopția continuă.</li>
+    <li><strong>Fiat</strong>: inflație țintită (de obicei ~2%), dar episoade cu deviații majore; masa monetară (M2) poate crește accelerat în crize.</li>
+    <li>Consecință: pentru economisire pe termen lung, un activ cu ofertă fixă poate <strong>conserva mai bine</strong> puterea de cumpărare, cu condiția unei cereri sustenabile.</li>
+</ul>
+
+<h3>3) Descentralizare și cenzură</h3>
+<ul>
+    <li><strong>Bitcoin</strong>: rețea deschisă, fără permisiuni, rezistentă la cenzură; reguli egale pentru toți.</li>
+    <li><strong>Fiat</strong>: intermediari și reglementări; plăți reversibile/înghețabile la nevoie; avantaje de protecție consumator, dar și potențial de cenzură.</li>
+</ul>
+
+<h3>4) Verificabilitate și transparență</h3>
+<ul>
+    <li><strong>Bitcoin</strong>: registru public (blockchain), verificabil chiar cu un <a href="/securitate-portofele-si-custodie/">nod propriu</a>.</li>
+    <li><strong>Fiat</strong>: agregate monetare, rapoarte, transparență instituțională variabilă; nu oricine poate „verifica” emisia la nivel de tranzacție.</li>
+</ul>
+
+<h2>De ce contează „21 de milioane” pentru economisire și investiții</h2>
+<p>O ofertă fixă <strong>disciplinează comportamentul investitorilor</strong>: nu te poți baza pe diluare pentru a accelera creșterea nominală. Valorizarea depinde de cerere, adopție și utilitate. Pentru cei care pun accent pe <em>protecția pe termen lung</em>, lipsa diluării structurale este esențială. De aceea, multe strategii includ <strong>DCA</strong> (cumpărare periodică cu sume fixe), ceea ce reduce impactul volatilității. Vezi și <a href="/strategii-de-investitii-in-bitcoin/">strategiile de investiții</a>.</p>
+
+<h2>Volatilitatea Bitcoin vs. riscul real</h2>
+<p>În orizonturi scurte, Bitcoin este volatil. Însă, pe orizonturi lungi, constrângerile ofertei și efectele de rețea au susținut trendul adopției. Riscul real este <strong>comportamental</strong>: cumpărare sus, vânzare jos, levier nepotrivit. O abordare disciplinată (DCA, fără levier, auto‑custodie pentru sume relevante) reduce erorile. Începe responsabil: <a href="/exchange-uri/">alege un exchange verificat</a>, activează 2FA și mută BTC în <a href="/securitate-portofele-si-custodie/">portofelul tău</a> când ești pregătit.</p>
+
+<h2>Rol macro: activ neutru vs. monedă de cont</h2>
+<p>Astăzi, Bitcoin este folosit mai ales ca <strong>activ de tezaurizare</strong> (store of value) și, în unele contexte, ca instrument de transfer rapid (Lightning). Monedele fiat rămân <strong>monede de cont</strong> (unitate de măsură) pentru majoritatea prețurilor și salariilor. În timp, e posibilă o <strong>coexistență</strong>: fiat pentru fluxuri curente, Bitcoin ca activ de rezervă pentru diversificare și protecție la diluare.</p>
+
+<h2>Întrebări frecvente</h2>
+[faq_list title="FAQ: Bitcoin vs. banii tradiționali"]
+[faq_item q="De ce 21 de milioane și nu alt număr?" a="Este o decizie inițială de design pentru a crea raritate programată. Schimbarea ar necesita consens larg al rețelei și ar încălca așteptările de imutabilitate."]
+[faq_item q="Dacă oferta e fixă, nu devine Bitcoin deflaționar?" a="Emisia scade în timp; în funcție de cerere, prețul poate crește. Deflația problematică implică colapsul cererii; Bitcoin are utilități noi (transfer global, auto‑custodie) care pot susține adopția."]
+[faq_item q="Ce rol are halving-ul?" a="Reduce emisia de monedă nouă la jumătate aproximativ o dată la patru ani, crescând raritatea relativă și disciplinând dinamica pieței."]
+[/faq_list]
+
+<h2>Pași practici pentru începători</h2>
+<ol>
+    <li>Învață bazele: citește <a href="/ghid-bitcoin-incepatori/">Ghidul pentru începători</a>.</li>
+    <li>Deschide cont pe un <a href="/exchange-uri/">exchange verificat</a> și finalizează KYC.</li>
+    <li>Cumpără periodic sume mici (DCA), fără levier.</li>
+    <li>Mută sumele relevante în <a href="/securitate-portofele-si-custodie/">portofel hardware</a> și notează seed phrase-ul offline.</li>
+    <li>Ține evidența pentru <a href="/fiscalitate-declarare-castiguri-crypto/">fiscalitate</a> (Declarația Unică).</li>
+ </ol>
+
+<p><em>Disclaimer: Acest material are scop educațional. Nu este recomandare de investiții sau consultanță fiscală.</em></p>
+<?php $content = ob_get_clean();
+
+        // Creează postarea
+        $post_id = wp_insert_post(array(
+                'post_title'   => $title,
+                'post_name'    => $slug,
+                'post_status'  => 'publish',
+                'post_type'    => 'post',
+                'post_content' => $content,
+                'post_excerpt' => $excerpt,
+                'post_author'  => 1,
+                'comment_status' => 'open',
+                'tags_input'   => array('bitcoin','politică monetară','inflație','halving','educație'),
+        ));
+
+        if (!is_wp_error($post_id) && $post_id) {
+                if (!empty($cat_ids)) {
+                        wp_set_post_categories($post_id, $cat_ids);
+                }
+                // Sideload imagine featured (Unsplash random tematic) – fallback dacă eșuează
+                try {
+                    $img_url = 'https://source.unsplash.com/1200x630/?bitcoin,banknotes';
+                    if (!function_exists('media_sideload_image')) require_once ABSPATH . 'wp-admin/includes/media.php';
+                    if (!function_exists('download_url')) require_once ABSPATH . 'wp-admin/includes/file.php';
+                    if (!function_exists('wp_read_image_metadata')) require_once ABSPATH . 'wp-admin/includes/image.php';
+                    $attach_id = media_sideload_image($img_url, $post_id, $title, 'id');
+                    if (!is_wp_error($attach_id) && $attach_id) {
+                        set_post_thumbnail($post_id, (int)$attach_id);
+                    }
+                } catch (Throwable $e) {
+                    // Ignoră imaginea dacă eșuează pentru a evita întreruperea site-ului
+                }
+        }
+
+        update_option($flag, 1);
+}
+add_action('init', 'bitcoinul_ro_seed_article_21m_once', 46);
+
+/**
+ * Seed: Creează o postare SEO despre Bitcoin (o singură dată)
+ * - Articol lung, structurat, doar despre Bitcoin
+ * - Include linkuri interne, HowTo/FAQ shortcodes și tabel platforme
+ */
+function bitcoinul_ro_seed_seo_bitcoin_article_once() {
+        if (!function_exists('wp_insert_post')) return;
+        $slug = 'bitcoin-romania-ghid-complet-2025';
+
+        // Evită duplicarea
+        $existing = get_page_by_path($slug, OBJECT, array('post'));
+        if ($existing) return;
+
+        // Conținut articol (HTML + shortcodes)
+        $content = <<<HTML
+<p><em>[actualizat prefix="Actualizat: "]</em></p>
+<p><strong>Bitcoin</strong> este cea mai solidă formă de bani nativi internetului, construită pe o rețea deschisă, fără permisiuni. În România, interesul pentru Bitcoin a crescut constant odată cu maturizarea ecosistemului și apariția unor <a href="/exchange-uri/">exchange‑uri verificate</a>, metode simple de cumpărare în RON și o comunitate tot mai educată.</p>
+
+<h2>Ce este Bitcoin, pe scurt</h2>
+<p>Bitcoin este o rețea descentralizată care permite transferul de valoare între participanți, fără intermediar. Unitatea sa de cont, <strong>BTC</strong>, are ofertă limitată la 21 de milioane. Protocolul este open‑source, iar validarea tranzacțiilor este realizată de o rețea globală de noduri și mineri.</p>
+
+<h2>De ce contează: proprietăți cheie</h2>
+<ul>
+    <li><strong>Raritate programată:</strong> ofertă maximă fixă (21M), emisă conform unui program descrescător (halving).</li>
+    <li><strong>Rezistență la cenzură:</strong> tranzacții globale, fără permisiuni.</li>
+    <li><strong>Auto‑custodie:</strong> poți deține și transfera BTC fără intermediar, prin cheile tale private.</li>
+    <li><strong>Transparență:</strong> registru public (blockchain) verificabil de oricine.</li>
+    <li><strong>Portabilitate digitală:</strong> valori mari se pot muta la cost marginal mic.</li>
+    <li><strong>Divizibilitate:</strong> până la 1 satoshi (0.00000001 BTC).</li>
+    <li><strong>Interoperabilitate:</strong> mii de servicii și aplicații, de la platforme de schimb la portofele hardware.</li>
+    <li><strong>Programabilitate:</strong> plăți automate, canale Lightning pentru micro‑plăți.</li>
+    <li><strong>Neutralitate:</strong> protocol deschis, reguli egale pentru toți participanții.</li>
+    <li><strong>Imutabilitate:</strong> tranzacțiile confirmate sunt, practic, ireversibile.</li>
+    <li><strong>Descentralizare:</strong> nu există punct unic de control sau „buton de oprit”.</li>
+    <li><strong>Rețea antifragilă:</strong> devine mai robustă pe măsură ce este folosită și testată.</li>
+</ul>
+
+<h2>Cum începi în România: pași practici</h2>
+<p>Vrei prima expunere? Începe simplu și responsabil:</p>
+<ol>
+    <li>Deschide cont pe un <a href="/exchange-uri/">exchange verificat</a> și finalizează KYC.</li>
+    <li>Depune RON (card/transfer) și cumpără BTC pe <strong>spot</strong>.</li>
+    <li>Activează <strong>2FA</strong> și mută BTC într‑un <a href="/securitate-portofele-si-custodie/">portofel sigur</a> când ești pregătit.</li>
+    <li>Ține evidența tranzacțiilor pentru <a href="/fiscalitate-declarare-castiguri-crypto/">fiscalitate</a>.</li>
+</ol>
+
+[howto title="Cum să cumperi primul tău Bitcoin (în România)" description="Pașii simpli pentru o achiziție responsabilă: de la cont până la custodie proprie."]
+    [howto_step title="Alege un exchange verificat" text="Compară comisioane, metode de depunere și reputație. Vezi /exchange-uri/ pentru recomandări."]
+    [howto_step title="Creează cont și finalizează KYC" text="Completează datele solicitate conform reglementărilor KYC/AML."]
+    [howto_step title="Depune RON" text="Prin card sau transfer bancar/SEPA; verifică taxele asociate."]
+    [howto_step title="Cumpără BTC pe spot" text="Folosește un ordin simplu de market sau limit. Evită derivatele dacă ești începător."]
+    [howto_step title="Asigură‑ți BTC" text="Activează 2FA și, ideal, mută BTC într‑un portofel hardware sau software sub controlul tău."]
+[/howto]
+
+<h2>Comparație rapidă platforme</h2>
+[platforms_table]
+
+<h2>Strategii pentru începători: DCA și disciplină</h2>
+<p><strong>DCA (Dollar‑Cost Averaging)</strong> înseamnă să cumperi periodic aceeași sumă în RON, indiferent de preț. Scopul: să reduci impactul emoțiilor și al volatilității. Adaugă reguli simple de <em>risk management</em> și un orizont de timp realist (4+ ani).</p>
+<ul>
+    <li>Definește o sumă lunară pe care ți‑o permiți fără stres.</li>
+    <li>Automatizează achizițiile unde este posibil.</li>
+    <li>Revizuiește anual obiectivele; nu reacționa impulsiv la scăderi.</li>
+</ul>
+
+<h2>Securitate: nu cheile tale, nu monedele tale</h2>
+<p>Auto‑custodia este esențială pentru deținători pe termen lung. Învață <a href="/securitate-portofele-si-custodie/">bunele practici</a> și folosește hardware wallet pentru sume semnificative.</p>
+<ul>
+    <li>Notează <em>seed phrase</em>-ul pe hârtie/placă, păstrat offline.</li>
+    <li>Activează 2FA pe conturile de exchange.</li>
+    <li>Verifică adresele la transfer (și pe ecranul hardware wallet‑ului).</li>
+    <li>Nu împărtăși niciodată fraza de recuperare.</li>
+    <li>Ia în calcul multisig pentru sume mari.</li>
+    <li>Ferește-te de scheme “prea bune ca să fie adevărate”.</li>
+    <li>Folosește parole lungi, unice, cu manager de parole.</li>
+</ul>
+
+<h2>Fiscalitate în România (informativ)</h2>
+<p>Câștigurile din tranzacții crypto se declară în <strong>Declarația Unică</strong>. Ține evidența tranzacțiilor, folosește exporturile din exchange și consultă <a href="/fiscalitate-declarare-castiguri-crypto/">ghidul fiscal</a>. Acest articol NU reprezintă consultanță fiscală.</p>
+
+<h2>Greșeli frecvente</h2>
+<ul>
+    <li>Levier/derivate fără experiență.</li>
+    <li>Vânzare emoțională la scăderi temporare.</li>
+    <li>Neglijarea securității seed phrase‑ului.</li>
+    <li>Tranzacționare excesivă din plictiseală.</li>
+    <li>“All‑in” pe termen scurt; lipsa unui plan.</li>
+    <li>Cumpărare doar când e pe prime‑time; uită de disciplină când piața scade.</li>
+    <li>Ignorarea costurilor: comisioane, spread, taxe.</li>
+    <li>Ținerea BTC pe exchange pe termen lung, fără motiv.</li>
+    <li>Interacțiunea cu linkuri suspecte/phishing.
+    </li>
+    <li>Amânarea educației: citește și verifică sursele.</li>
+    <li>Neglijarea back‑up‑ului pentru portofel.</li>
+    <li>Ignorarea planului fiscal până în ultima clipă.</li>
+    <li>Speranța în “îmbogățire rapidă” în loc de disciplină.</li>
+    <li>Confundarea Bitcoin cu “orice alt token” – sunt lucruri diferite.</li>
+    <li>Uitarea faptului că piața este ciclică și volatilă.</li>
+</ul>
+
+<h2>Întrebări frecvente</h2>
+[faq_list title="Întrebări frecvente despre Bitcoin în România"]
+    [faq_item question="Este Bitcoin legal în România?" answer="Da, deținerea și tranzacționarea sunt legale. Respectă reglementările KYC/AML ale platformelor și obligațiile fiscale."]
+    [faq_item question="Cât de sigur este Bitcoin?" answer="Protocolul Bitcoin este robust și verificat de 15+ ani. Riscurile apar mai ales la interfețe (exchange-uri, portofele) și la comportamentul utilizatorului. Respectă bunele practici de securitate."]
+    [faq_item question="Cât să investesc?" answer="Sume pe care ți le permiți să le ții pe termen lung fără stres. Pentru mulți începători, DCA cu sume mici este o abordare prudentă."]
+    [faq_item question="Ar trebui să mut BTC din exchange?" answer="Pentru deținere pe termen lung, auto‑custodia este recomandată. Folosește un hardware wallet și păstrează seed phrase‑ul în siguranță."]
+    [faq_item question="De unde încep?" answer="Compară platformele la /exchange-uri/, citește ghidul /ghid-bitcoin-incepatori/ și asigură-ți portofelul /securitate-portofele-si-custodie/."]
+[/faq_list]
+
+<h2>Resurse utile pe Bitcoinul.ro</h2>
+<ul>
+    <li><a href="/ghid-bitcoin-incepatori/">Ghid Bitcoin pentru începători</a></li>
+    <li><a href="/strategii-de-investitii-in-bitcoin/">Strategii de investiții</a></li>
+    <li><a href="/stiri/">Știri Bitcoin în limba română</a></li>
+    <li><a href="/exchange-uri/">Compară exchange-uri recomandate</a></li>
+    <li><a href="/cum-sa-cumperi-bitcoin-in-romania/">Cum să cumperi Bitcoin (pași și comisioane)</a></li>
+    <li><a href="/securitate-portofele-si-custodie/">Securitate și auto‑custodie</a></li>
+    <li><a href="/fiscalitate-declarare-castiguri-crypto/">Fiscalitate (informativ)</a></li>
+    <li><a href="/#newsletter">Abonează‑te la newsletter</a> pentru ghiduri și actualizări.</li>
+    <li><a href="/despre-noi/">Despre Bitcoinul.ro</a></li>
+    <li><a href="/contact/">Contact</a></li>
+    <li><a href="/politica-confidentialitate/">Politica de confidențialitate</a></li>
+    <li><a href="/termeni-si-conditii/">Termeni și condiții</a></li>
+    <li><a href="/disclaimer-investitii/">Disclaimer investiții</a></li>
+    <li><a href="/ghiduri/">Toate ghidurile</a></li>
+    <li><a href="/stiri/">Știrile de azi</a></li>
+    <li><a href="/exchange-uri/">Lista completă de platforme</a></li>
+</ul>
+
+<p><em>Disclaimer: Material cu scop educațional. Nu reprezintă recomandare de investiții. Investițiile în active volatile implică riscuri. Nu investi mai mult decât îți permiți să pierzi.</em></p>
+HTML;
+
+        $postarr = array(
+                'post_title'   => 'Bitcoin România 2025: Ghid complet pentru începători și investitori (DCA, securitate, taxe)',
+                'post_name'    => $slug,
+                'post_status'  => 'publish',
+                'post_type'    => 'post',
+                'post_content' => $content,
+                'post_excerpt' => 'Bitcoin România: ghid complet 2025 despre BTC — cum începi responsabil, platforme verificate, DCA, securitate, fiscalitate și greșeli de evitat.',
+                'comment_status' => 'closed',
+        );
+
+        $post_id = wp_insert_post($postarr);
+        if (!is_wp_error($post_id)) {
+                // Etichete utile
+                wp_set_post_tags($post_id, array('bitcoin','btc','dca','securitate','fiscalitate'), true);
+                // (Opțional) categorie implicită "Bitcoin" – o creăm dacă lipsește
+                $cat_name = 'Bitcoin';
+                $term = get_term_by('name', $cat_name, 'category');
+                if (!$term) {
+                        $new_term = wp_insert_term($cat_name, 'category');
+                        if (!is_wp_error($new_term) && isset($new_term['term_id'])) {
+                                $term = get_term($new_term['term_id']);
+                        }
+                }
+                if ($term && !is_wp_error($term)) {
+                        wp_set_post_categories($post_id, array($term->term_id), true);
+                }
+        }
+}
+add_action('init', 'bitcoinul_ro_seed_seo_bitcoin_article_once', 46);
+
+/**
+ * Seed: Creează un articol diferit (mituri demontate) – SEO & creativ, doar despre Bitcoin
+ * Publicat o singură dată; apare în listarea de postări.
+ */
+function bitcoinul_ro_seed_bitcoin_myths_article_once() {
+        if (!function_exists('wp_insert_post')) return;
+        $slug = 'mituri-bitcoin-romania-2025';
+        $existing = get_page_by_path($slug, OBJECT, array('post'));
+        if ($existing) return;
+
+        $content = <<<HTML
+<p><em>[actualizat prefix="Actualizat: "]</em></p>
+<p><strong>Miturile despre Bitcoin</strong> apar pentru că tehnologia este nouă, contra‑intuitivă și adesea prezentată superficial. În România, vedem aceleași idei reciclate: “Bitcoin e doar pentru speculă”, “e prea târziu”, “consumă prea multă energie”, “interzice statul mâine” ș.a.m.d. Hai să le demontăm, pe rând, cu bun‑simț și exemple practice.</p>
+
+<h2>De ce apar mituri despre Bitcoin</h2>
+<ul>
+    <li><strong>Noutate:</strong> Bitcoin schimbă felul în care ne raportăm la bani digitali – apar rezistențe firești.</li>
+    <li><strong>Informație fragmentată:</strong> știri de suprafață, fără context tehnic ori economic.</li>
+    <li><strong>Interese divergente:</strong> de la click‑bait până la confuzii între Bitcoin și alte proiecte.</li>
+</ul>
+
+<h2>Mituri populare vs realitate (pe scurt)</h2>
+<table style="width:100%;border-collapse:separate;border-spacing:0 10px;">
+    <thead>
+        <tr><th style="text-align:left">Mit</th><th style="text-align:left">Realitate</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>“Bitcoin este doar pentru speculă.”</td><td>BTC este activ cu ofertă fixă, deținut global, folosit ca rezervă și pentru plăți (on‑chain/Lightning).</td></tr>
+        <tr><td>“E prea târziu să cumperi.”</td><td>Strategiile disciplinate (DCA) elimină timing‑ul; piața rămâne ciclică.</td></tr>
+        <tr><td>“Bitcoin este anonim, e pentru infractori.”</td><td>Blockchainul este public; analiza tranzacțiilor este uzuală. Majoritatea folosirilor sunt legitime.</td></tr>
+        <tr><td>“Statul îl va interzice ușor.”</td><td>Rețea deschisă, globală, fără punct unic de control; reglementarea există, interzicerea generală e improbabilă.</td></tr>
+        <tr><td>“Consumă prea multă energie.”</td><td>PoW securizează rețeaua; consumul urmărește prețul și eficiența; apar integrații cu energie curată/excedentară.</td></tr>
+        <tr><td>“Doar cei bogați câștigă.”</td><td>BTC e divizibil la 1 sat și accesibil cu sume mici; disciplina bate sumele mari prost gestionate.</td></tr>
+        <tr><td>“Îl pierzi ușor.”</td><td>Cu bune practici (seed offline, 2FA, hardware wallet), riscul scade semnificativ.</td></tr>
+    </tbody>
+    </table>
+
+<h2>Mituri demontate – întrebări și răspunsuri</h2>
+[faq_list title="Mituri despre Bitcoin în România: întrebări frecvente (2025)"]
+    [faq_item question="Bitcoin este o schemă rapidă de îmbogățire?" answer="Nu. Este o rețea monetară deschisă, cu volatilitate. Fără strategie și disciplină, riscul perceput crește. Pentru mulți, DCA și orizontul lung reduc emoțiile."]
+    [faq_item question="Mai are rost în 2025?" answer="Da, dacă abordezi expunerea responsabil: sume potrivite, DCA, securitate și înțelegerea riscurilor. Prețul este al pieței – niciodată garanții."]
+    [faq_item question="Se poate confisca ușor Bitcoin?" answer="Cheile private deținute corect (auto‑custodie) îți conferă controlul. Respectă bunele practici de securitate și confidențialitate."]
+    [faq_item question="Bitcoin este anonim?" answer="Nu. E pseudonim. Registrul este public. Respectă legea, fiscalitatea și folosește portofele corect configurate."]
+    [faq_item question="Este prea complicat?" answer="Începe cu pași mici: cont pe exchange verificat, DCA modest, apoi învață auto‑custodia. Avem ghiduri și checklist‑uri clare pe site."]
+    [faq_item question="Este periculos să ții BTC pe exchange?" answer="Pe termen lung – da, este riscant. Pentru deținere serioasă, învață auto‑custodia cu hardware wallet și back‑up corect al seed‑ului."]
+[/faq_list]
+
+<h2>Cum filtrezi informația proastă</h2>
+<ul>
+    <li><strong>Verifică sursa:</strong> preferă documentația primară și explicații tehnice.</li>
+    <li><strong>Nu confunda Bitcoin cu “tot ce e cripto”:</strong> obiective și modele diferite.</li>
+    <li><strong>Ferește‑te de promisiuni garantate:</strong> nu există randamente fără risc.</li>
+    <li><strong>Testează pe sume mici:</strong> învață operațiunile înainte de alocări mai mari.</li>
+    <li><strong>Folosește liste și checklist‑uri:</strong> reduc erorile umane.</li>
+    <li><strong>Urmărește evoluții reale:</strong> Lightning, custodie îmbunătățită, integrare cu energie curată.</li>
+    <li><strong>Respectă legea:</strong> KYC/AML pe platforme și <a href="/fiscalitate-declarare-castiguri-crypto/">obligațiile fiscale</a>.</li>
+    <li><strong>Protejează‑ți confidențialitatea digitală:</strong> 2FA, manager de parole, evită phishing-ul.</li>
+    <li><strong>Separă opinia de fapt:</strong> notează ceea ce este dovedit vs. speculație.</li>
+    <li><strong>Recunoaște bias‑urile personale:</strong> caută surse contradictorii pentru echilibru.</li>
+    <li><strong>Revizuiește periodic:</strong> cunoștințele se învechesc; păstrează o mentalitate de învățare.</li>
+    <li><strong>Notează întrebările:</strong> dacă persistă nelămuriri, cere clarificări în comunitate.</li>
+    <li><strong>Ignoră “zgomotul”:</strong> notificările și știrile minute‑la‑minut distorsionează deciziile.</li>
+    <li><strong>Respectă un plan:</strong> documentat, scris, cu reguli clare de risc.</li>
+    <li><strong>Construiește obiceiuri:</strong> constanța bate inspirația de moment.</li>
+    <li><strong>Educație continuă:</strong> vezi <a href="/ghid-bitcoin-incepatori/">ghidul de bază</a> și <a href="/strategii-de-investitii-in-bitcoin/">strategiile</a>.</li>
+    <li><strong>Nu amâna securitatea:</strong> vezi <a href="/securitate-portofele-si-custodie/">securitate și custodie</a>.</li>
+    <li><strong>Compară platforme:</strong> <a href="/exchange-uri/">exchange‑uri verificate</a> din România.</li>
+    <li><strong>Rămâi informat:</strong> <a href="/stiri/">Știri Bitcoin</a> în limba română.</li>
+    <li><strong>Fii răbdător:</strong> piața este ciclică; disciplina învinge emoția.</li>
+    <li><strong>Țintește clar:</strong> de ce vrei expunere la BTC? În funcție de răspuns, stabilește regulile.</li>
+    <li><strong>Acționează incremental:</strong> învață, aplică, măsoară, ajustează.</li>
+    <li><strong>Folosește DCA dacă e potrivit pentru tine:</strong> automatizare și simplitate.</li>
+    <li><strong>Nu te împrumuta pentru investiții speculative:</strong> riscuri inutile.</li>
+    <li><strong>Păstrează perspective multiple:</strong> tehnice, economice, de securitate.</li>
+    <li><strong>Nu te compara cu alții:</strong> gestionează‑ți propriul risc.</li>
+    <li><strong>Ai un “plan B”:</strong> back‑up, contingente, suport.
+    </li>
+</ul>
+
+<h2>Resurse utile pe Bitcoinul.ro</h2>
+<ul>
+    <li><a href="/exchange-uri/">Comparație exchange‑uri Bitcoin</a></li>
+    <li><a href="/ghid-bitcoin-incepatori/">Ghid pentru începători</a></li>
+    <li><a href="/strategii-de-investitii-in-bitcoin/">Strategii de investiții</a></li>
+    <li><a href="/securitate-portofele-si-custodie/">Securitate și custodie</a></li>
+    <li><a href="/fiscalitate-declarare-castiguri-crypto/">Fiscalitate (informativ)</a></li>
+    <li><a href="/stiri/">Știri Bitcoin România</a></li>
+    <li><a href="/#newsletter">Abonează‑te la newsletter</a> pentru ghiduri și actualizări.</li>
+    <li><a href="/despre-noi/">Despre proiect</a> și <a href="/contact/">Contact</a></li>
+    <li><a href="/ghiduri/">Toate ghidurile</a></li>
+    <li><a href="/">Acasă</a></li>
+    </ul>
+
+<p><em>Disclaimer: Articol educațional. Nu reprezintă recomandare de investiții. Volatilitatea este ridicată; gestionează riscul responsabil.</em></p>
+HTML;
+
+        $postarr = array(
+                'post_title'   => 'Mituri despre Bitcoin în România (2025): demontate cu exemple practice',
+                'post_name'    => $slug,
+                'post_status'  => 'publish',
+                'post_type'    => 'post',
+                'post_content' => $content,
+                'post_excerpt' => 'Mituri Bitcoin în România, explicate corect: energie, legalitate, “e prea târziu”, auto‑custodie, disciplină (DCA) și bune practici. Articol educațional, fără hype.',
+                'comment_status' => 'closed',
+        );
+
+        $post_id = wp_insert_post($postarr);
+        if (!is_wp_error($post_id)) {
+                // Tag-uri tematice
+                wp_set_post_tags($post_id, array('bitcoin','mituri','educatie','romania','dca','securitate'), true);
+                // Categorii: Analiză (creăm dacă lipsește)
+                $cat_name = 'Analiză';
+                $term = get_term_by('name', $cat_name, 'category');
+                if (!$term) {
+                        $new_term = wp_insert_term($cat_name, 'category');
+                        if (!is_wp_error($new_term) && isset($new_term['term_id'])) {
+                                $term = get_term($new_term['term_id']);
+                        }
+                }
+                if ($term && !is_wp_error($term)) {
+                        wp_set_post_categories($post_id, array($term->term_id), true);
+                }
+        }
+}
+add_action('init', 'bitcoinul_ro_seed_bitcoin_myths_article_once', 47);
 
 // Ensure primary menu conține Despre/Contact (o singură dată pe 12h)
 add_action('init', function(){
@@ -2619,6 +3062,25 @@ function bitcoinul_ro_output_xml($xml) {
     exit;
 }
 
+// Disable WordPress core sitemap to avoid duplication (/wp-sitemap.xml)
+add_filter('wp_sitemaps_enabled', '__return_false');
+
+// Simple transient cache for sitemap parts (15 min)
+function bitcoinul_ro_get_sitemap_cache_key($type = 'index'){
+    $t = $type ?: 'index';
+    return 'btc_smap_' . sanitize_key($t);
+}
+function bitcoinul_ro_sitemap_get_cached($type = 'index'){
+    return get_transient(bitcoinul_ro_get_sitemap_cache_key($type));
+}
+function bitcoinul_ro_sitemap_set_cache($type, $xml){
+    set_transient(bitcoinul_ro_get_sitemap_cache_key($type), $xml, 15 * MINUTE_IN_SECONDS);
+}
+function bitcoinul_ro_sitemap_flush_cache(){
+    $parts = array('index','pages','posts','exchanges','taxonomies');
+    foreach ($parts as $p) delete_transient(bitcoinul_ro_get_sitemap_cache_key($p));
+}
+
 // Build URL node with optional image
 function bitcoinul_ro_build_url_node($loc, $lastmod = '', $changefreq = '', $priority = '', $image_url = '', $image_title = '') {
     $xmlns_image = '';
@@ -2638,7 +3100,9 @@ function bitcoinul_ro_build_url_node($loc, $lastmod = '', $changefreq = '', $pri
 
 // Generate sitemap index
 function bitcoinul_ro_generate_sitemap_index() {
-    $home = home_url('/');
+    if ($cached = bitcoinul_ro_sitemap_get_cached('index')) {
+        bitcoinul_ro_output_xml($cached);
+    }
     $parts = array('pages','posts','exchanges','taxonomies');
     $xml  = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
     $xml .= "<sitemapindex xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n";
@@ -2650,11 +3114,15 @@ function bitcoinul_ro_generate_sitemap_index() {
         $xml .= "  </sitemap>\n";
     }
     $xml .= "</sitemapindex>\n";
+    bitcoinul_ro_sitemap_set_cache('index', $xml);
     bitcoinul_ro_output_xml($xml);
 }
 
 // Generate pages sitemap (includes homepage and key pages first)
 function bitcoinul_ro_generate_sitemap_pages() {
+    if ($cached = bitcoinul_ro_sitemap_get_cached('pages')) {
+        bitcoinul_ro_output_xml($cached);
+    }
     bitcoinul_ro_custom_post_types(); // ensure CPTs are registered
     $home = home_url('/');
 
@@ -2714,11 +3182,15 @@ function bitcoinul_ro_generate_sitemap_pages() {
         $xml .= bitcoinul_ro_build_url_node($u['loc'], $u['lastmod'], $u['changefreq'], $u['priority'], isset($u['image']) ? $u['image'] : '', isset($u['image_title']) ? $u['image_title'] : '');
     }
     $xml .= "</urlset>\n";
+    bitcoinul_ro_sitemap_set_cache('pages', $xml);
     bitcoinul_ro_output_xml($xml);
 }
 
 // Generate exchanges sitemap (CPT 'exchange')
 function bitcoinul_ro_generate_sitemap_exchanges() {
+    if ($cached = bitcoinul_ro_sitemap_get_cached('exchanges')) {
+        bitcoinul_ro_output_xml($cached);
+    }
     bitcoinul_ro_custom_post_types();
     $posts = get_posts(array(
         'post_type' => 'exchange',
@@ -2737,11 +3209,15 @@ function bitcoinul_ro_generate_sitemap_exchanges() {
         $xml .= bitcoinul_ro_build_url_node(get_permalink($p), bitcoinul_ro_iso_utc($p->post_modified_gmt ?: $p->post_date_gmt), 'weekly', '0.7', $img, get_the_title($p));
     }
     $xml .= "</urlset>\n";
+    bitcoinul_ro_sitemap_set_cache('exchanges', $xml);
     bitcoinul_ro_output_xml($xml);
 }
 
 // Generate taxonomies sitemap (exchange_type terms)
 function bitcoinul_ro_generate_sitemap_taxonomies() {
+    if ($cached = bitcoinul_ro_sitemap_get_cached('taxonomies')) {
+        bitcoinul_ro_output_xml($cached);
+    }
     $xml  = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
     $xml .= "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n";
     $taxes = array('exchange_type','category','post_tag');
@@ -2755,6 +3231,7 @@ function bitcoinul_ro_generate_sitemap_taxonomies() {
         }
     }
     $xml .= "</urlset>\n";
+    bitcoinul_ro_sitemap_set_cache('taxonomies', $xml);
     bitcoinul_ro_output_xml($xml);
 }
 
@@ -2806,6 +3283,9 @@ add_filter('robots_txt', 'bitcoinul_ro_add_robots_sitemap', 10, 2);
 
 // Generate posts sitemap (blog articles)
 function bitcoinul_ro_generate_sitemap_posts() {
+    if ($cached = bitcoinul_ro_sitemap_get_cached('posts')) {
+        bitcoinul_ro_output_xml($cached);
+    }
     $posts = get_posts(array(
         'post_type' => 'post',
         'post_status' => 'publish',
@@ -2823,6 +3303,7 @@ function bitcoinul_ro_generate_sitemap_posts() {
         $xml .= bitcoinul_ro_build_url_node(get_permalink($p), bitcoinul_ro_iso_utc($p->post_modified_gmt ?: $p->post_date_gmt), 'weekly', '0.7', $img, get_the_title($p));
     }
     $xml .= "</urlset>\n";
+    bitcoinul_ro_sitemap_set_cache('posts', $xml);
     bitcoinul_ro_output_xml($xml);
 }
 
@@ -2845,3 +3326,29 @@ add_action('init', function() {
     }
     set_transient($k, 1, 12 * HOUR_IN_SECONDS);
 }, 70);
+
+// Flush sitemap cache and ping search engines on content changes
+function bitcoinul_ro_ping_sitemaps() {
+    $sitemap = urlencode(home_url('/sitemap.xml'));
+    $endpoints = array(
+        'https://www.google.com/ping?sitemap=' . $sitemap,
+        'https://www.bing.com/ping?sitemap=' . $sitemap,
+    );
+    foreach ($endpoints as $url) {
+        wp_remote_get($url, array('timeout' => 3, 'blocking' => false));
+    }
+}
+add_action('transition_post_status', function($new_status, $old_status, $post){
+    if ($new_status === 'publish' && $old_status !== 'publish') {
+        bitcoinul_ro_sitemap_flush_cache();
+        bitcoinul_ro_ping_sitemaps();
+    }
+}, 10, 3);
+add_action('save_post', function($post_id){
+    if (wp_is_post_revision($post_id)) return;
+    if (get_post_status($post_id) !== 'publish') return;
+    bitcoinul_ro_sitemap_flush_cache();
+}, 20);
+add_action('edited_terms', 'bitcoinul_ro_sitemap_flush_cache', 10);
+add_action('created_term', 'bitcoinul_ro_sitemap_flush_cache', 10);
+add_action('delete_term', 'bitcoinul_ro_sitemap_flush_cache', 10);

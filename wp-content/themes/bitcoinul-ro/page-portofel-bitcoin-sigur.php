@@ -52,6 +52,19 @@ get_header();
     </div>
   </section>
 
+  <section class="section" aria-label="FAQ Portofele Bitcoin">
+    <div class="exchange">
+      <div class="faq-badge"><span class="emoji">❓</span><span>FAQ</span></div>
+      <h2 style="margin:.5rem 0 0">Întrebări frecvente despre portofele Bitcoin</h2>
+      <?php echo do_shortcode('[faq_list title="Întrebări frecvente despre portofele Bitcoin"]
+      [faq_item question="Am nevoie neapărat de un hardware wallet?" answer="Nu neapărat pentru sume mici, dar pentru stocare pe termen lung și sume mai mari recomandăm hardware wallet (ex. Ledger)."]
+      [faq_item question="Ce se întâmplă dacă pierd device‑ul?" answer="Fondurile rămân sigure dacă ai seed phrase-ul. Poți restaura pe un alt dispozitiv compatibil folosind seed-ul. Păstrează seed-ul offline, în siguranță."]
+      [faq_item question="Este sigur să trimit BTC de pe exchange pe Ledger?" answer="Da, dacă alegi corect rețeaua BTC (on-chain), verifici adresa pe ecranul Ledger și confirmi cu 2FA pe exchange."]
+      [faq_item question="Ce este passphrase-ul adițional?" answer="O parolă suplimentară peste seed-ul standard care creează o ‘contopiere’ diferită a portofelului. Util pentru securitate avansată; folosește-l doar dacă înțelegi riscurile."]
+      [/faq_list]'); ?>
+    </div>
+  </section>
+
   <section class="pbs-grid">
     <div class="card">
       <h3>Tipuri de portofele</h3>

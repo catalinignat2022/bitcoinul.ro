@@ -29,6 +29,20 @@
       if (is_home() || is_front_page()) {
           $meta_description = 'Învață cum să cumperi Bitcoin în România în 2025. Ghiduri, comparații de platforme și sfaturi de securitate — începe aici pe Bitcoinul.ro.';
       }
+      // Descrieri unice pentru pagini/șabloane cheie
+      if (function_exists('is_page_template')) {
+          if (is_page_template('page-exchange-uri.php')) {
+              $meta_description = 'Top exchange-uri Bitcoin 2025 pentru România: comisioane mici, metode de depunere RON, securitate și bonusuri. Comparație rapidă și recomandări.';
+          } elseif (is_page_template('page-ghiduri.php')) {
+              $meta_description = 'Ghiduri Bitcoin în limba română: începători, securitate, investiții (DCA), trading și fiscalitate. Explicații clare pas cu pas.';
+          } elseif (is_page_template('page-cum-cumpar-bitcoin.php')) {
+              $meta_description = 'Cum cumperi Bitcoin în România, pas cu pas: cont, KYC, depunere RON și cumpărare BTC pe spot. Tutorial rapid pentru începători.';
+          } elseif (is_page_template('page-portofel-bitcoin-sigur.php')) {
+              $meta_description = 'Portofele Bitcoin sigure: hardware wallet, seed phrase, 2FA, self‑custody. Învață cum îți protejezi BTC în România în 2025.';
+          } elseif (is_page_template('page-taxe-bitcoin-romania.php')) {
+              $meta_description = 'Taxe Bitcoin în România (2025): ce impozite plătești, cum declari câștigurile și bune practici pentru evidență fiscală.';
+          }
+      }
       // Trim la ~155 caractere
       $md_trim = function($text){
           $text = trim(preg_replace('/\s+/', ' ', $text));
@@ -50,7 +64,7 @@
     <meta name="robots" content="<?php echo esc_attr($robots); ?>">
     
     <!-- Open Graph pentru Social Media -->
-    <meta property="og:title" content="<?php echo is_home() ? get_bloginfo('name') . ' - ' . get_bloginfo('description') : wp_get_document_title(); ?>">
+    <meta property="og:title" content="<?php echo wp_get_document_title(); ?>">
     <meta property="og:description" content="<?php echo esc_attr($meta_description); ?>">
     <meta property="og:type" content="<?php echo is_single() ? 'article' : 'website'; ?>">
     <?php
@@ -87,7 +101,7 @@
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="<?php echo is_home() ? get_bloginfo('name') . ' - ' . get_bloginfo('description') : wp_get_document_title(); ?>">
+    <meta name="twitter:title" content="<?php echo wp_get_document_title(); ?>">
     <meta name="twitter:description" content="<?php echo esc_attr($meta_description); ?>">
     
     <!-- Schema.org pentru SEO -->
@@ -110,7 +124,6 @@
         }
     }
     </script>
-        <?php if (is_home() || is_front_page()): ?>
         <script type="application/ld+json">
         {
             "@context": "https://schema.org",
@@ -123,7 +136,6 @@
             ]
         }
         </script>
-        <?php endif; ?>
                 <?php if (is_archive() || is_category() || is_tag()): ?>
                 <script type="application/ld+json">
                 {
@@ -136,12 +148,47 @@
                 }
                 </script>
                 <?php endif; ?>
+                <?php if (is_single() || (is_page() && !is_front_page())): ?>
+                <?php
+                    $breadcrumbs = array();
+                    $breadcrumbs[] = array('name' => 'Acasă', 'item' => home_url('/'));
+                    if (is_single()) {
+                        $cats = get_the_category();
+                        if (!empty($cats)) {
+                            // ia prima categorie
+                            $cat = $cats[0];
+                            $breadcrumbs[] = array('name' => $cat->name, 'item' => get_category_link($cat));
+                        }
+                        $breadcrumbs[] = array('name' => get_the_title(), 'item' => $canonical);
+                    } else {
+                        // pagini cu părinți
+                        global $post;
+                        $anc = array_reverse(get_post_ancestors($post));
+                        foreach ($anc as $aid) {
+                            $breadcrumbs[] = array('name' => get_the_title($aid), 'item' => get_permalink($aid));
+                        }
+                        $breadcrumbs[] = array('name' => get_the_title(), 'item' => $canonical);
+                    }
+                    $items = array();
+                    foreach ($breadcrumbs as $i => $b) {
+                        $items[] = '{"@type":"ListItem","position":' . ($i+1) . ',"name":' . json_encode($b['name']) . ',"item":' . json_encode($b['item']) . '}';
+                    }
+                ?>
+                <script type="application/ld+json">
+                {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[<?php echo implode(',', $items); ?>]}
+                </script>
+                <?php endif; ?>
     
         <!-- Preconnect pentru optimizarea performanței -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://api.coingecko.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdn.simpleicons.org" crossorigin>
+    <!-- DNS Prefetch pentru domenii afiliate externe -->
+    <link rel="dns-prefetch" href="//accounts.binance.com">
+    <link rel="dns-prefetch" href="//www.bybit.com">
+    <link rel="dns-prefetch" href="//revolut.com">
     <?php $cdn_base = trim(get_theme_mod('bitcoinul_ro_cdn_base', '')); if ($cdn_base): ?>
     <link rel="preconnect" href="<?php echo esc_url($cdn_base); ?>" crossorigin>
     <?php endif; ?>
@@ -201,6 +248,9 @@
         .site-title .tld { color: #f9a34d; }
         @media (min-width: 992px) { .site-title { font-size: 1.25rem; } }
         .updated-at{display:inline-block;margin:.25rem 0 .5rem;color:#6b7280;font-size:.9rem}
+        /* Badge mic pentru secțiunile FAQ */
+        .faq-badge{display:inline-flex;align-items:center;gap:.5rem;background:#111827;color:#fff;border-radius:999px;padding:.35rem .7rem;font-weight:700;font-size:.8rem}
+        .faq-badge .emoji{font-size:1rem}
     </style>
 </head>
 
@@ -212,6 +262,36 @@
 window.trackEvent = window.trackEvent || function(){ try{ if(window.gtag){ gtag('event', arguments[0]||'event', {event_category: arguments[1]||'', event_label: arguments[2]||'', value: arguments[3]||0}); } }catch(e){} };
 window.trackAffiliateClick = window.trackAffiliateClick || function(exchangeName, linkType){ try{ if(window.gtag){ gtag('event','affiliate_click',{event_category:'affiliate_marketing',event_label:(exchangeName||'')+'_'+(linkType||'')}); } }catch(e){} };
 window.trackGuideEngagement = window.trackGuideEngagement || function(guideName, action){ try{ if(window.gtag){ gtag('event','guide_interaction',{event_category:'content_engagement',event_label:(guideName||'')+'_'+(action||'')}); } }catch(e){} };
+// Ensure security attributes on external links opened in new tabs
+document.addEventListener('DOMContentLoaded', function(){
+    try {
+        document.querySelectorAll('a[target="_blank"]').forEach(function(a){
+            var rel = (a.getAttribute('rel')||'').toLowerCase().split(/\s+/).filter(Boolean);
+            if (rel.indexOf('noopener') === -1) rel.push('noopener');
+            if (rel.indexOf('noreferrer') === -1) rel.push('noreferrer');
+            a.setAttribute('rel', rel.join(' '));
+        });
+        // Enforce sponsored + nofollow on known affiliate domains
+        var affiliateDomains = [
+            'accounts.binance.com',
+            'www.bybit.com',
+            'revolut.com'
+        ];
+        document.querySelectorAll('a[href]').forEach(function(a){
+            try{
+                var url = new URL(a.href, window.location.origin);
+                if (affiliateDomains.indexOf(url.hostname) !== -1 || /ref=|aff/i.test(url.search) ) {
+                    var rel = (a.getAttribute('rel')||'').toLowerCase().split(/\s+/).filter(Boolean);
+                    if (rel.indexOf('nofollow') === -1) rel.push('nofollow');
+                    if (rel.indexOf('sponsored') === -1) rel.push('sponsored');
+                    if (rel.indexOf('noopener') === -1) rel.push('noopener');
+                    if (rel.indexOf('noreferrer') === -1) rel.push('noreferrer');
+                    a.setAttribute('rel', rel.join(' '));
+                }
+            }catch(e){}
+        });
+    } catch(e){}
+});
 </script>
 
 <div id="page" class="site">
@@ -242,7 +322,9 @@ window.trackGuideEngagement = window.trackGuideEngagement || function(guideName,
                             echo '<li><a href="' . esc_url(home_url('/exchange-uri/')) . '">Exchange-uri</a></li>';
                             echo '<li><a href="' . esc_url(home_url('/ghiduri/')) . '">Ghiduri</a></li>';
                             echo '<li><a href="' . esc_url(home_url('/stiri/')) . '">Știri</a></li>';
-                            echo '<li><a href="#exchange-uri-bitcoin" class="cta-button" onclick="trackEvent(\'cta_click\', \'navigation\', \'header_start_investing\'); return true;">Începe Investiția</a></li>';
+                            echo '<li><a href="' . esc_url(home_url('/despre-noi/')) . '">Despre</a></li>';
+                            echo '<li><a href="' . esc_url(home_url('/contact/')) . '">Contact</a></li>';
+                            // CTA mutat din meniu pentru a păstra navigația curată în header
                             echo '</ul>';
                         }
                     ));

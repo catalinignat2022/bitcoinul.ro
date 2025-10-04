@@ -98,6 +98,17 @@ get_header();
         <li><a class="ref" href="https://www.revolut.com/help" target="_blank" rel="noopener">Export istorice – Revolut</a></li>
       </ul>
     </div>
+
+    <div class="section" aria-label="FAQ Taxe Bitcoin România">
+      <div class="faq-badge"><span class="emoji">❓</span><span>FAQ</span></div>
+      <h2 style="margin:.5rem 0 0">Întrebări frecvente (informativ)</h2>
+      <?php echo do_shortcode('[faq_list title="Taxe Bitcoin în România – întrebări frecvente (informativ)"]
+      [faq_item q="Trebuie să declar câștigurile din crypto?" a="Da, în general câștigurile se declară prin Declarația Unică. Consultă ghidurile ANAF și un specialist pentru situația ta."]
+      [faq_item q="Cum calculez profitul?" a="De regulă: preț vânzare − cost achiziție − comisioane. O metodă uzuală de alocare este FIFO."]
+      [faq_item q="Există contribuții pe lângă impozit?" a="În anumite condiții, pot fi datorate contribuții. Verifică pragurile și regulile din Codul Fiscal în vigoare."]
+      [faq_item q="Acest ghid este consultanță fiscală?" a="Nu. Materialul are caracter informativ. Pentru decizii fiscale, cere întotdeauna opinia unui specialist autorizat."]
+      [/faq_list]'); ?>
+    </div>
   </div>
 </div>
 <?php get_footer(); ?>

@@ -316,6 +316,9 @@ get_header(); ?>
                             <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--success-green); font-size: 0.9rem;">✓ Copy trading disponibil</div>
                         </div>
                     </div>
+                    
+                
+
                     <div class="action-container" style="text-align: center;">
                         <a href="https://gate.io/signup/BITCOIN_RO" target="_blank" rel="sponsored nofollow" 
                            style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 1rem 2rem; border-radius: 30px; text-decoration: none; font-weight: 700; font-size: 1rem; text-transform: uppercase; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);"
@@ -674,6 +677,16 @@ get_header(); ?>
         }
     });
     </script>
+
+    <!-- FAQ Exchange-uri -->
+    <section class="container" style="margin:2rem auto 3rem;">
+        <div class="faq-badge"><span class="emoji">❓</span><span>FAQ</span></div>
+        <?php echo do_shortcode('[faq_list title="Întrebări despre exchange-uri Bitcoin în România"]
+        [faq_item q="Care este exchange-ul cu cele mai mici comisioane?" a="De regulă Binance și Bybit oferă comisioane spot în jur de 0.1%. Verifică mereu tarifele actuale în contul tău."]
+        [faq_item q="Pot cumpăra Bitcoin cu cardul în RON?" a="Da, multe platforme acceptă carduri românești. Alternativ, poți depune prin transfer bancar (SEPA) și converti în USDT/BTC."]
+        [faq_item q="Este necesar KYC?" a="Da, pentru platformele reglementate KYC este obligatoriu. Acesta ajută la securitate și limite mai mari de tranzacționare."]
+        [/faq_list]'); ?>
+    </section>
 
     <!-- Ghid Rapid -->
     <section class="quick-guide">

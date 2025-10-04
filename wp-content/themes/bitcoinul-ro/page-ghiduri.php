@@ -148,6 +148,17 @@ get_header(); ?>
         </div>
     </section>
 
+    <section>
+        <div class="container" style="margin:1rem auto 2.5rem;">
+            <div class="faq-badge"><span class="emoji">❓</span><span>FAQ</span></div>
+            <?php echo do_shortcode('[faq_list title="Întrebări despre ghidurile Bitcoin"]
+            [faq_item q="Pentru cine sunt ghidurile?" a="Pentru începători și intermediari care vor să înțeleagă bazele, securitatea și strategiile de investiții."]
+            [faq_item q="Cât de des actualizați conținutul?" a="Periodic, pe măsură ce apar schimbări importante în ecosistem (reglementări, produse, taxe)."]
+            [faq_item q="Oferiți recomandări financiare?" a="Nu. Informațiile sunt educaționale. Pentru decizii de investiții, consultă un specialist autorizat."]
+            [/faq_list]'); ?>
+        </div>
+    </section>
+
     <script>
     function filterGuides(cat) {
         const buttons = document.querySelectorAll('.guide-filters .filter-btn');

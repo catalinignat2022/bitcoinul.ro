@@ -150,6 +150,20 @@ get_header();
       </details>
     </div>
   </section>
+
+  <section class="exchange-tutorial" aria-label="FAQ – Schema pentru rich results">
+    <div class="exchange">
+      <div class="faq-badge"><span class="emoji">❓</span><span>FAQ</span></div>
+      <h2 style="margin:.5rem 0 0">FAQ – răspunsuri rapide</h2>
+      <?php echo do_shortcode('[faq_list title="Cum cumpăr Bitcoin – întrebări frecvente"]
+      [faq_item question="Care sunt comisioanele când cumpăr BTC?" answer="Pe exchange-urile mari comisioanele spot sunt ~0.1% (taker/maker). În plus, unele metode (card) au fee suplimentar."]
+      [faq_item question="Pot cumpăra sume mici?" answer="Da, poți începe și cu sume foarte mici. Verifică totuși limitele minime ale platformei."]
+      [faq_item question="Am nevoie de portofel hardware?" answer="Nu este obligatoriu la început, dar este recomandat pentru sume mai mari sau păstrare pe termen lung (self‑custody)."]
+      [faq_item question="Strategia DCA e potrivită pentru începători?" answer="Da, DCA reduce impactul volatilității cumpărând periodic o sumă fixă, indiferent de preț."]
+      [faq_item question="Trebuie să declar taxele?" answer="Câștigurile din cripto sunt impozabile în România. Informează‑te și păstrează un istoric al tranzacțiilor."]
+      [/faq_list]'); ?>
+    </div>
+  </section>
 </div>
 
 <script>

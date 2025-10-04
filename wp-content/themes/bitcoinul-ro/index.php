@@ -332,8 +332,140 @@ get_header(); ?>
 
 </main>
 
+<!-- FAQ Homepage (expandabil, optimizat SEO) -->
+<section id="faq" class="home-faq-section" aria-label="Întrebări frecvente despre Bitcoin în România">
+    <div class="container">
+        <div class="faq-wrap">
+            <div class="faq-badge" aria-hidden="true">FAQ</div>
+            <h2 class="section-title">Întrebări frecvente despre Bitcoin în România</h2>
+            <p class="section-subtitle">Răspunsuri pe scurt pentru începători: comisioane, legalitate, siguranță și taxe.</p>
+
+            <div class="faq-accordion" itemscope itemtype="https://schema.org/FAQPage">
+                <details class="faq-item">
+                    <summary class="faq-q" itemprop="mainEntity" itemscope itemtype="https://schema.org/Question">
+                        <span itemprop="name">Cum cumpăr rapid Bitcoin în România?</span>
+                    </summary>
+                    <div class="faq-a" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                        <p itemprop="text">
+                            Deschizi cont la un exchange de încredere, parcurgi verificarea KYC și depui RON prin card sau transfer bancar. Vezi lista noastră de <a href="/exchange-uri/">exchange-uri recomandate</a>.
+                        </p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary class="faq-q" itemprop="mainEntity" itemscope itemtype="https://schema.org/Question">
+                        <span itemprop="name">Ce comisioane plătesc când cumpăr BTC?</span>
+                    </summary>
+                    <div class="faq-a" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                        <p itemprop="text">
+                            Pe platformele mari, comisioanele spot sunt de obicei ~0.1% (taker/maker). Pot exista costuri suplimentare la depuneri cu cardul sau la retrageri. Verifică mereu tarifele actuale în contul tău.
+                        </p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary class="faq-q" itemprop="mainEntity" itemscope itemtype="https://schema.org/Question">
+                        <span itemprop="name">Este legal să dețin și să tranzacționez Bitcoin?</span>
+                    </summary>
+                    <div class="faq-a" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                        <p itemprop="text">
+                            Da. Deținerea și tranzacționarea de Bitcoin sunt permise în România. Câștigurile pot fi impozabile conform legislației în vigoare.
+                        </p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary class="faq-q" itemprop="mainEntity" itemscope itemtype="https://schema.org/Question">
+                        <span itemprop="name">Cum păstrez Bitcoin-ul în siguranță?</span>
+                    </summary>
+                    <div class="faq-a" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                        <p itemprop="text">
+                            Activează 2FA pe exchange și, pentru sume mai mari, folosește self‑custody cu portofel hardware. Învață bazele în <a href="/securitate-portofele-si-custodie/">ghidul despre portofele</a>.
+                        </p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary class="faq-q" itemprop="mainEntity" itemscope itemtype="https://schema.org/Question">
+                        <span itemprop="name">Trebuie să fac KYC?</span>
+                    </summary>
+                    <div class="faq-a" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                        <p itemprop="text">
+                            Da. Majoritatea exchange‑urilor reglementate solicită KYC (verificare identitate) pentru depuneri/retrageri și limite mai mari.
+                        </p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary class="faq-q" itemprop="mainEntity" itemscope itemtype="https://schema.org/Question">
+                        <span itemprop="name">Cum declar taxele pentru câștigurile din Bitcoin?</span>
+                    </summary>
+                    <div class="faq-a" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                        <p itemprop="text">
+                            Câștigurile pot fi impozabile și se declară conform reglementărilor fiscale. Vezi <a href="/taxe-bitcoin-romania/">ghidul despre taxe</a> și consultă un specialist dacă ai nelămuriri. Aceasta nu este consultanță fiscală.
+                        </p>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+    <style>
+    .home-faq-section{padding:2.5rem 0;background:#fff}
+    .home-faq-section .section-title{margin:0.25rem 0 .25rem}
+    .home-faq-section .section-subtitle{margin:0 0 1rem;color:#6b7280}
+    .home-faq-section .faq-wrap{position:relative}
+    .faq-accordion{display:grid;gap:.5rem}
+    .faq-item{background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden}
+    .faq-item summary{cursor:pointer;list-style:none;padding:.9rem 1rem;font-weight:700;color:#111827}
+    .faq-item[open] summary{background:#fff}
+    .faq-item summary::-webkit-details-marker{display:none}
+    .faq-item .faq-a{padding:0 1rem 1rem 1rem;color:#111827}
+    .faq-item .faq-a p{margin:.5rem 0 0;line-height:1.7}
+    </style>
+
+    <!-- JSON-LD FAQPage (în oglindă cu întrebările de mai sus) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Cum cumpăr rapid Bitcoin în România?",
+          "acceptedAnswer": {"@type": "Answer", "text": "Deschizi cont la un exchange de încredere, parcurgi verificarea KYC și depui RON prin card sau transfer bancar. Vezi lista noastră de exchange-uri recomandate."}
+        },
+        {
+          "@type": "Question",
+          "name": "Ce comisioane plătesc când cumpăr BTC?",
+          "acceptedAnswer": {"@type": "Answer", "text": "Pe platformele mari, comisioanele spot sunt de obicei ~0.1% (taker/maker). Pot exista costuri suplimentare la depuneri cu cardul sau la retrageri. Verifică mereu tarifele actuale în contul tău."}
+        },
+        {
+          "@type": "Question",
+          "name": "Este legal să dețin și să tranzacționez Bitcoin?",
+          "acceptedAnswer": {"@type": "Answer", "text": "Da. Deținerea și tranzacționarea de Bitcoin sunt permise în România. Câștigurile pot fi impozabile conform legislației în vigoare."}
+        },
+        {
+          "@type": "Question",
+          "name": "Cum păstrez Bitcoin-ul în siguranță?",
+          "acceptedAnswer": {"@type": "Answer", "text": "Activează 2FA pe exchange și, pentru sume mai mari, folosește self‑custody cu portofel hardware. Învață bazele în ghidul despre portofele."}
+        },
+        {
+          "@type": "Question",
+          "name": "Trebuie să fac KYC?",
+          "acceptedAnswer": {"@type": "Answer", "text": "Da. Majoritatea exchange‑urilor reglementate solicită KYC (verificare identitate) pentru depuneri/retrageri și limite mai mari."}
+        },
+        {
+          "@type": "Question",
+          "name": "Cum declar taxele pentru câștigurile din Bitcoin?",
+          "acceptedAnswer": {"@type": "Answer", "text": "Câștigurile pot fi impozabile și se declară conform reglementărilor fiscale. Consultă ghidul nostru despre taxe și un specialist când ai nelămuriri. Aceasta nu este consultanță fiscală."}
+        }
+      ]
+    }
+    </script>
+</section>
+
 <!-- Newsletter signup (placeholder; connect to service later) at bottom -->
-<section class="newsletter-section">
+<section id="newsletter" class="newsletter-section">
     <div class="container">
         <div class="newsletter-card">
             <div class="nl-left">
